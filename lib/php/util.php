@@ -36,6 +36,8 @@ error_log(__METHOD__);
         return $_SESSION[$k] =
             (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
                 ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+//            (isset($_SESSION[$k]) && ($v !== $_SESSION[$k]))
+//                ? $v : $_SESSION[$k] ?? $v;
     }
 
     public static function cfg($g)

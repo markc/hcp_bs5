@@ -5,7 +5,7 @@
 
 class w_News extends Crud
 {
-    protected $b  = '
+    protected $b2  = '
     <h2>News</h2>
     <p>
 This is a simple note system, you can

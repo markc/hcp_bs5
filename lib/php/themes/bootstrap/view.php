@@ -10,49 +10,65 @@ class Themes_Bootstrap_View extends View
 error_log(__METHOD__);
 
         return '
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="//fonts.googleapis.com/css?family=Roboto:400,100,300,100italic" rel="stylesheet" type="text/css">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,100,100italic" rel="stylesheet" type="text/css">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <style>
-* { transition: 0.2s linear; }
-body {
-  background: url("/simple-php7-examples/lib/img/20130317_Albert_Park_800x144.jpg") fixed top no-repeat;
-  background-size: 100%;
-  font-family: "Roboto", sans-serif; font-weight: 300;
+html {
+  background: url(https://unsplash.it/1366/720?image=990) no-repeat center center fixed;
+  background-size: cover;
+  font-size: 16px;
 }
-.demo-content {
-  background-color: #FFF;
+body {
+  background-color: transparent;
+  font-family: "Roboto", sans-serif; font-weight: 300;
+  font-size: 1.1rem;
+}
+.content {
+  background-color: #FFFFFF;
   margin-bottom: 4em;
-  padding-bottom: 1em;
+  margin-top: 50px;
+  opacity: 0.9;
+  padding: 0.5em 1em;
+}
+.content > h2 {
+  margin: 0.25em 0;
 }
 footer {
-  background-color: #424242;
+  background-color: #3F3E3D;
   bottom: 0px;
   color: #9E9E9E;
-  padding: 2em 1em 3em;
+  height: 50px;
+  padding: 0.5em;
   position: fixed;
+  text-align: center;
   width: 100%;
-  z-index: -99;
+  z-index: 99;
 }
 td {
-    white-space: nowrap;
+  white-space: nowrap;
+}
+.navbar {
+  background-color: #3F3E3D;
+  border: none;
 }
 @media(min-width:767px){
   .alert { margin-top: 1em; }
-  .demo-content {
-    border-radius: 0.2em;
+  .content {
+    border-radius: 0.25em;
     box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12), 0px 2px 4px -1px rgba(0, 0, 0, 0.2);
+    margin-top: 70px;
+    padding: 1em 2em;
   }
 }
 </style>';
     }
 
-    public function msg() : string
+    public function log() : string
     {
 error_log(__METHOD__);
 
-        list($l, $m) = $this->g->in['m']
-            ? explode(':', $this->g->in['m']) : util::msg();
+        list($l, $m) = util::log();
         return $m ? '
       <div class="alert alert-'.$l.'">'.$m.'
       </div>' : '';
@@ -63,7 +79,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return '
-    <header class="navbar navbar-inverse navbar-static-top">
+    <header class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -72,7 +88,7 @@ error_log(__METHOD__);
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">'.$this->g->out['head'].'</a>
+          <a class="navbar-brand" href="?o=home"><strong>'.$this->g->out['head'].'</strong></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">'.$this->g->out['nav1'].'
@@ -94,10 +110,12 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $p = '?p='.$_SESSION['p'];
-        $t = '?t='.$_SESSION['t'];
-        return join('', array_map(function ($n) use ($p, $t) {
-            $c = $p === $n[1] || $t === $n[1] ? ' class="active"' : '';
+//        $p = '?p='.$_SESSION['p'];
+//        $t = '?t='.$_SESSION['t'];
+        $o = '?o='.$this->g->in['o'];
+        $t = '?t='.$this->g->in['t'];
+        return join('', array_map(function ($n) use ($o, $t) {
+            $c = $o === $n[1] || $t === $n[1] ? ' class="active"' : '';
             return '
             <li'.$c.'><a href="'.$n[1].'">'.$n[0].'</a></li>';
         }, $a));
@@ -117,10 +135,10 @@ error_log(__METHOD__);
         return '
     <main class="container">
       <div class="row">
-        <div class="col-md-1"></div>
-        <div class="demo-content col-md-10">'.$this->g->out['msg'].$this->g->out['main'].'
+        <div class="col-md-1 col-lg-2"></div>
+        <div class="content col-md-10 col-lg-8">'.$this->g->out['log'].$this->g->out['main'].'
         </div>
-        <div class="col-md-1"></div>
+        <div class="col-md-1 col-lg-2"></div>
       </div>
     </main>';
     }
@@ -130,8 +148,8 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return '
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>';
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>';
     }
 
     public function veto_a($href, $label, $class, $extra)
@@ -149,7 +167,7 @@ error_log(__METHOD__);
         $class = $class ? ' btn-'.$class : '';
         return ['class' => 'btn btn-primary'.$class];
     }
-
+/*
     public function veto_email_contact_form()
     {
 error_log(__METHOD__);
@@ -175,7 +193,7 @@ error_log(__METHOD__);
         </div>
       </form>';
     }
-
+*/
     // Notes
 
     public function veto_notes_item($ary) : string
@@ -363,7 +381,7 @@ error_log(__METHOD__);
     }
 
     // Auth
-
+/*
 //    public function auth_signin(string $uid = '') : string
     public function auth_signin(array $ary) : string
     {
@@ -410,7 +428,7 @@ error_log(__METHOD__);
           </form>
         </div>';
     }
-
+*/
     public function auth_forgotpw(string $uid = '') : string
     {
 error_log(__METHOD__);

@@ -9,7 +9,7 @@ class Themes_Simple_View extends View
     {
         return '
     <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,300italic,100,100italic" rel="stylesheet" type="text/css">
-    <link href="../lib/css/simple.css" media="all" rel="stylesheet">';
+    <link href="lib/css/simple.css" media="all" rel="stylesheet">';
     }
 
     public function nav1(array $a = []) : string

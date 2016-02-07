@@ -20,10 +20,13 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+error_log("name=$name");
 //error_log("name=$name,args=".var_export($args,true));
 
         $t1 = INC.'themes' . DS . $_SESSION['t'] . DS . str_replace('_', DS, $name).'.php';
+error_log("t1=$t1");
         $t2 = INC.'themes' . DS . 'none' . DS . str_replace('_', DS, $name).'.php';
+error_log("t2=$t2");
 
         if (isset($args[0]) and is_array($args[0]))
             extract($args[0]);
@@ -91,7 +94,7 @@ error_log(__METHOD__);
 
         return '
     <footer>
-      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+      <em><small>' . $this->g->out['foot'] . '</small></em>
     </footer>';
     }
 

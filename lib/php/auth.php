@@ -37,6 +37,13 @@ error_log(__METHOD__);
         return $this->b;
     }
 
+    public function read() : string
+    {
+error_log(__METHOD__);
+
+        return $this->signin();
+    }
+
     public function signin() : string
     {
 error_log(__METHOD__);

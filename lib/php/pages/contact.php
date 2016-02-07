@@ -3,8 +3,7 @@
 <?php
 // contact.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-return '
-      <h2>Email Contact Form</h2>' . $t->contact() . '
+return $t->contact() . '
       <script>
 function mailform(form) {
   location.href = "mailto:' . $g->cfg['email'] . '"

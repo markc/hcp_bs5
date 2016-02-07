@@ -22,6 +22,8 @@ error_log(__METHOD__);
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->in['l'] = util::ses('l', $g->in['l']);
+        $g->in['o'] = util::ses('o', $g->in['o']);
+error_log("o+".$g->in['o']."=".$g->in['o']);
         $g->in['t'] = util::ses('t', $g->in['t']);
         $theme = 'themes_' . $g->in['t'] . '_view';
         $t = $this->t = class_exists($theme) ? new $theme($g) : new View($g);

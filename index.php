@@ -33,7 +33,7 @@ echo new Controller(new class
     $out = [
         'top'       => '',
         'meta'      => '',
-        'doc'       => 'SPE::09',
+        'doc'       => 'SysAdm',
         'css'       => '',
         'log'       => '',
         'nav1'      => '',
@@ -41,7 +41,7 @@ echo new Controller(new class
         'nav3'      => '',
         'head'      => 'SysAdm',
         'main'      => 'Missing home page',
-        'foot'      => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
+        'foot'      => 'Copyright (C) 2015-2016 Mark Constable (AGPL-3.0)',
         'end'       => '',
     ],
     $db = [
