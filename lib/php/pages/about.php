@@ -3,6 +3,7 @@
 <?php
 // about.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+dbg($t);
 return $t->about() . '
       <script>
 function ajax() {

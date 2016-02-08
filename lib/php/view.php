@@ -5,13 +5,11 @@
 
 class View extends Widgets
 {
-    protected $g = null;
+    public $g = null;
 
     public function __construct($g)
     {
 error_log(__METHOD__);
-
-//dbg($g);
 
         $this->g = $g;
     }
@@ -20,13 +18,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-error_log("name=$name");
-//error_log("name=$name,args=".var_export($args,true));
-
         $t1 = INC.'themes' . DS . $_SESSION['t'] . DS . str_replace('_', DS, $name).'.php';
-error_log("t1=$t1");
         $t2 = INC.'themes' . DS . 'none' . DS . str_replace('_', DS, $name).'.php';
-error_log("t2=$t2");
 
         if (isset($args[0]) and is_array($args[0]))
             extract($args[0]);
@@ -65,7 +58,7 @@ error_log(__METHOD__);
                 return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
             }
-        }, array_merge(util::which_usr($this->g->nav1), $this->g->nav2))) . '
+        }, array_merge(util::nav($this->g->nav1), $this->g->nav2))) . '
       </nav>';
     }
 

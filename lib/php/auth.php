@@ -19,15 +19,15 @@ class Auth
         'passwd2'       => '',
     ];
 
-    public function __construct(View $t, $g)
+    public function __construct(View $t)
     {
 error_log(__METHOD__);
 
         $this->t  = $t;
-        $this->g  = $g;
+        $this->g  = $t->g;
         db::$tbl  = self::TABLE;
         $this->in = util::esc($this->in);
-        $this->b  = $this->{$g->in['m']}();
+        $this->b  = $this->{$t->g->in['m']}();
     }
 
     public function __toString() : string

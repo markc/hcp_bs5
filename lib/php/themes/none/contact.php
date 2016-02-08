@@ -4,7 +4,7 @@
 // contact.php 20151030 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 return '
-      <h2>Email Contact Form</h2>
+      <h2>Contact</h2>
       <form action="" method="post" onsubmit="return mailform(this);">
         <p>
           <label for="subject">Your Subject</label>

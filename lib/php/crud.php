@@ -15,17 +15,17 @@ class Crud
     protected $create   = 'Create';
     protected $acl      = 1;
 
-    public function __construct(View $t, $g)
+    public function __construct(View $t)
     {
 error_log(__METHOD__);
 
         util::acl($this->acl);
         $this->t  = $t;
-        $this->g  = $g;
-        $this->o  = $g->in['o'];
+        $this->g  = $t->g;
+        $this->o  = $t->g->in['o'];
         $this->in = util::esc($this->in);
         db::$tbl  = $this->o;
-        $this->b .= $this->{$g->in['m']}();
+        $this->b .= $this->{$t->g->in['m']}();
     }
 
     public function __toString() : string

@@ -109,7 +109,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
+        $a = isset($a[0]) ? $a : util::nav($this->g->nav1);
 //        $p = '?p='.$_SESSION['p'];
 //        $t = '?t='.$_SESSION['t'];
         $o = '?o='.$this->g->in['o'];

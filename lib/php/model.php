@@ -5,20 +5,21 @@
 
 class Model
 {
-    public function __construct(View $t, $g)
+    public function __construct(View $t)
     {
 error_log(__METHOD__);
 
+        $g = $t->g;
         $o = INC.'pages/'.str_replace('_', DS, $g->in['o']).'.php';
 
         if (method_exists($this, $g->in['o'])) {
-            $g->out['main'] = $this->{$g->in['o']}($t, $g);
+            $g->out['main'] = $this->{$g->in['o']}($t);
         } elseif (file_exists($o)) {
             $g->out['main'] = include $o;
         } elseif (class_exists($g->in['o'])) {
             db::$dbh = $g->dbh = new db($g->db);
             util::remember($g->db);
-            $g->out['main'] = new $g->in['o']($t, $g);
+            $g->out['main'] = new $g->in['o']($t);
         }
     }
 

@@ -49,7 +49,7 @@ error_log(__METHOD__);
                $g->$k = array_merge($g->$k, $v);
     }
 
-    public static function which_usr(array $nav = []) : array
+    public static function nav(array $nav = []) : array
     {
 error_log(__METHOD__);
 
@@ -67,6 +67,7 @@ error_log(__METHOD__);
       : $url;
     }
 
+    // needs work
     public static function acl(int $acl = 1, string $url = '/')
     {
 error_log(__METHOD__);
@@ -78,6 +79,20 @@ error_log(__METHOD__);
             header("Location: ".$url);
             exit();
         } else return true;
+    }
+
+    public static function is_usr() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['usr']);
+    }
+
+    public static function is_adm() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['adm']);
     }
 
     public static function remember($db)

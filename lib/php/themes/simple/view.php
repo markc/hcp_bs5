@@ -16,7 +16,7 @@ class Themes_Simple_View extends View
     {
 error_log(__METHOD__);
 
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
+        $a = isset($a[0]) ? $a : util::nav($this->g->nav1);
         $o = '?o='.$this->g->in['o'];
         $t = '?t='.$this->g->in['t'];
         return '

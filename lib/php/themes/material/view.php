@@ -112,10 +112,10 @@ table {
     <div class="mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">';
     }
 
-    public function msg() : string
+    public function log() : string
     {
-        list($l, $m) = $this->g->in['m']
-            ? explode(':', $this->g->in['m']) : util::msg();
+        list($l, $m) = $this->g->in['l']
+            ? explode(':', $this->g->in['l']) : util::log();
         return $m ? '
             <p class="demo-alert' . $this->mdl_color($l) . '">' . $m . '
             </p>' : '';
@@ -158,7 +158,6 @@ table {
         $o = '?o='.$this->g->in['o'];
         return join('', array_map(function ($n) use ($o) {
             if (is_array($n[1])) {
-                error_log(var_export($n[1],true));
                 return '
         <ul>
           <li class="drop">'.$n[0].'
@@ -174,7 +173,7 @@ table {
             return '
             <a class="mdl-navigation__link'.($o===$n[1]?' is-active':'').'" href="'.$n[1].'">'.$n[0].'</a>';
             }
-        }, util::which_usr($this->g->nav1)));
+        }, util::nav($this->g->nav1)));
     }
 
     public function nav2() : string
