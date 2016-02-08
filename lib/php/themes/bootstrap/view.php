@@ -11,7 +11,7 @@ error_log(__METHOD__);
 
         return '
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,100,100italic" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,300italic,100,100italic" rel="stylesheet" type="text/css">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <style>
 html {
@@ -61,7 +61,7 @@ td {
     padding: 1em 2em;
   }
 }
-</style>';
+    </style>';
     }
 
     public function log() : string
@@ -78,6 +78,12 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        $a = util::nav($this->g->nav1);
+        $n = array_shift($a);
+        $l = $n[0] ? $n[0] : $this->g->out['head'];
+        $u = $n[1] ? $n[1] : '#';
+        $i = $n[2] ? '<i class="' . $n[2] . '"></i> ' : '';
+
         return '
     <header class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -88,44 +94,62 @@ error_log(__METHOD__);
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="?o=home"><strong>'.$this->g->out['head'].'</strong></a>
+          <a class="navbar-brand" href="' . $u . '">' . $i . '<strong>' . $l .'</strong></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">'.$this->g->out['nav1'].'
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Themes <span class="caret"></span></a>
-              <ul class="dropdown-menu">'.$this->g->out['nav2'].'
-              </ul>
-            </li>
-          </ul>
+          </ul>'.$this->g->out['nav2'].'
         </div><!--/.nav-collapse -->
       </div>
     </header>';
     }
 
-    public function nav1(array $a = []) : string
+    public function nav(array $a = []) : string
     {
 error_log(__METHOD__);
 
-        $a = isset($a[0]) ? $a : util::nav($this->g->nav1);
-//        $p = '?p='.$_SESSION['p'];
-//        $t = '?t='.$_SESSION['t'];
         $o = '?o='.$this->g->in['o'];
         $t = '?t='.$this->g->in['t'];
         return join('', array_map(function ($n) use ($o, $t) {
+error_log(var_export($n, true));
+            if (is_array($n[1])) return $this->nav_dropdown($n[1], $n[0], $n[2]);
             $c = $o === $n[1] || $t === $n[1] ? ' class="active"' : '';
+            $i = $n[2] ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-            <li'.$c.'><a href="'.$n[1].'">'.$n[0].'</a></li>';
+            <li' . $c . '><a href="'.$n[1].'">' . $i . $n[0] . '</a></li>';
         }, $a));
+    }
+
+    public function nav_dropdown(array $a = [], $label = '', $icon = '', $rhs = '') : string
+    {
+error_log(__METHOD__);
+
+        $icon = $icon ? '<i class="' . $icon . '"></i> ' : '';
+        return '
+          <ul class="nav navbar-nav ' . $rhs . '">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">' . $icon . $label . ' <span class="caret"></span></a>
+              <ul class="dropdown-menu">' . $this->nav($a) . '
+              </ul>
+            </li>
+          </ul>';
+    }
+
+    public function nav1() : string
+    {
+error_log(__METHOD__);
+
+        $a = util::nav($this->g->nav1);
+        array_shift($a);
+        return $this->nav($a);
     }
 
     public function nav2() : string
     {
 error_log(__METHOD__);
 
-        return $this->nav1($this->g->nav2);
+        $n = $this->g->nav2[0];
+        return $this->nav_dropdown($n[1], $n[0], $n[2], 'navbar-right');
     }
 
     public function main() : string
@@ -330,6 +354,13 @@ error_log(__METHOD__);
         </div>
         <div class="col-md-4"></div>
       </div>';
+    }
+
+    public function veto_title($label, $icon = '') : array
+    {
+error_log(__METHOD__);
+
+        return ['icon' => util::nav($this->g->nav1)[0][2]];
     }
 
     public function veto_users_form(array $ary) : string

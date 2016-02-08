@@ -5,6 +5,8 @@
 
 class w_News extends Crud
 {
+    protected $b = '
+      <h2>News</h2>';
     protected $in = [
         'title'     => '',
         'author'    => '',

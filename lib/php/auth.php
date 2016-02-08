@@ -175,7 +175,7 @@ Please click on the link below and continue with reseting your password.
 
 If you did not request this action then ignore this email message.
 
-https://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?p=auth&a=newpw&otp='.$newpass,
+https://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].'?o=auth&m=newpw&otp='.$newpass,
             $headers
         );
     }

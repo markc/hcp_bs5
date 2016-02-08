@@ -40,35 +40,53 @@ error_log(__METHOD__);
       <p class="alert ' . $l . '">' . $m . '</p>' : '';
     }
 
-    public function nav1() : string
+    public function nav(array $a) : string
     {
 error_log(__METHOD__);
 
         $o = '?o='.$this->g->in['o'];
-        return '
-      <nav>' . join('', array_map(function ($n) use ($o) {
-            if (is_array($n[1])) {
-                return join('', array_map(function ($x) use ($o) {
-                    $c = $o === $x[1] ? ' class="active"' : '';
-                    return '
-        <a'.$c.' href="'.$x[1].'">'.$x[0].'</a>';
-                }, $n[1]));
-            } else {
-                $c = $o === $n[1] ? ' class="active"' : '';
-                return '
-        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-            }
-        }, array_merge(util::nav($this->g->nav1), $this->g->nav2))) . '
-      </nav>';
+        $t = '?t='.$this->g->in['t'];
+        return join('', array_map(function ($n) use ($o, $t) {
+error_log(var_export($n, true));
+            $l = ($o === $n[1] || $t === $n[1]) ? '<b>' . $n[0] . '</b>' : $n[0];
+            return '
+        <a href="' . $n[1] . '">' . $l . '</a>';
+        }, $a));
+    }
+
+    public function nav1() : string
+    {
+error_log(__METHOD__);
+
+        $a = util::nav($this->g->nav1);
+        array_shift($a);
+error_log(var_export($a, true));
+        $b = '';
+        foreach($a as $n)
+//            $b .= is_array($n[1]) ? ' is_array ' : ' NOT array ';
+            $b .= is_array($n[1]) ? $this->nav($n[1]) : $this->nav([$n]);
+
+        return $b;
+    }
+
+    public function nav2() : string
+    {
+error_log(__METHOD__);
+
+        return $this->nav($this->g->nav2[0][1]);
     }
 
     public function head() : string
     {
 error_log(__METHOD__);
 
+        $n = util::nav($this->g->nav1)[0];
         return '
     <header>
-      <h1>' . $this->g->out['head'] . '</h1>' . $this->g->out['nav1'] . '
+      <h1>
+        <a href="' . $n[1] . '">' . $n[0] . '</a>
+      </h1>
+      <nav>' . $this->g->out['nav1'] . $this->g->out['nav2'] . '</nav>
     </header>';
     }
 

@@ -25,7 +25,8 @@ error_log(__METHOD__);
         $this->o  = $t->g->in['o'];
         $this->in = util::esc($this->in);
         db::$tbl  = $this->o;
-        $this->b .= $this->{$t->g->in['m']}();
+        $this->b = $this->{$t->g->in['m']}();
+//        $this->b .= $this->{$t->g->in['m']}();
     }
 
     public function __toString() : string
@@ -43,10 +44,8 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             $this->in['created'] = date('Y-m-d H:i:s');
             db::create($this->in);
-//            return $this->read();
-//            self::log("You must be logged in to access this page");
             header("Location: ?o=".$this->o);
-error_log("after header location");
+            exit();
         } else {
             $this->in['submit'] = $this->create;
             return $this->t->{$this->o.'_form'}($this->in);

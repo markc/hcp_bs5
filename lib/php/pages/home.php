@@ -3,8 +3,9 @@
 <?php
 // home.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-return '
-      <h2><i class="fa fa-home fa-fw"></i> Netserva SysAdm</h2>
+//<h2><i class="fa fa-home fa-fw"></i> Netserva SysAdm</h2>
+
+return $t->title('NetServa') . '
       <p>
         <strong>
 The beginning of a lightweight admin panel for Ubuntu (xenial) mail and web servers
@@ -26,6 +27,6 @@ on a root owned cron job stored in a database.
       <p>
 Comments and pull requests are most welcome via the Issue Tracker link below.
       </p>
-      <p>' . ($t->a('https://github.com/netserva/www', 'Project Page', 'primary'))
-           . ($t->a('https://github.com/netserva/www/issues', 'Issue Tracker', 'primary')) . '
+      <p>' . $t->a('https://github.com/netserva/www', 'Project Page', 'primary')
+           . $t->a('https://github.com/netserva/www/issues', 'Issue Tracker', 'primary') . '
       </p>';

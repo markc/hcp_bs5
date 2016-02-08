@@ -45,4 +45,20 @@ error_log(__METHOD__);
         return '
           <button'.$class.$type.$name.$value.$extra.'>'.$label.'</button>';
     }
+
+    public function title(
+        string $label,
+        string $icon  = '') : string
+    {
+error_log(__METHOD__);
+
+        $v = 'veto_title';
+        if (method_exists($this, $v))
+            extract($this->$v($label, $icon));
+
+        $icon  = $icon ? '<i class="' . $icon . '"></i> ' : '';
+        return '
+          <h2>' . $icon . $label . '</h2>';
+    }
+
 }

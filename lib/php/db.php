@@ -12,8 +12,6 @@ class Db extends \PDO
     {
 error_log(__METHOD__);
 
-//error_log(var_export($dbcfg,true));
-
         extract($dbcfg);
         $dsn = $type === 'mysql'
             ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
@@ -48,6 +46,7 @@ error_log(__METHOD__);
  INSERT INTO `" . self::$tbl . "` ($fields
 ) VALUES ($values
 )";
+
 error_log("sql=$sql");
 
         try {
@@ -69,7 +68,7 @@ error_log("sql=$sql");
 error_log(__METHOD__);
 
         $w = $where ? "
-    WHERE $where = :wval" : '';
+  WHERE $where = :wval" : '';
         $a = $wval ? ['wval' => $wval] : [];
         $sql = "
  SELECT $field
@@ -98,6 +97,7 @@ error_log(__METHOD__);
         $sql = "
  UPDATE `" . self::$tbl . "` SET$set_str
   WHERE$where_str";
+
 error_log("sql=$sql");
 
         try {
@@ -123,6 +123,7 @@ error_log(__METHOD__);
         $sql = "
  DELETE FROM `" . self::$tbl . "`
   WHERE $where_str";
+
 error_log("sql=$sql");
 
         try {
