@@ -180,16 +180,16 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $class = $class ? ' btn-'.$class : '';
-        return ['class' => 'btn btn-primary'.$class];
+        $class = $class ? ' btn-'.$class : 'btn-primary';
+        return ['class' => 'btn '.$class];
     }
 
     public function veto_button($label, $type, $class, $name, $value, $extra)
     {
 error_log(__METHOD__);
 
-        $class = $class ? ' btn-'.$class : '';
-        return ['class' => 'btn btn-primary'.$class];
+        $class = $class ? ' btn-'.$class : 'btn-primary';
+        return ['class' => 'btn '.$class];
     }
 /*
     public function veto_email_contact_form()
@@ -219,7 +219,7 @@ error_log(__METHOD__);
     }
 */
     // Notes
-
+/*
     public function veto_notes_item($ary) : string
     {
 error_log(__METHOD__);
@@ -277,7 +277,7 @@ error_log(__METHOD__);
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
     }
-
+*/
     // Users
 
     public function veto_users_list(string $str) : string

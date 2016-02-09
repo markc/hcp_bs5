@@ -35,6 +35,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        if ($this->g->in['o'] != 'auth') $_SESSION['old'] = $_SESSION['o'];
+error_log('END SESSION='.var_export($_SESSION, true));
         error_log($_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 

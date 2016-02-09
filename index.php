@@ -28,7 +28,7 @@ echo new Controller(new class
         'm'         => 'read',                  // Method action
         'n'         => 1,                       // Navigation
         'o'         => 'home',                  // Object module
-        't'         => 'simple',                // current Theme
+        't'         => 'bootstrap',             // current Theme
     ],
     $out = [
         'top'       => '',

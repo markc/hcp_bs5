@@ -22,29 +22,27 @@ return '
         extract($ary);
 
         $ext = util::is_adm() ? '
-              <a class="btn btn-success btn-xs" href="?o=w_news&m=update&i=' . $id . '" title="Update">E</a>
-              <a class="btn btn-danger btn-xs" href="?o=w_news&m=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>' : '';
+          <div class="col-md-12 text-right">
+            <a class="btn btn-success btn-xs" href="?o=w_news&m=update&i=' . $id . '" title="Edit">Edit</a>
+          </div>' : '';
+
+        $ext2 = util::is_adm() ? '
+            <a class="btn btn-success btn-xs" href="?o=w_news&m=update&i=' . $id . '" title="Edit">Edit</a>' : '';
+
+//              <a class="btn btn-danger btn-xs" href="?o=w_news&m=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>' : '';
 
         return '
         <div class="row">
-
-          <div class="col-md-6">
-            <h4><a href="?o=w_news&m=read&i=' . $id . '">' . $title . '</a><h4>
+          <div class="col-md-12">
+            <h3><a href="?o=w_news&m=read&i=' . $id . '">' . $title . '</a><h3>
           </div>
-
-          <div class="col-md-6 text-right">
+          <div class="col-md-12"><p>' . nl2br($content) . '</p>
+          </div>
+          <div class="col-md-12 text-right">
             <small>
-              <i>' . util::now($updated) . ' by ' . $author . '</i> ' . $ext . '
+              <i>' . util::now($updated) . ' by ' . $author . '</i>' . $ext2 . '
             </small>
           </div>
-
-        </div>
-        <div class="row">
-
-          <div class="col-md-12"><p>' . nl2br($content) . '</p><hr>
-          </div>
-
-        </div>
-          ';
+        </div>';
     }
 

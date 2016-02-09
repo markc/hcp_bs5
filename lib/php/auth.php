@@ -66,7 +66,7 @@ error_log(__METHOD__);
                         $_SESSION['usr'] = [$usr['id'], $usr['acl'], $u, $tmp];
                         util::log($usr['uid'].' is now logged in', 'success');
                         if ((int) $usr['acl'] === 1) $_SESSION['adm'] = $usr['id'];
-                        header('Location: ' . $_SERVER['PHP_SELF']);
+                        header('Location: ?o=' . $_SESSION['old']);
                         exit();
                     } else util::log('Incorrect password');
                 } else util::log('Account is disabled, contact your System Administrator');
@@ -85,7 +85,7 @@ error_log(__METHOD__);
         unset($_SESSION['usr']);
         util::cookie_del('remember');
         util::log($u . ' is now logged out', 'success');
-        header('Location: '.$_SERVER['PHP_SELF']);
+        header('Location: ?o=home');
         exit();
     }
 

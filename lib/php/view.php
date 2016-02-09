@@ -47,7 +47,6 @@ error_log(__METHOD__);
         $o = '?o='.$this->g->in['o'];
         $t = '?t='.$this->g->in['t'];
         return join('', array_map(function ($n) use ($o, $t) {
-error_log(var_export($n, true));
             $l = ($o === $n[1] || $t === $n[1]) ? '<b>' . $n[0] . '</b>' : $n[0];
             return '
         <a href="' . $n[1] . '">' . $l . '</a>';
@@ -60,12 +59,9 @@ error_log(__METHOD__);
 
         $a = util::nav($this->g->nav1);
         array_shift($a);
-error_log(var_export($a, true));
         $b = '';
         foreach($a as $n)
-//            $b .= is_array($n[1]) ? ' is_array ' : ' NOT array ';
             $b .= is_array($n[1]) ? $this->nav($n[1]) : $this->nav([$n]);
-
         return $b;
     }
 

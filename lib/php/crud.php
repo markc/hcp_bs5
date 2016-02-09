@@ -75,8 +75,8 @@ error_log(__METHOD__);
             unset($this->in['id'], $this->in['created']);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            $this->g->in['i'] = 0;
-            return $this->read();
+            header("Location: ?o=".$this->o);
+            exit();
         } elseif ($this->g->in['i']) {
             return $this->t->{$this->o.'_form'}(array_merge(
                 db::read('*', 'id', $this->g->in['i'], '', 'one'),
@@ -92,7 +92,8 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             $this->g->in['i'] = 0;
-            return $this->read();
+            header("Location: ?o=".$this->o);
+            exit();
         } else return 'Error with Delete';
     }
 }
