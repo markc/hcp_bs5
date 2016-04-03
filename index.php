@@ -51,7 +51,7 @@ echo new Controller(new class
         'path'      => 'lib' . DS . '.ht_db.sqlite',
         'port'      => '3306',
         'sock'      => '', // '/run/mysqld/mysqld.sock',
-        'type'      => 'mysql', // mysql|sqlite
+        'type'      => 'sqlite', // mysql|sqlite
         'user'      => 'sysadm',
     ],
     $nav1 = [
