@@ -62,39 +62,17 @@ CREATE TABLE m_welcomes (
   `created` datetime NOT NULL
 );
 
-CREATE TABLE s_usergrouplist (
-  `id` int(11) NOT NULL,
-  `gid` int(11) NOT NULL DEFAULT '0',
-  `username` char(16) NOT NULL DEFAULT '',
-  `updated` datetime NOT NULL,
-  `created` datetime NOT NULL
-);
-
-CREATE TABLE s_usergroups (
-  `id` int(11) NOT NULL,
-  `name` varchar(16) NOT NULL DEFAULT '',
-  `password` varchar(34) NOT NULL DEFAULT 'x',
-  `gid` int(11) NOT NULL,
-  `updated` datetime NOT NULL,
-  `created` datetime NOT NULL
-);
-
 CREATE TABLE s_users (
   `id` int(11) NOT NULL,
   `uid` int(11) NOT NULL,
-  `gid` int(11) NOT NULL DEFAULT '5000',
+  `gid` int(11) NOT NULL DEFAULT '1000',
   `username` varchar(16) NOT NULL DEFAULT '',
   `gecos` varchar(128) NOT NULL DEFAULT '',
   `homedir` varchar(255) NOT NULL DEFAULT '',
-  `shell` varchar(64) NOT NULL DEFAULT '/bin/bash',
+  `shell` varchar(64) NOT NULL DEFAULT '/bin/sh',
   `password` varchar(34) NOT NULL DEFAULT 'x',
-  `lstchg` bigint(20) NOT NULL DEFAULT '1',
-  `min` bigint(20) NOT NULL DEFAULT '0',
-  `max` bigint(20) NOT NULL DEFAULT '99999',
-  `warn` bigint(20) NOT NULL DEFAULT '0',
-  `inact` bigint(20) NOT NULL DEFAULT '0',
-  `expire` bigint(20) NOT NULL DEFAULT '-1',
-  `flag` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `group` bigint(20) NOT NULL DEFAULT '',
+  `groups` bigint(20) NOT NULL DEFAULT '',
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL
 );
