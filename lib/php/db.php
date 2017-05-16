@@ -1,7 +1,6 @@
-<?php declare(strict_types = 1);?>
-<?php error_log(__FILE__);?>
 <?php
-// db.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/db.php 20150225 - 20170316
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
 {
@@ -12,19 +11,21 @@ class Db extends \PDO
     {
 error_log(__METHOD__);
 
-        extract($dbcfg);
-        $dsn = $type === 'mysql'
-            ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
-            : 'sqlite:' . $path;
-        $pass = file_exists($pass) ? include $pass : $pass;
-        try {
-            parent::__construct($dsn, $user, $pass, [
-                \PDO::ATTR_EMULATE_PREPARES => false,
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-            ]);
-        } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+        if (is_null(self::$dbh)) {
+            extract($dbcfg);
+            $dsn = $type === 'mysql'
+                ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
+                : 'sqlite:' . $path;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+            try {
+                parent::__construct($dsn, $user, $pass, [
+                    \PDO::ATTR_EMULATE_PREPARES => false,
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                ]);
+            } catch(\PDOException $e) {
+                die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+            }
         }
     }
 
@@ -35,26 +36,26 @@ error_log(__METHOD__);
         $fields = $values = '';
         foreach($ary as $k=>$v) {
             $fields .= "
-        $k,";
+                $k,";
             $values .= "
-        :$k,";
+                :$k,";
         }
         $fields = rtrim($fields, ',');
         $values = rtrim($values, ',');
 
         $sql = "
- INSERT INTO `" . self::$tbl . "` ($fields
-) VALUES ($values
-)";
+ INSERT INTO `" . self::$tbl . "` ($fields)
+ VALUES ($values)";
 
-error_log("sql=$sql");
+error_log("create sql = $sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
-            return $stm->execute();
+            $res = $stm->execute();
+            return self::$dbh->lastInsertId();
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
@@ -68,8 +69,10 @@ error_log("sql=$sql");
 error_log(__METHOD__);
 
         $w = $where ? "
-  WHERE $where = :wval" : '';
-        $a = $wval ? ['wval' => $wval] : [];
+    WHERE $where = :wval" : '';
+
+        $a = ($wval || $wval == '0') ? ['wval' => $wval] : [];
+
         $sql = "
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
@@ -98,14 +101,14 @@ error_log(__METHOD__);
  UPDATE `" . self::$tbl . "` SET$set_str
   WHERE$where_str";
 
-error_log("sql=$sql");
+error_log("update sql = $sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
             return $stm->execute();
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
@@ -124,14 +127,14 @@ error_log(__METHOD__);
  DELETE FROM `" . self::$tbl . "`
   WHERE $where_str";
 
-error_log("sql=$sql");
+error_log("delete sql = $sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $where_ary);
             return $stm->execute();
         } catch(\PDOException $e) {
-            die(__FILE__." ".__LINE__."\n".$e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
@@ -139,13 +142,14 @@ error_log("sql=$sql");
     {
 error_log(__METHOD__);
 
-error_log("sql=$sql");
+error_log("qry sql = $sql");
 
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
             $stm = self::$dbh->prepare($sql);
             if ($ary) self::bvs($stm, $ary);
             if ($stm->execute()) {
+                $res = null;
                 if ($type === 'all') $res = $stm->fetchAll();
                 elseif ($type === 'one') $res = $stm->fetch();
                 elseif ($type === 'col') $res = $stm->fetchColumn();
@@ -153,13 +157,16 @@ error_log("sql=$sql");
                 return $res;
             } else return false;
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
-    public static function bvs($stm, array $ary) // bind value statement
+    // bind value statement
+    public static function bvs($stm, array $ary)
     {
 error_log(__METHOD__);
+
+error_log("bvs = ".var_export($ary, true));
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {
@@ -173,3 +180,5 @@ error_log(__METHOD__);
         }
     }
 }
+
+?>

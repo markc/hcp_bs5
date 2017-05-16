@@ -1,115 +1,107 @@
 <?php
-// index.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20170305
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-declare(strict_types = 1);
-
-const DS    = DIRECTORY_SEPARATOR;
-const SYS   = __DIR__;
-const INC   = SYS.DS.'lib'.DS.'php'.DS;
+const DS  = DIRECTORY_SEPARATOR;
+const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 spl_autoload_register(function ($c) {
-    $f = INC.str_replace(['\\', '_'], [DS, DS], strtolower($c)).'.php';
+    $f = INC . str_replace(['\\', '_'], [DS, DS], strtolower($c)) . '.php';
     if (file_exists($f)) include $f;
+    else error_log("!!! $f does not exist");
 });
 
-echo new Controller(new class
+echo new Init(new class
 {
     public
-    $dbh = null,
-    $cfg = [
-        'file'      => 'lib'.DS.'.ht_conf.php', // override settings file
-        'email'     => 'markc@renta.net',       // site admin email
-    ],
+    $email      = 'markc@renta.net',
+    $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $hash       = 'SHA512-CRYPT',
+    $perp       = 5,
+    $self       = '',
     $in = [
-        'a'         => '',                      // API [html(default)|json]
-        'g'         => 0,                       // Group (category)
-        'i'         => 0,                       // Item or ID
-        'l'         => '',                      // Logging [lvl:msg]
-        'm'         => 'read',                  // Method action
-        'n'         => 1,                       // Navigation
-        'o'         => 'home',                  // Object module
-        't'         => 'bootstrap',             // current Theme
+        'd'     => '',          // Domain (current)
+        'g'     => null,        // Group/Category
+        'i'     => null,        // Item or ID
+        'l'     => '',          // Log (message)
+        'm'     => 'list',      // Method (action)
+        'o'     => 'home',      // Object (content)
+        't'     => 'bootstrap', // Theme
+        'x'     => '',          // XHR (request)
     ],
     $out = [
-        'top'       => '',
-        'meta'      => '',
-        'doc'       => 'SysAdm',
-        'css'       => '',
-        'log'       => '',
-        'nav1'      => '',
-        'nav2'      => '',
-        'nav3'      => '',
-        'head'      => 'SysAdm',
-        'main'      => 'Missing home page',
-        'foot'      => 'Copyright (C) 2015-2016 Mark Constable (AGPL-3.0)',
-        'end'       => '',
+        'doc'   => 'NetServa',
+        'css'   => '',
+        'log'   => '',
+        'nav1'  => '',
+        'nav2'  => '',
+        'nav3'  => '',
+        'head'  => 'NetServa',
+        'main'  => 'Error: missing page!',
+        'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
+        'end'   => '',
     ],
     $db = [
-        'host'      => '127.0.0.1',
-        'name'      => 'sysadm',
-        'pass'      => 'lib' . DS . '.ht_pw.php',
-        'path'      => 'lib' . DS . '.ht_db.sqlite',
-        'port'      => '3306',
-        'sock'      => '', // '/run/mysqld/mysqld.sock',
-        'type'      => 'sqlite', // mysql|sqlite
-        'user'      => 'sysadm',
+        'host'  => '127.0.0.1', // DB site
+        'name'  => 'sysadm',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
+        'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
+        'port'  => '3306',      // DB port
+        'sock'  => '',          // '/run/mysqld/mysqld.sock',
+        'type'  => 'sqlite',    // mysql | sqlite
+        'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
         'non' => [
-            ['NetServa', '?o=home', 'fa fa-home fa-fw'],
-            ['About', '?o=about', 'fa fa-question-circle fa-fw'],
-            ['Contact', '?o=contact', 'fa fa-envelope-o fa-fw'],
-            ['News', '?o=w_news', 'fa fa-newspaper-o fa-fw'],
-            ['Sign in', '?o=auth&m=signin', 'fa fa-sign-in fa-fw'],
+            ['About',       '?o=about', 'fa fa-info-circle fa-fw'],
+            ['Contact',     '?o=contact', 'fa fa-envelope fa-fw'],
+            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
+            ['Sign in',     '?o=auth', 'fa fa-sign-in fa-fw'],
         ],
         'usr' => [
-            ['NetServa', '?o=home', 'fa fa-home fa-fw'],
-            ['About', '?o=about', 'fa fa-question-circle fa-fw'],
-            ['Contact', '?o=contact', 'fa fa-envelope-o fa-fw'],
-            ['News', '?o=w_news', 'fa fa-newspaper-o fa-fw'],
-            ['Sign out', '?o=auth&m=signout', 'fa fa-sign-in fa-fw'],
+            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
         ],
         'adm' => [
-            ['NetServa', '?o=home', 'fa fa-home fa-fw'],
-            ['News', '?o=w_news', 'fa fa-newspaper-o fa-fw'],
-            ['Admin', [
-                ['Mail Users', '?o=m_users', ''],
-                ['Mail Forwards', '?o=m_forwards', ''],
-                ['Mail Limits', '?o=m_limits', ''],
-                ['Mail Vacations', '?o=m_vacations', ''],
-                ['Mail Welcomes', '?o=m_welcomes', ''],
-                ['SysUsers', '?o=s_users', ''],
-                ['SysUserGroups', '?o=s_usergroups', ''],
-                ['SysUserGrouplist', '?o=s_usergrouplist', ''],
-                ['Web News', '?o=w_news', ''],
-                ['Web Users', '?o=w_users', ''],
-            ], 'fa fa-user-secret fa-fw'],
-            ['Sign out', '?o=auth&m=signout', 'fa fa-sign-out fa-fw'],
+            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
+            ['Admin',       [
+                ['Accounts',    '?o=accounts&p=1', 'fa fa-vcard fa-fw'],
+                ['Vhosts',      '?o=vhosts&p=1', 'fa fa-globe fa-fw'],
+                ['Vmails',      '?o=vmails&p=1', 'fa fa-envelope fa-fw'],
+                ['Aliases',     '?o=valias&p=1', 'fa fa-envelope-square fa-fw'],
+                ['Domains',     '?o=domains&p=1', 'fa fa-server fa-fw'],
+            ], 'fa fa-users fa-fw'],
+            ['Stats',       [
+                ['Sys Info',    '?o=infosys&p=1', 'fa fa-server fa-fw'],
+                ['Mail Info',    '?o=infomail&p=1', 'fa fa-envelope-o fa-fw'],
+                ['Mail Graph',    '?o=mailgraph&p=1', 'fa fa-envelope fa-fw'],
+            ], 'fa fa-server fa-fw'],
         ],
     ],
     $nav2 = [
-        ['Theme', [
-            ['None', '?t=none', ''],
-            ['Simple', '?t=simple', ''],
-            ['Bootstrap', '?t=bootstrap', ''],
-            ['Material', '?t=material', ''],
-        ], 'fa fa-list-alt fa-fw'],
+    ],
+    $dns = [
+        'a'     => '127.0.0.1',
+        'mx'    => '',
+        'ns1'   => 'ns1.',
+        'ns2'   => 'ns2.',
+        'prio'  => 0,
+        'ttl'   => 300,
+        'soa'   => [
+            'primary' => 'ns1.',
+            'email'   => 'admin.',
+            'refresh' => 7200,
+            'retry'   => 540,
+            'expire'  => 604800,
+            'ttl'     => 3600,
+        ]
     ],
     $acl = [
-        0 => 'Anonymous',
+        0 => 'SuperAdmin',
         1 => 'Administrator',
         2 => 'User',
         3 => 'Suspended',
+        9 => 'Anonymous',
     ];
 });
 
-function dbg($var = null)
-{
-    if (is_object($var))
-        error_log(ReflectionObject::export($var, true));
-    ob_start();
-    print_r($var);
-    $ob = ob_get_contents();
-    ob_end_clean();
-    error_log($ob);
-}
+?>

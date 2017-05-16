@@ -1,8 +1,8 @@
 <?php
-// lib/php/themes/bootstrap/about.php 20150101 - 20170317
+// lib/php/themes/bootstrap/home.php 20150101 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
+class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
