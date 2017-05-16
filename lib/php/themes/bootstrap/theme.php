@@ -9,6 +9,23 @@ class Themes_Bootstrap_Theme extends Theme
 error_log(__METHOD__);
 
         return '
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/lib/img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" sizes="57x57" href="/lib/img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/lib/img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/lib/img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/lib/img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/lib/img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/lib/img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/lib/img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/lib/img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/lib/img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/lib/img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/lib/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/lib/img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/lib/img/favicon-16x16.png">
+    <link rel="manifest" href="/lib/img/manifest.json">
     <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300italic" rel="stylesheet" type="text/css">
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" rel="stylesheet" crossorigin="anonymous">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -23,14 +40,12 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
 .w200 { width: 200px; }
 .w300 { width: 300px; }
 .max200 { max-width: 200px; }
-
 .min50  { min-width:  50px; }
 .min100 { min-width: 100px; }
 .min150 { min-width: 150px; }
 .min200 { min-width: 200px; }
 .min300 { min-width: 300px; }
 .min600 { min-width: 600px; }
-
     </style>';
     }
 
@@ -57,7 +72,7 @@ error_log(__METHOD__);
         <span class="navbar-toggler-icon"></span>
       </button>
       <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
-        <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
+        <b><i class="fa fa-server fa-fw"></i> ' . $this->g->out['head'] . '</b>
       </a>
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '

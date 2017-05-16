@@ -71,10 +71,10 @@ echo new Init(new class
                 ['Domains',     '?o=domains&p=1', 'fa fa-server fa-fw'],
             ], 'fa fa-users fa-fw'],
             ['Stats',       [
-                ['Sys Info',    '?o=infosys&p=1', 'fa fa-server fa-fw'],
+                ['Sys Info',    '?o=infosys&p=1', 'fa fa-dashboard fa-fw'],
                 ['Mail Info',    '?o=infomail&p=1', 'fa fa-envelope-o fa-fw'],
                 ['Mail Graph',    '?o=mailgraph&p=1', 'fa fa-envelope fa-fw'],
-            ], 'fa fa-server fa-fw'],
+            ], 'fa fa-info-circle fa-fw'],
         ],
     ],
     $nav2 = [
