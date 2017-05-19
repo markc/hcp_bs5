@@ -1,5 +1,5 @@
-#!/bin/bash
-# build.sh 20170301
+#!/usr/bin/env bash
+# ~/.sh/build.sh 20170301 - 20170519
 # Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 [ -n $1 ] && cd $1
