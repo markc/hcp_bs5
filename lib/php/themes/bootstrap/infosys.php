@@ -14,12 +14,10 @@ error_log(var_export($in,true));
 
         return '
         <div class="row">
-          <div class="col-md-6">
-            <h3 class="min300">
-              <i class="fa fa-server fa-fw"></i> System Info
-            </h3>
+          <div class="col-6">
+            <h3><i class="fa fa-server fa-fw"></i> System Info</h3>
           </div>
-          <div class="col-md-6">
+          <div class="col-6">
             <form method="post" class="form-inline pull-right">
               <div class="form-group">
                 <input type="hidden" id="o" name="o" value="infosys">
