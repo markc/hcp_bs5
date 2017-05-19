@@ -21,20 +21,39 @@ cheap 256MB to 512MB VPS plans. Some of the features are...
 ## Usage
 
 The PHP web interface relies on the [Shell Helper] scripts being installed
-on the primary and target hosts so as root. Please review the very simple
-script by removing the `| bash` part first...
+on the primary and target hosts so as root...
 
     curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
 
+_Please review the very simple script by removing the `| bash` part first._
+
 Once installed and activated then `gethost` should show the current config
 settings. Use the `es` alias to edit (ctrl-x to save and quit) and activate
-any custom env vars and aliases. The next step is to install a local LXD
-container or remote server and repeat setting up the `sh` script repo
-inside the target server.
+any custom env vars and aliases.
 
-TODO: to be continued rsn...
+TODO: describe LXD testing setup
+
+Once the target system is available then `ssh` (or `lxc exec LXD bash`)
+into the target system, install and activate the [Shell Helper] scripts
+again and...
+
+    setup-all sqlite
+
+This may take 5 or 10 mintes to complete depending on the bandwidth
+available to the target server. Once finished you should be able to go to
+`http://$VHOST` and login to the HCP web interface as `admin@$VHOST`
+with a default password of `changeme_N0W`, and immediately change that
+password.
+
+---
+
+If using `mysql` then run `es` and set the `DPASS` variable to the MySQL
+user password.
+
+#### Note: mysql setup is not fully tested and working yet.
 
 _All scripts and documentation are Copyright (C) 1995-2017 Mark Constable
 and Licensed [AGPL-3.0]_
 
 [Shell Helper]: https://github.com/netserva/sh
+[AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
