@@ -32,7 +32,7 @@ error_log(__METHOD__);
                   </td>
                   <td>' . $type . '
                   </td>
-                  <td>' . $content . '
+                  <td class="nowrap ellide max200">' . $content . '
                   </td>
                   <td>' . $priority . '
                   </td>
@@ -147,10 +147,10 @@ error_log('records::editor = '.var_export($in,true));
                 <tr class="editrow" data-rowid="' . $id . '" data-active="' . $active . '">
                   <td class="min300"><b title="DNS record ID: ' . $id . '">' . $name . '</b></td>
                   <td class="min50">' . $type . '</td>
-                  <td class="min300">' . $content . '</td>
+                  <td class="max300 ellide nowrap">' . $content . '</td>
                   <td class="min100">' . $priority . '</td>
                   <td class="min100">' . $ttl . '</td>
-                  <td class="text-right">' . $active_buf . '
+                  <td class="min100 text-right">' . $active_buf . '
                     <a class="editlink" href="#" title="Update DNS record ID: ' . $id . '">
                       <i class="fa fa-pencil fa-fw cursor-pointer"></i>
                     </a>
@@ -166,7 +166,7 @@ error_log('records::editor = '.var_export($in,true));
                 <div class="col-md-6">
                   <h3 class="min600">
                     <a href="?o=domains&m=list">
-                      <i class="fa fa-globe fa-fw"></i> ' . $domain . '
+                      <i class="fa fa-chevron-left fa-fw"></i> ' . $domain . '
                     </a>
                   </h3>
                 </div>
@@ -177,7 +177,7 @@ error_log('records::editor = '.var_export($in,true));
                 </div>
               </div>
               <div class="table-responsive">
-                <table class="table table-sm min600">
+                <table class="table table-sm min900">
                   <thead>
                     <tr>
                       <th>Name</th>

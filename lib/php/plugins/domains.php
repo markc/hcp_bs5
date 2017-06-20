@@ -5,6 +5,7 @@
 class Plugins_Domains extends Plugin
 {
     protected
+    $dbh = null,
     $tbl = 'domains', // dnszones ?
     $in = [
         'name'        => '',
@@ -15,6 +16,15 @@ class Plugins_Domains extends Plugin
         'notified_serial' => '',
         'account'     => '',
     ];
+
+    public function __construct(Theme $t)
+    {
+error_log(__METHOD__);
+
+        if ($t->g->dns['db']['type'])
+            $this->dbh = new db($t->g->dns['db']);
+        parent::__construct($t);
+    }
 
     protected function create() : string
     {
@@ -35,10 +45,17 @@ error_log(__METHOD__);
               $soa['ttl'];
             $did = db::create([
                 'name'    => $domain,
-                'type'    => 'MASTER',
+                'master'  => $type === 'SLAVE' ? $master : '',
+                'type'    => $type ? $type : 'MASTER',
                 'updated' => $created,
                 'created' => $created,
             ]);
+
+            if ($type === 'SLAVE') {
+                util::log('Created DNS Zone: ' . $domain, 'success');
+                return $this->list();
+            }
+
             $sql = "
  INSERT INTO `records` (
         content, created, disabled, domain_id, name, prio, ttl, type, updated
@@ -159,16 +176,19 @@ error_log(__METHOD__);
             util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
             return $this->list();
         } elseif ($this->g->in['i']) {
-            $sql = "
+            $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
+            if ($dom['type'] === 'SLAVE') {
+                return $this->t->update($dom);
+            } else {
+                $sql = "
  SELECT content as soa
    FROM records
   WHERE type='SOA'
     AND domain_id=:did";
 
-            $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
-            $dom = db::read('name', 'id', $this->g->in['i'], '', 'one');
-            // TODO check $soa and $dom ???
-            return $this->t->update(array_merge($dom, $soa));
+                $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
+                return $this->t->update(array_merge($dom, $soa));
+            }
         }
         return 'Error updating item';
     }
@@ -196,27 +216,30 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $pager = util::pager(
-            (int) util::ses('p'),
-            (int) $this->g->perp,
-            (int) db::read('count(id)', '', '', '', 'col')
-        );
-// might be useful when permissions are needed
-//   LEFT OUTER JOIN permissions P ON D.id = P.domain
-//  WHERE (P.userid='1' OR 1)
+        if ($this->g->in['x'] !== 'json')
+          return $this->t->list([]);
+
+        extract($this->t->g->in);
+
+        $search = $search ? "
+ HAVING (D.name LIKE '%$search%')
+     OR (D.type LIKE '%$search%')" : '';
+
+        if ($sort === 'name') $orderby = 'D.`name`';
+        elseif ($sort === 'type') $orderby = 'D.`type`';
+        elseif ($sort === 'records') $orderby = '`records`';
+        else $orderby = 'D.`updated`';
 
         $sql = "
  SELECT D.id,D.name,D.type,count(R.domain_id) AS records
    FROM domains D
    LEFT OUTER JOIN records R ON D.id = R.domain_id
-  GROUP BY D.id, D.name, D.type
- HAVING (D.name LIKE '' OR 1)
-    AND (D.type='' OR 1)
-  ORDER BY D.`updated` DESC LIMIT " . $pager['start'] . "," . $pager['perp'];
+  GROUP BY D.name, D.type $search
+  ORDER BY $orderby $order LIMIT $offset,$limit";
 
-        return $this->t->list(array_merge(
-            db::qry($sql),
-            ['pager' => $pager]
+        return json_encode(array_merge(
+            ['total' => db::read('count(id)', '', '', '', 'col')],
+            ['rows' => db::qry($sql)]
         ));
     }
 }

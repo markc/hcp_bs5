@@ -6,6 +6,7 @@ class Plugin
 {
     protected
     $buf = '',
+    $dbh = null,
     $tbl = '',
     $in  = [];
 
@@ -26,7 +27,9 @@ error_log(__METHOD__);
         $this->g  = $t->g;
         $this->in = util::esc($this->in);
         if ($this->tbl) {
-            if (is_null(db::$dbh))
+            if (!is_null($this->dbh))
+                db::$dbh = $this->dbh;
+            elseif (is_null(db::$dbh))
                 db::$dbh = new db($t->g->db);
             db::$tbl = $this->tbl;
         }

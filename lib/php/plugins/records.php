@@ -19,6 +19,15 @@ class Plugins_Records extends Plugin
         'type'        => '',
     ];
 
+    public function __construct(Theme $t)
+    {
+error_log(__METHOD__);
+
+        if ($t->g->dns['db']['type'])
+            $this->dbh = new db($t->g->dns['db']);
+        parent::__construct($t);
+    }
+
     protected function create() : string
     {
 error_log(__METHOD__);

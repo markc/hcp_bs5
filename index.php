@@ -17,7 +17,7 @@ echo new Init(new class
     $email      = 'markc@renta.net',
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
     $hash       = 'SHA512-CRYPT',
-    $perp       = 5,
+    $perp       = 25,
     $self       = '',
     $in = [
         'd'     => '',          // Domain (current)
@@ -28,6 +28,11 @@ echo new Init(new class
         'o'     => 'home',      // Object (content)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
+        'search'=> '',
+        'sort'  => '',
+        'order' => 'desc',
+        'offset'=> '0',
+        'limit' => '10',
     ],
     $out = [
         'doc'   => 'NetServa',
@@ -48,7 +53,7 @@ echo new Init(new class
         'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',     // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
@@ -93,7 +98,17 @@ echo new Init(new class
             'retry'   => 540,
             'expire'  => 604800,
             'ttl'     => 3600,
-        ]
+        ],
+        'db' => [
+            'host'  => '127.0.0.1', // Alt DNS DB site
+            'name'  => 'pdns',      // Alt DNS DB name
+            'pass'  => 'lib' . DS . '.ht_dns_pw', // MySQL DNS password override
+            'path'  => '/var/lib/sqlite/sysadm/pdns.db', // DNS SQLite DB
+            'port'  => '3306',      // Alt DNS DB port
+            'sock'  => '',          // '/run/mysqld/mysqld.sock',
+            'type'  => '',          // mysql | sqlite | '' to disable
+            'user'  => 'pdns',      // Alt DNS DB user
+        ],
     ],
     $acl = [
         0 => 'SuperAdmin',

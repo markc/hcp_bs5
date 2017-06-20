@@ -19,8 +19,8 @@ error_log(var_export($in,true));
           </div>
           <div class="col-6">
             <form method="post" class="form-inline pull-right">
+              <input type="hidden" id="o" name="o" value="infosys">
               <div class="form-group">
-                <input type="hidden" id="o" name="o" value="infosys">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Refresh</button>
               </div>
             </form>
