@@ -164,7 +164,7 @@ error_log(__METHOD__);
             $ret = shell_exec("sudo addvhost $vhost $dtype");
             util::redirect($this->g->self . '?o=vhosts', 5, $ret);
             util::log('Created ' . $vhost, 'success');
-            shell_exec("nohup sh -c 'sudo serva web reload' > /tmp/serva.log 2>&1 &");
+            shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
             exit;
         }
         return $this->t->create($this->in);
@@ -254,7 +254,7 @@ error_log(__METHOD__);
             $ret = shell_exec("sudo delvhost $vhost " . $this->g->db['type']);
             util::redirect($this->g->self . '?o=vhosts', 5, $ret);
             util::log('Removed ' . $vhost, 'success');
-            shell_exec("nohup sh -c 'sudo serva web reload' > /tmp/serva.log 2>&1 &");
+            shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
             exit;
         }
         return 'Error deleting item';
