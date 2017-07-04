@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/valias.php 20170225
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/valias.php 20170225 - 20170704
+// Copyright (C) 1995-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
@@ -15,6 +15,7 @@ class Plugins_Valias extends Plugin
     ];
 
 // TODO recfactor common parts of create() and update() into private methods
+// yep, as of 20170704 this is still a medium to high priority TODO
 
     protected function create() : string
     {
@@ -65,14 +66,23 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
+ SELECT 1 FROM `valias`
+  WHERE `source` = :catchall";
+
+                $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
+//error_log("catchall=$catchall");
+
+                if ($catchall !== 1) {
+                    $sql = "
  SELECT `source` FROM `valias`
   WHERE `source` = :source";
 
-                $num_results = count(db::qry($sql, ['source' => $s]));
+                    $num_results = count(db::qry($sql, ['source' => $s]));
 
-                if ($num_results) {
-                    util::log($s . ' already exists as an alias');
-                    $_POST = []; return $this->t->create($this->in);
+                    if ($num_results) {
+                        util::log($s . ' already exists as an alias');
+                        $_POST = []; return $this->t->create($this->in);
+                    }
                 }
 
                 $sql = "
@@ -100,9 +110,11 @@ error_log(__METHOD__);
                         $_POST = []; return $this->t->create($this->in);
                     }
 
-                    if ($t === $s) {
-                        util::log('Alias source and target addresses must not be the same');
-                        $_POST = []; return $this->t->create($this->in);
+                    if ($catchall !== 1) {
+                        if ($t === $s) {
+                            util::log('Alias source and target addresses must not be the same');
+                            $_POST = []; return $this->t->create($this->in);
+                        }
                     }
                 }
 
@@ -200,14 +212,23 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
+ SELECT 1 FROM `valias`
+  WHERE `source` = :catchall";
+
+                $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
+//error_log("catchall=$catchall");
+
+                if ($catchall !== 1) {
+                    $sql = "
  SELECT `user` FROM `vmails`
   WHERE `user` = :source";
 
-                $num_results = count(db::qry($sql, ['source' => $s]));
+                    $num_results = count(db::qry($sql, ['source' => $s]));
 
-                if ($num_results) {
-                    util::log($s . ' already exists as a regular mailbox');
-                    $_POST = []; return $this->read();
+                    if ($num_results) {
+                        util::log($s . ' already exists as a regular mailbox');
+                        $_POST = []; return $this->read();
+                    }
                 }
 
                 foreach ($targets as $t) {
@@ -224,9 +245,11 @@ error_log(__METHOD__);
                         $_POST = []; return $this->read();
                     }
 
-                    if ($t === $s) {
-                        util::log('Alias source and target addresses must not be the same');
-                        $_POST = []; return $this->read();
+                    if ($catchall !== 1) {
+                        if ($t === $s) {
+                            util::log('Alias source and target addresses must not be the same');
+                            $_POST = []; return $this->read();
+                        }
                     }
                 }
 

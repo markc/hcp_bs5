@@ -1,2 +1,4 @@
 .ht*
 adminer.php
+phpinfo.php
+status/

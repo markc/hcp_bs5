@@ -52,6 +52,39 @@ error_log(__METHOD__);
                 }
                 $password = $passwd1;
             }
+            $sql = "
+ SELECT 1 FROM `valias`
+  WHERE `source` = :catchall";
+
+            $catchall = db::qry($sql, ['catchall' => '@'.$rhs], 'col');
+//error_log("catchall=$catchall");
+
+            if ($catchall === 1) {
+                $sql = "
+ INSERT INTO `valias` (
+        `active`,
+        `did`,
+        `source`,
+        `target`,
+        `updated`,
+        `created`
+) VALUES (
+        :active,
+        :did,
+        :source,
+        :target,
+        :updated,
+        :created
+)";
+                $result = db::qry($sql, [
+                    'active'  => $active ? 1 : 0,
+                    'did'     => $d['id'],
+                    'source'  => $user,
+                    'target'  => $user,
+                    'updated' => date('Y-m-d H:i:s'),
+                    'created' => date('Y-m-d H:i:s')
+                ]);
+            }
 
             $sql = "
  INSERT INTO `vmails` (
