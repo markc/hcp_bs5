@@ -161,7 +161,7 @@ error_log(__METHOD__);
               <i class="fa fa-newspaper-o fa-fw"></i> ' . $header . '
             </a>
           </h3>
-          <form method="post" action="' . $this->g->cfg->self . '">
+          <form method="post" action="' . $this->g->cfg['self'] . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
             <input type="hidden" name="author" value="' . $uid . '">

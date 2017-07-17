@@ -102,7 +102,7 @@ error_log(__METHOD__);
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="' . $this->g->cfg->self . '" title="Home Page">
+      <a class="navbar-brand" href="' . $this->g->cfg['self'] . '" title="Home Page">
         <b><i class="fa fa-server fa-fw"></i> ' . $this->g->out['head'] . '</b>
       </a>
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">

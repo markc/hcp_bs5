@@ -114,7 +114,7 @@ error_log(__METHOD__);
             </a>
           </h3>
           <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
-          <form method="post" action="' . $this->g->cfg->self . '">
+          <form method="post" action="' . $this->g->cfg['self'] . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
             <div class="row">

@@ -22,7 +22,7 @@ error_log(__METHOD__);
         $js = '
       <script>
 function mailform(form) {
-    location.href = "mailto:' . $this->g->cfg->email . '"
+    location.href = "mailto:' . $this->g->cfg['email'] . '"
         + "?subject=" + encodeURIComponent(form.subject.value)
         + "&body=" + encodeURIComponent(form.message.value);
     form.subject.value = "";

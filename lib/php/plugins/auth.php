@@ -29,7 +29,7 @@ error_log(__METHOD__);
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if ($usr['acl'] != 9) {
                         $newpass = util::genpw();
-                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg->email)) {
+                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
                             db::update([
                                 'otp' => $newpass,
                                 'otpttl' => time()
@@ -68,7 +68,7 @@ error_log(__METHOD__);
                         util::log($login.' is now logged in', 'success');
                         if ((int) $acl === 0) $_SESSION['adm'] = $id;
                         $_SESSION['m'] = 'list';
-                        header('Location: ' . $this->g->cfg->self);
+                        header('Location: ' . $this->g->cfg['self']);
                         exit();
                     } else util::log('Incorrect password');
                 } else util::log('Account is disabled, contact your System Administrator');
@@ -99,7 +99,7 @@ error_log(__METHOD__);
                                 ], [['id', '=', $i]])) {
                                 util::log('Password reset for ' . $usr['login'], 'success');
                                 if (util::is_usr()) {
-                                    header('Location: ' . $this->g->cfg->self);
+                                    header('Location: ' . $this->g->cfg['self']);
                                     exit();
                                 } else return $this->t->list(['login' => $usr['login']]);
                             } else util::log('Problem updating database');
@@ -121,7 +121,7 @@ error_log(__METHOD__);
         unset($_SESSION['usr']);
         util::del_cookie('remember');
         util::log($u . ' is now logged out', 'success');
-        header('Location: ' . $this->g->cfg->self);
+        header('Location: ' . $this->g->cfg['self']);
         exit();
     }
 
@@ -142,7 +142,7 @@ error_log(__METHOD__);
                 } else util::log('Your one time password key has expired');
             } else util::log('Your one time password key no longer exists');
         } else util::log('Incorrect one time password key');
-        header('Location: ' . $this->g->cfg->self);
+        header('Location: ' . $this->g->cfg['self']);
         exit();
     }
 
@@ -152,7 +152,7 @@ error_log(__METHOD__);
 
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
             . $_SERVER['HTTP_HOST']
-            . $this->g->cfg->self;
+            . $this->g->cfg['self'];
         return mail(
             "$email",
             'Reset password for ' . $_SERVER['HTTP_HOST'],

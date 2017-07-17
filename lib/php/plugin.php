@@ -19,7 +19,7 @@ error_log(__METHOD__);
 
         if (!util::is_usr() && $o !== 'auth' && $m !== 'list' && $m !== 'read') {
             util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
-            header('Location: ' . $t->g->cfg->self . '?o=auth');
+            header('Location: ' . $t->g->cfg['self'] . '?o=auth');
             exit();
         }
 
@@ -97,7 +97,7 @@ error_log(__METHOD__);
 
         $pager = util::pager(
             (int) util::ses('p'),
-            (int) $this->g->cfg->perp,
+            (int) $this->g->cfg['perp'],
             (int) db::read('count(id)', '', '', '', 'col')
         );
 

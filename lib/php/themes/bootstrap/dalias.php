@@ -115,7 +115,7 @@ error_log(var_export($in, true));
               <i class="fa fa-globe fa-fw"></i> ' . $header . '
             </a>
           </h3>
-          <form method="post" action="' . $this->g->cfg->self . '">
+          <form method="post" action="' . $this->g->cfg['self'] . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
             <div class="row">
