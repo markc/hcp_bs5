@@ -60,12 +60,13 @@ password.
 
 The main `index.php` file is actually the configuration for the entire
 program so that the rest of the PHP files could actually be included from
-anywhere else on the system (not just from `lib/php`) if the `INC` const
-is changed. To override the default settings, and so sensitive information
-is not committed to some Git repo, a config override file can be put
-anywhere (the default is `lib/.ht_conf.php`) in which an array is returned
-where any of the top level property array values can be overridden. An
-example of how to is...
+anywhere else on the system, not just from `lib/php`, if the `INC` const
+is changed. To override the default settings (so sensitive information
+is not committed to some Git repo) a config override file can be put
+anywhere (the default being `lib/.ht_conf.php`) in which an array is
+returned where any of the top level property array values can be overridden.
+First review the main `index.php` file top level properties then compare
+below as an example of how to override those property values...
 
     <?php
     return [
@@ -93,8 +94,8 @@ SSH password if a SSH key is not available.
 
 The `sysadm` user has access to the entire server with SUDO permissions to
 the `/root/.sh/bin/*` shell scripts but not general SUDO access to any other
-exectables. This user also "owns" the default `adm.YOUR_DOMAIN` web area with
-the NetServa HCP web interface, if used.
+executables. This user also "owns" the default `adm.YOUR_DOMAIN` web area
+with the NetServa HCP web interface, if used.
 
 All extra virtual hosts will be owned by `u1000 u1001 u1002 etc` system users
 which will be chrooted, or locked into, their respective VHOST web area. For
@@ -128,9 +129,10 @@ would result in access to the whole (non-root) file system whereas...
 
 would chroot or lock access to the `/home/u/example.org` area with no
 possibility of using SUDO so folks only interested in working on a web site
-have reasonably safe access to only that web area. `setup-ssh` can be used
-to manage local SSH keys to make logging in to a container or remote server
-much easier.
+have reasonably safe access to only that web area.
+
+`setup-ssh` can be used to manage local SSH keys to make logging in to a
+container or remote server much easier.
 
     Usage: setup-ssh domain [targethost] [user] [port] [sshkey]
 
