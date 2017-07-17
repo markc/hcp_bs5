@@ -31,11 +31,17 @@ Once installed and activated then `gethost` should show the current config
 settings. Use the `es` alias to edit (ctrl-x to save and quit) and activate
 any custom env vars and aliases.
 
-TODO: describe LXD testing setup
+Assuming a LXD container is to be used (recomended for initial testing)
+then try `setup-lxd C1.DOMAIN.NAME` where `C1` will be the container
+name and `C1.DOMAIN.NAME` will be the internal FQDN hostname. The setup
+script will install LXD and create a ZFS pool of 50GB by default.
 
-Once the target system is available then `ssh` (or `lxc exec LXD bash`)
-into the target system, install and activate the [Shell Helper] scripts
-again and...
+    Usage: setup-lxd FQDN [small|medium|large] [pool size (50)]
+
+Or if you already have a containter or remote server ready to use after
+a fresh Ubuntu install then you could install the entire NetServa SH
+and HCP system by using after ssh'ing into the system, or `lxc exec LXD
+bash` for a container.
 
     setup-all sqlite
 
@@ -47,10 +53,31 @@ password.
 
 ---
 
-If using `mysql` then run `es` and set the `DPASS` variable to the MySQL
-user password.
+## Config Override
 
-#### Note: mysql setup is not fully tested and working yet.
+The main `index.php` file is actually the configuration for the entire
+program so that the rest of the PHP files could actually be included from
+anywhere else on the system (not just from `lib/php`) if the `INC` const
+is changed. To override the default settings, and so sensitive information
+is not committed to some Git repo, a config override file can be put
+anywhere (the default is `lib/.ht_conf.php`) in which an array is returned
+where any of the top level property array values can be overridden. An
+example of how to is...
+
+    <?php
+    return [
+        'cfg' => ['email' => 'YOUR@EMAIL_ADDRESS'],
+        'db' => ['type' => 'mysql', 'pass' => 'YOUR_MYSQL_PW'],
+    ];
+
+which would change the default email address (for forgotten password etc)
+to your email address and set the database to use MySQL with it's password.
+
+Another alternate option for a MySQL password is to create a simple plain
+text file called `lib/.ht_pw` and put ONLY the MySQL password in that file
+but of course using `lib/.ht_conf.php` allows you to modify or extend any
+of the top level properties in `index.php`.
+
 
 _All scripts and documentation are Copyright (C) 1995-2017 Mark Constable
 and Licensed [AGPL-3.0]_

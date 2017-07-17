@@ -55,7 +55,7 @@ echo new Init(new class
         'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'mysql',     // mysql | sqlite
+        'type'  => 'sqlite',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
