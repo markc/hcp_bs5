@@ -14,11 +14,13 @@ spl_autoload_register(function ($c) {
 echo new Init(new class
 {
     public
-    $email      = 'markc@renta.net',
-    $file       = 'lib' . DS . '.ht_conf.php', // settings override
-    $hash       = 'SHA512-CRYPT',
-    $perp       = 25,
-    $self       = '',
+    $cfg = [
+        'email' => 'markc@renta.net',
+        'file'  => 'lib' . DS . '.ht_conf.php', // settings override
+        'hash'  => 'SHA512-CRYPT',
+        'perp'  => 25,
+        'self'  => '',
+    ],
     $in = [
         'd'     => '',          // Domain (current)
         'g'     => null,        // Group/Category

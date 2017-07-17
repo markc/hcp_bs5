@@ -25,7 +25,7 @@ error_log(var_export($in,true));
 
         if ($in['type'] === 'SLAVE') {
             return '
-              <form method="post" action="' . $this->g->self . '">
+              <form method="post" action="' . $this->g->cfg->self . '">
                 <div class="col-12">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
@@ -115,7 +115,7 @@ error_log(__METHOD__);
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <form method="post" action="' . $this->g->self . '">
+              <form method="post" action="' . $this->g->cfg->self . '">
                 <div class="modal-body">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
@@ -259,7 +259,7 @@ error_log(__METHOD__);
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-                <form method="post" action="' . $this->g->self . '">
+                <form method="post" action="' . $this->g->cfg->self . '">
               <div class="modal-body">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
@@ -310,7 +310,7 @@ error_log(__METHOD__);
               <i class="fa fa-chevron-left fa-fw"></i> ' . $header . '
             </a>' . $serial . '
           </h3>
-          <form method="post" action="' . $this->g->self . '">
+          <form method="post" action="' . $this->g->cfg->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
             <div class="row">

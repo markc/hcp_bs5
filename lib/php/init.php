@@ -20,7 +20,7 @@ error_log('SESSION=' . var_export($_SESSION, true));
 
         util::cfg($g);
         $g->in = util::esc($g->in);
-        $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+        $g->cfg->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
         util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];

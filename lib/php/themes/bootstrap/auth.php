@@ -14,7 +14,7 @@ error_log(__METHOD__);
         return '
         <div class="col-md-4 offset-md-4">
           <h2><i class="fa fa-key"></i> Forgot password</h2>
-          <form action="' . $this->g->self . '" method="post">
+          <form action="' . $this->g->cfg->self . '" method="post">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <div class="form-group">
               <div class="input-group">
@@ -45,7 +45,7 @@ error_log(var_export($in,true));
         return '
         <div class="col-md-4 offset-md-4">
           <h2><i class="fa fa-sign-in"></i> Sign in</h2>
-          <form action="' . $this->g->self . '" method="post">
+          <form action="' . $this->g->cfg->self . '" method="post">
             <input type="hidden" name="o" value="auth">
             <div class="form-group">
               <div class="input-group">
@@ -85,7 +85,7 @@ error_log(var_export($in,true));
         return '
         <div class="col-md-4 offset-md-4">
           <h2><i class="fa fa-key"></i> Update Password</h2>
-          <form action="' . $this->g->self . '" method="post">
+          <form action="' . $this->g->cfg->self . '" method="post">
             <input type="hidden" name="o" value="auth">
             <input type="hidden" name="id" value="' . $id . '">
             <input type="hidden" name="login" value="' . $login . '">

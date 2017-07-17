@@ -11,7 +11,7 @@ error_log(__METHOD__);
         return '
         <div class="col-md-4 offset-md-4">
           <h2><i class="fa fa-envelope"></i> Contact us</h2>
-          <form action="' . $this->g->self . '" method="post" onsubmit="return mailform(this)">
+          <form action="' . $this->g->cfg->self . '" method="post" onsubmit="return mailform(this)">
             <input type="hidden" name="o" value="auth">
             <div class="form-group">
               <label for="subject">Subject</label>

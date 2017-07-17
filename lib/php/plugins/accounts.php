@@ -34,7 +34,7 @@ error_log(__METHOD__);
 
         $pager = util::pager(
             (int) util::ses('p'),
-            (int) $this->g->perp,
+            (int) $this->g->cfg->perp,
             (int) db::read('count(id)', $where, $wval, '', 'col')
         );
 

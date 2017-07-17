@@ -191,7 +191,7 @@ error_log('records::editor = '.var_export($in,true));
                   <tbody>' . $buf . '
               </table>
             </div>
-              <form method="post" action="' . $this->g->self . '">
+              <form method="post" action="' . $this->g->cfg->self . '">
             <div class="row">
                 <input type="hidden" id="o" name="o" value="' . $this->g->in['o'] . '">
                 <input type="hidden" id="i" name="i" value="0">

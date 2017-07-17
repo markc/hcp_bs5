@@ -49,8 +49,8 @@ error_log(__METHOD__."($k, $v, $x)");
     {
 error_log(__METHOD__);
 
-        if (file_exists($g->file))
-           foreach(include $g->file as $k => $v)
+        if (file_exists($g->cfg->file))
+           foreach(include $g->cfg->file as $k => $v)
                $g->$k = array_merge($g->$k, $v);
     }
 

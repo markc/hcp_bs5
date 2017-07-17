@@ -140,7 +140,7 @@ error_log(__METHOD__);
               <i class="fa fa-user fa-fw"></i> ' . $header . '
             </a>
           </h3>
-          <form method="post" action="' . $this->g->self . '">
+          <form method="post" action="' . $this->g->cfg->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $id . '">
             <div class="row">

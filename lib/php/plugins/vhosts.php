@@ -62,7 +62,7 @@ error_log(__METHOD__);
             $dtype = $this->g->db['type'];
             $pws = shell_exec("sudo newpw 3");
             $ret = shell_exec("sudo addvhost $vhost $dtype $pws");
-            util::redirect($this->g->self . '?o=vhosts', 5, $ret);
+            util::redirect($this->g->cfg->self . '?o=vhosts', 5, $ret);
             util::log('Created ' . $vhost, 'success');
             shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
             exit;
@@ -152,7 +152,7 @@ error_log(__METHOD__);
             db::qry("DELETE FROM `logging` WHERE `did` = :did", ['did' => $this->g->in['i']]);
 
             $ret = shell_exec("sudo delvhost $vhost " . $this->g->db['type']);
-            util::redirect($this->g->self . '?o=vhosts', 5, $ret);
+            util::redirect($this->g->cfg->self . '?o=vhosts', 5, $ret);
             util::log('Removed ' . $vhost, 'success');
             shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
             exit;

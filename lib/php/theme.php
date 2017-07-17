@@ -52,7 +52,7 @@ error_log(__METHOD__);
         return '
     <header>
       <h1>
-        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
+        <a href="' . $this->g->cfg->self . '">' . $this->g->out['head'] . '</a>
       </h1>' . $this->g->out['nav1'] . '
     </header>';
     }
