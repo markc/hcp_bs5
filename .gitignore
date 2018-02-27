@@ -4,4 +4,10 @@ phpinfo.php
 status/
 phpmyadmin/
 webmail/
+lib/uploads/
+whmcs/
 .well-known/
+delete_tblpricing.sh
+synergytld.php
+testpricing.php
+tld_order.php

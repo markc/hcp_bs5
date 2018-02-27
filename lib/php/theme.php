@@ -98,7 +98,7 @@ error_log(__METHOD__);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>' . $doc . '</title>' . $css . '
   </head>
-  <body>' . $head . $main . $foot . $end . '
+  <body>' . $head . $main . $foot . $end . $js . '
   </body>
 </html>
 ';

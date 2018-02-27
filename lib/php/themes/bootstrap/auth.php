@@ -43,13 +43,13 @@ error_log(var_export($in,true));
         extract($in);
 
         return '
-        <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-sign-in"></i> Sign in</h2>
+        <div class="col-12 col-sm-6 col-md-4 mr-md-auto ml-md-auto">
+          <h2><i class="fas fa-sign-in-alt"></i> Sign in</h2>
           <form action="' . $this->g->cfg['self'] . '" method="post">
             <input type="hidden" name="o" value="auth">
             <div class="form-group">
               <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+                <span class="input-group-addon"><i class="fas fa-user fa-fw"></i></span>
                 <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="' . $login . '" required autofocus>
               </div>
             </div>

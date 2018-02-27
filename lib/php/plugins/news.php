@@ -8,6 +8,7 @@ class Plugins_News extends Plugin
     $tbl = 'news',
     $in = [
         'title'     => '',
+        'media'     => '',
         'author'    => 1,
         'content'   => '',
     ];

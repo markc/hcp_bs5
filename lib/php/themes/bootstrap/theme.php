@@ -9,73 +9,71 @@ class Themes_Bootstrap_Theme extends Theme
 error_log(__METHOD__);
 
         return '
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/lib/img/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="apple-touch-icon" sizes="57x57" href="/lib/img/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/lib/img/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/lib/img/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/lib/img/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/lib/img/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/lib/img/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/lib/img/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/lib/img/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/lib/img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/lib/img/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/lib/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/lib/img/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/lib/img/favicon-16x16.png">
-    <link rel="manifest" href="/lib/img/manifest.json">
-    <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300italic" rel="stylesheet" type="text/css">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" rel="stylesheet" crossorigin="anonymous">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <script src="//code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script src="/lib/js/bootstrap-table.js"></script>
-<!--
-    <link href="/lib/css/bootstrap-table.css" rel="stylesheet">
-    <script src="/lib/js/bootstrap-table-editable.js"></script>
-    <script src="/lib/js/bootstrap-table-export.js""></script>
-    <script src="/lib/js/tableExport.js""></script>
-    <script src="/lib/js/bootstrap-editable.js"></script>
--->
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:100,300,400,500,300italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
     <style>
-* { transition: 0.2s linear; }
-body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; padding-top: 5rem; }
-.nowrap { white-space: nowrap; }
-.ellide { overflow: hidden; text-overflow: ellipsis; }
-.w100 { width: 100px; }
-.w200 { width: 200px; }
-.w300 { width: 300px; }
-.max100 { max-width:  50px; }
-.max100 { max-width: 100px; }
-.max100 { max-width: 150px; }
-.max200 { max-width: 200px; }
-.max300 { max-width: 300px; }
-.max600 { max-width: 600px; }
-.min50  { min-width:  50px; }
-.min100 { min-width: 100px; }
-.min150 { min-width: 150px; }
-.min200 { min-width: 200px; }
-.min300 { min-width: 300px; }
-.min600 { min-width: 600px; }
-.min900 { min-width: 900px; }
-.table-toolbar .search, .fixed-table-toolbar .columns { margin-bottom: 10px; }
-.fixed-table-container thead th .sortable {
-    cursor: pointer;
-    background-position: right;
-    background-repeat: no-repeat;
-    padding-right: 30px;
+body{min-height:75rem;padding-top:5rem;}
+.mw30{min-width:30rem;}
+.mw60{min-width:60rem;}
+
+  .media {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .media-img {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .media img {
+    max-width: 100%;
+    height: auto;
+    /*margin-bottom: 0.75rem;*/
+  }
+  .media-blank {
+    width: 300px;
+  }
+  .media-title {
+    margin-bottom: 0.75rem;
+  }
+
+  /*body{ background:yellow; }*/
+
+@media (min-width:576px) {
+  /*body{ background:red; }*/
 }
-.fixed-table-container thead th .both {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAQAAADYWf5HAAAAkElEQVQoz7X QMQ5AQBCF4dWQSJxC5wwax1Cq1e7BAdxD5SL+Tq/QCM1oNiJidwox0355mXnG/DrEtIQ6azioNZQxI0ykPhTQIwhCR+BmBYtlK7kLJYwWCcJA9M4qdrZrd8pPjZWPtOqdRQy320YSV17OatFC4euts6z39GYMKRPCTKY9UnPQ6P+GtMRfGtPnBCiqhAeJPmkqAAAAAElFTkSuQmCC");
+@media (min-width:768px) {
+  /*body{ background:blue; }*/
+
+  .media {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .media-body {
+    margin-left: 1.5rem;
+  }
+  .media-img, .media-blank, .media img {
+    max-width: 200px;
+  }
 }
-.fixed-table-container thead th .asc {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAZ0lEQVQ4y2NgGLKgquEuFxBPAGI2ahhWCsS/gDibUoO0gPgxEP8H4ttArEyuQYxAPBdqEAxPBImTY5gjEL9DM+wTENuQahAvEO9DMwiGdwAxOymGJQLxTyD+jgWDxCMZRsEoGAVoAADeemwtPcZI2wAAAABJRU5ErkJggg==");
+@media (min-width:992px) {
+  /*body{ background: green; }*/
+  .media-img, .media-blank, .media img {
+    max-width: 100%;
+  }
 }
-.fixed-table-container thead th .desc {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAZUlEQVQ4y2NgGAWjYBSggaqGu5FA/BOIv2PBIPFEUgxjB+IdQPwfC94HxLykus4GiD+hGfQOiB3J8SojEE9EM2wuSJzcsFMG4ttQgx4DsRalkZENxL+AuJQaMcsGxBOAmGvopk8AVz1sLZgg0bsAAAAASUVORK5CYII= ");
+@media (min-width:1200px) {
+  /*body{ background: white; }*/
+  .media-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
 }
     </style>';
     }
@@ -86,11 +84,13 @@ error_log(__METHOD__);
 
         list($lvl, $msg) = util::log();
         return $msg ? '
-      <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>' . $msg . '
-      </div>' : '';
+        <div class="col-12">
+          <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>' . $msg . '
+          </div>
+        </div>' : '';
     }
 
     public function head() : string
@@ -98,20 +98,19 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return '
-    <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a class="navbar-brand" href="' . $this->g->cfg['self'] . '" title="Home Page">
-        <b><i class="fa fa-server fa-fw"></i> ' . $this->g->out['head'] . '</b>
-      </a>
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
-        </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item pull-right">' . $this->g->out['nav3'] . '
-          </li>
-        </ul>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <div class=container>
+        <a class="navbar-brand" href="' . $this->g->cfg['self'] . '" title="Home Page">
+          <b><i class="fa fa-server fa-fw"></i> ' . $this->g->out['head'] . '</b>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsDefault">
+          <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+          </ul>
+        </div>
       </div>
     </nav>';
     }
@@ -180,11 +179,21 @@ error_log(__METHOD__);
 
         return '
     <main class="container">
-      <div class="row">
-        <div class="col-12">' . $this->g->out['log'] . $this->g->out['main'] . '
-        </div>
+      <div class="row">' . $this->g->out['log'] . $this->g->out['main'] . '
       </div>
     </main>';
+    }
+
+    public function js() : string
+    {
+error_log(__METHOD__);
+        return '
+<script defer src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script>
+<script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script defer src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>';
     }
 
     protected function pager(array $ary) : string

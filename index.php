@@ -46,6 +46,7 @@ echo new Init(new class
         'head'  => 'NetServa',
         'main'  => 'Error: missing page!',
         'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
+        'js'   => '',
         'end'   => '',
     ],
     $db = [
@@ -60,28 +61,28 @@ echo new Init(new class
     ],
     $nav1 = [
         'non' => [
-            ['About',       '?o=about', 'fa fa-info-circle fa-fw'],
-            ['Contact',     '?o=contact', 'fa fa-envelope fa-fw'],
-            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
-            ['Sign in',     '?o=auth', 'fa fa-sign-in fa-fw'],
+            ['About',       '?o=about', 'fas fa-info-circle fa-fw'],
+            ['Contact',     '?o=contact', 'fas fa-envelope fa-fw'],
+            ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
+            ['Sign in',     '?o=auth', 'fas fa-sign-in-alt fa-fw'],
         ],
         'usr' => [
-            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
+            ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
         ],
         'adm' => [
-            ['News',        '?o=news&p=1', 'fa fa-file-text fa-fw'],
+            ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
             ['Admin',       [
-                ['Accounts',    '?o=accounts&p=1', 'fa fa-vcard fa-fw'],
-                ['Vhosts',      '?o=vhosts&p=1', 'fa fa-globe fa-fw'],
-                ['Vmails',      '?o=vmails&p=1', 'fa fa-envelope fa-fw'],
-                ['Aliases',     '?o=valias&p=1', 'fa fa-envelope-square fa-fw'],
-                ['Domains',     '?o=domains&p=1', 'fa fa-server fa-fw'],
-            ], 'fa fa-users fa-fw'],
+                ['Accounts',    '?o=accounts&p=1', 'fas fa-vcard fa-fw'],
+                ['Vhosts',      '?o=vhosts&p=1', 'fas fa-globe fa-fw'],
+                ['Vmails',      '?o=vmails&p=1', 'fas fa-envelope fa-fw'],
+                ['Aliases',     '?o=valias&p=1', 'fas fa-envelope-square fa-fw'],
+                ['Domains',     '?o=domains&p=1', 'fas fa-server fa-fw'],
+            ], 'fas fa-users fa-fw'],
             ['Stats',       [
-                ['Sys Info',    '?o=infosys&p=1', 'fa fa-dashboard fa-fw'],
-                ['Mail Info',    '?o=infomail&p=1', 'fa fa-envelope-o fa-fw'],
-                ['Mail Graph',    '?o=mailgraph&p=1', 'fa fa-envelope fa-fw'],
-            ], 'fa fa-info-circle fa-fw'],
+                ['Sys Info',    '?o=infosys&p=1', 'fas fa-dashboard fa-fw'],
+                ['Mail Info',    '?o=infomail&p=1', 'fas fa-envelope-o fa-fw'],
+                ['Mail Graph',    '?o=mailgraph&p=1', 'fas fa-envelope fa-fw'],
+            ], 'fas fa-info-circle fa-fw'],
         ],
     ],
     $nav2 = [
