@@ -27,6 +27,7 @@ error_log(__METHOD__);
         if ($_POST) {
             $this->in['quota'] *= 1048576;
             extract($this->in);
+/*
             $password = 'changeme_N0W';
             list($lhs, $rhs) = explode('@', $user);
 
@@ -125,8 +126,10 @@ error_log(__METHOD__);
             // test $res ?
 
             util::log('Created mailbox for ' . $user, 'success');
+*/
             shell_exec("nohup sh -c 'sleep 1; sudo addvmail $user' > /tmp/addvmail.log 2>&1 &");
             util::ses('p', '', '1');
+            utill::log(shell_exec("sudo rootcat /tmp/addvmail.log"));
             return $this->list();
         }
         return $this->t->create($this->in);
@@ -200,7 +203,7 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
 
-            db::qry("DELETE FROM `vmails` WHERE `id` = :id", ['id' => $this->g->in['i']]);
+//            db::qry("DELETE FROM `vmails` WHERE `id` = :id", ['id' => $this->g->in['i']]);
             db::qry("DELETE FROM `valias` WHERE `target` = :user", ['user' => $user]);
             db::qry("DELETE FROM `logging` WHERE `name` = :user", ['user' => $user]);
 
