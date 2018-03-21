@@ -171,7 +171,7 @@ error_log(__METHOD__);
                   </div>
                   <div class="form-group">
                     <label for="media">Media</label>
-                    <input type="text" class="form-control" id="media" name="media" value="' . $media . '" required>
+                    <input type="text" class="form-control" id="media" name="media" value="' . $media . '">
                   </div>
                   <div class="form-group">
                     <label for="author">Author</label>' . $author_buf . '

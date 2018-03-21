@@ -65,21 +65,17 @@ error_log(var_export($in,true));
 error_log(__METHOD__);
 
       return '
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="min600">
+          <div class="col-12">
+            <h3>
+              <i class="fa fa-globe fa-fw"></i> Domains
               <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
-                <i class="fa fa-globe fa-fw"></i> Domains
                 <small><i class="fa fa-plus-circle fa-fw"></i></small>
               </a>
             </h3>
           </div>
-          <div class="col-md-6">
-            <div id="toolbar"></div>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-sm min600"
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <table id=domains class="table table-sm"
             data-click-to-select="true"
             data-mode="inline"
             data-page-list="[2, 5, 10, 20, 50, 100]"
@@ -104,7 +100,6 @@ error_log(__METHOD__);
               </tr>
             </thead>
           </table>
-        </div>
 
         <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
           <div class="modal-dialog" role="document">
@@ -151,6 +146,8 @@ error_log(__METHOD__);
         </div>
 
         <script>
+$(document).ready(function() { $("#domains").DataTable(); });
+
 $("#type").change(function () {
   if (this.value == "SLAVE")
     $("#mip-control").removeClass("invisible");
@@ -159,25 +156,24 @@ $("#type").change(function () {
 });
 
 function nameFormatter(value, row, index) {
-    return [
-        "<a href=\"?o=records&m=update&i=" + row.id + "\" title=\"Update records for " + row.name + "\">",
-          "<strong>" + row.name + "</strong>",
-       "</a>",
-    ].join("");
+  return [
+    "<a href=\"?o=records&m=update&i=" + row.id + "\" title=\"Update records for " + row.name + "\">",
+      "<strong>" + row.name + "</strong>",
+    "</a>",
+  ].join("");
 }
-function actionFormatter(value, row, index) {
-    return [
-        "<a href=\"?o=domains&m=update&i=" + row.id + "\" title=\"Update DNS record ID: " + row.id + "\">",
-          "<i class=\"fa fa-pencil fa-fw\"></i>",
-       "</a>",
-        "<a href=\"?o=domains&m=delete&i=" + row.id + "\" title=\"Remove DNS record ID: " + row.id + "\" onClick=\"javascript: return confirm(\'Are you sure you want to remove record ID: " + row.id + "?\')\">",
-          "<i class=\"fa fa-trash fa-fw text-danger\"></i>",
-       "</a>",
-    ].join("");
-}
-        </script>
 
-        ';
+function actionFormatter(value, row, index) {
+  return [
+    "<a href=\"?o=domains&m=update&i=" + row.id + "\" title=\"Update DNS record ID: " + row.id + "\">",
+      "<i class=\"fa fa-pencil fa-fw\"></i>",
+    "</a>",
+    "<a href=\"?o=domains&m=delete&i=" + row.id + "\" title=\"Remove DNS record ID: " + row.id + "\" onClick=\"javascript: return confirm(\'Are you sure you want to remove record ID: " + row.id + "?\')\">",
+      "<i class=\"fa fa-trash fa-fw text-danger\"></i>",
+    "</a>",
+  ].join("");
+}
+        </script>';
     }
 
     public function list_orig(array $in) : string
@@ -190,7 +186,7 @@ error_log(__METHOD__);
 
         if ($pgr['last'] > 1) {
             $pgr_top ='
-          <div class="col-md-6">' . $this->pager($pgr) . '
+          <div class="col-6">' . $this->pager($pgr) . '
           </div>';
             $pgr_end = '
           <div class="row">
@@ -227,7 +223,7 @@ error_log(__METHOD__);
 
         return '
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-6">
             <h3 class="min600">
               <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
                 <i class="fa fa-globe fa-fw"></i> Domains
@@ -314,37 +310,37 @@ error_log(__METHOD__);
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
             <div class="row">
-              <div class="col-md-3">
+              <div class="col-3">
                 <div class="form-group">
                   <label for="primary">Primary</label>
                   <input type="text" class="form-control" id="primary" name="primary" value="' . $soa[0] . '" required>
                 </div>
               </div>
-              <div class="col-md-3">
+              <div class="col-3">
                 <div class="form-group">
                   <label for="email">Email</label>
                   <input type="text" class="form-control" id="email" name="email" value="' . $soa[1] . '" required>
                 </div>
               </div>
-              <div class="col-md-1">
+              <div class="col-1">
                 <div class="form-group">
                   <label for="refresh">Refresh</label>
                   <input type="text" class="form-control" id="refresh" name="refresh" value="' . $soa[3] . '" required>
                 </div>
               </div>
-              <div class="col-md-1">
+              <div class="col-1">
                 <div class="form-group">
                   <label for="retry">Retry</label>
                   <input type="text" class="form-control" id="retry" name="retry" value="' . $soa[4] . '" required>
                 </div>
               </div>
-              <div class="col-md-2">
+              <div class="col-2">
                 <div class="form-group">
                   <label for="expire">Expire</label>
                   <input type="text" class="form-control" id="expire" name="expire" value="' . $soa[5] . '" required>
                 </div>
               </div>
-              <div class="col-md-2">
+              <div class="col-2">
                 <div class="form-group">
                   <label for="ttl">TTL</label>
                   <input type="text" class="form-control" id="ttl" name="ttl" value="' . $soa[6] . '" required>
@@ -352,7 +348,7 @@ error_log(__METHOD__);
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12 text-right">
+              <div class="col-12 text-right">
                 <div class="btn-group">' . $this->dropdown($this->mns, 'type', '', '', 'custom-select') . $submit . '
                 </div>
               </div>

@@ -28,7 +28,7 @@ error_log(__METHOD__);
 
         if ($pgr['last'] > 1) {
             $pgr_top ='
-          <div class="col-md-6">' . $this->pager($pgr) . '
+          <div class="col-6">' . $this->pager($pgr) . '
           </div>';
             $pgr_end = '
           <div class="row">
@@ -78,10 +78,10 @@ error_log(__METHOD__);
                 <td><strong>' . $url . '</strong></td>
                 <td>' . $uname . '</td>
                 <td>' . $uid . ':' . $gid . '</td>
-                <td>' . $num_aliases . ' / ' . $aliases . '</td>
-                <td>' . $num_mailboxes . ' / ' . $mailboxes . '</td>
-                <td>' . $size_mpath . ' / ' . $mail_quota . '</td>
-                <td>' . $size_upath . ' / ' . $disk_quota . '</td>
+                <td class="text-right">' . $num_aliases . ' / ' . $aliases . '</td>
+                <td class="text-right">' . $num_mailboxes . ' / ' . $mailboxes . '</td>
+                <td class="text-right">' . $size_mpath . ' / ' . $mail_quota . '</td>
+                <td class="text-right">' . $size_upath . ' / ' . $disk_quota . '</td>
                 <td>' . $active_icon . '</td>
               </tr>';
         }
@@ -90,34 +90,33 @@ error_log(__METHOD__);
                 <tr><td colspan="8" class="text-center">No Records</td></tr>';
 
         return '
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="min600">
+          <div class="col-12">
+            <h3>
+              <i class="fa fa-globe fa-fw"></i> Vhosts
               <a href="?o=vhosts&m=create" title="Add Vhost">
-                <i class="fa fa-globe fa-fw"></i> Vhosts
                 <small><i class="fa fa-plus-circle fa-fw"></i></small>
               </a>
             </h3>
-          </div>' . $pgr_top . '
-        </div>
-        <div class="table-responsive">
-          <table class="table table-sm min600">
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <table id=vhosts class="table table-sm">
             <thead class="nowrap">
               <tr>
-                <th class="min200">Domain</th>
-                <th class="min100">Uname</th>
-                <th class="min100">UID:GID</th>
-                <th class="min100">Aliases</th>
-                <th class="min100">Mailboxes</th>
-                <th class="min200">Mail Quota</th>
-                <th class="min200">Disk Quota</th>
-                <th></th>
+                <th>Domain</th>
+                <th>Uname</th>
+                <th>UID:GID</th>
+                <th>Aliases</th>
+                <th>Mailboxes</th>
+                <th>Mail Quota</th>
+                <th>Disk Quota</th>
+                <th data-sortable="false"></th>
               </tr>
             </thead>
             <tbody>' . $buf . '
             </tbody>
           </table>
-        </div>' . $pgr_end;
+          <script>$(document).ready(function() { $("#vhosts").DataTable(); });</script>';
     }
 
     private function editor(array $in) : string
@@ -151,28 +150,28 @@ error_log(__METHOD__);
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
             <div class="row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-4">
                 <label for="domain">Domain</label>' . $enable . '
               </div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-2">
                 <label for="aliases">Max Aliases</label>
                 <input type="number" class="form-control" name="aliases" id="aliases" value="' . $aliases . '">
               </div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-2">
                 <label for="mailboxes">Max Mailboxes</label>
                 <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $mailboxes . '">
               </div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-2">
                 <label for="mailquota">Mail Quota (MB)</label>
                 <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($mailquota / 1048576) . '">
               </div>
-              <div class="form-group col-md-2">
+              <div class="form-group col-2">
                 <label for="diskquota">Disk Quota (MB)</label>
                 <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($diskquota / 1048576) . '">
               </div>
             </div>
             <div class="row">
-              <div class="col-md-2 offset-md-6">
+              <div class="col-2 offset-md-6">
                 <div class="form-group">
                   <label class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
@@ -181,7 +180,7 @@ error_log(__METHOD__);
                   </label>
                 </div>
               </div>
-              <div class="col-md-4 text-right">
+              <div class="col-4 text-right">
                 <div class="btn-group">' . $submit . '
                 </div>
               </div>

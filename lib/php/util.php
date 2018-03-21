@@ -231,6 +231,7 @@ error_log(__METHOD__);
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
     }
 
+    // not used 20180319
     public static function getcfg()
     {
 error_log(__METHOD__);
@@ -248,7 +249,20 @@ error_log(__METHOD__);
 
     // mail utilities
 
-    public static function numfmt(float $size, int $precision = 2) : string
+    public static function numfmt(float $size, int $precision = null) : string
+    {
+error_log(__METHOD__);
+
+        if ($size == 0) return '0';
+        if ($size >= 1000000000000) return round(($size / 1000000000000), $precision??3) . ' TB';
+        else if ($size >= 1000000000) return round(($size / 1000000000), $precision??2) . ' GB';
+        else if ($size >= 1000000) return round(($size / 1000000), $precision??1) . ' MB';
+        else if ($size >= 1000) return round(($size / 1000), $precision??0) . ' KB';
+        else return $size . ' Bytes';
+    }
+
+    // numfmt() was wrong, we want MB not MiB
+    public static function numfmtsi(float $size, int $precision = 2) : string
     {
 error_log(__METHOD__);
 

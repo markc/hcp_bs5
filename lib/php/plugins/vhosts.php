@@ -24,8 +24,8 @@ class Plugins_Vhosts extends Plugin
 error_log(__METHOD__);
 
         if ($_POST) {
-            $this->in['diskquota'] *= 1048576;
-            $this->in['mailquota'] *= 1048576;
+            $this->in['diskquota'] *= 1000000;
+            $this->in['mailquota'] *= 1000000;
             extract($this->in);
             $active = $active ? 1 : 0;
 
@@ -83,8 +83,8 @@ error_log(__METHOD__);
 
         if ($_POST) {
             extract($this->in);
-            $diskquota *= 1048576;
-            $mailquota *= 1048576;
+            $diskquota *= 1000000;
+            $mailquota *= 1000000;
             $active = $active ? 1 : 0;
 
             if ($mailquota > $diskquota) {

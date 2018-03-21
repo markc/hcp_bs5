@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20170225
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/valias.php 20180219
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 {
@@ -22,12 +22,13 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $buf = $pgr_top = $pgr_end = '';
+        $buf = '';
         $pgr = $in['pager']; unset($in['pager']);
-
+/*
+        $buf = $pgr_top = $pgr_end = '';
         if ($pgr['last'] > 1) {
             $pgr_top ='
-          <div class="col-md-6">' . $this->pager($pgr) . '
+          <div class="col-6">' . $this->pager($pgr) . '
           </div>';
             $pgr_end = '
           <div class="row">
@@ -35,7 +36,7 @@ error_log(__METHOD__);
             </div>
           </div>';
         }
-
+*/
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
@@ -63,30 +64,30 @@ error_log(__METHOD__);
         }
 
         return '
-        <div class="row">
-          <div class="col-md-6">
-          <h3 class="min600">
+          <div class="col-6">
+          <h3>
+            <i class="fa fa-globe fa-fw"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
-              <i class="fa fa-globe fa-fw"></i> Aliases
               <small><i class="fa fa-plus-circle fa-fw"></i></small>
             </a>
           </h3>
-          </div>' . $pgr_top . '
-        </div>
-          <div class="table-responsive">
-            <table class="table table-sm min600">
+          </div>
+        </div><!-- END UPPER ROW -->
+          <div class="row">
+            <table id=valias class="table table-sm">
               <thead class="nowrap">
                 <tr>
-                  <th class="min100">Alias</th>
-                  <th class="min150">Target Address</th>
-                  <th class="min100">Domain</th>
-                  <th class="min50"></th>
+                  <th>Alias</th>
+                  <th>Target Address</th>
+                  <th>Domain</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
               </tbody>
             </table>
-          </div>' . $pgr_end;
+          </div>
+          <script>$(document).ready(function() { $("#valias").DataTable(); });</script>';
 
     }
 
@@ -118,19 +119,19 @@ error_log(__METHOD__);
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
             <div class="row">
-              <div class="form-group col-md-6">
+              <div class="form-group col-6">
                 <label class="control-label" for="source">Alias Address(es)</label>
                 <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source" id="source">' . $source . '</textarea>
                 <p>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>Locally hosted domains only</b>.</p>
               </div>
-              <div class="form-group col-md-6">
+              <div class="form-group col-6">
                 <label class="control-label" for="target">Target Address(es)</label>
                 <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target" name="target">' . $target . '</textarea>
                 <p>Full email address/es (comma-separated).</p>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-2 offset-md-6">
+              <div class="col-2 offset-md-6">
                 <div class="form-group">
                   <label class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
@@ -139,7 +140,7 @@ error_log(__METHOD__);
                   </label>
                 </div>
               </div>
-              <div class="col-md-4 text-right">
+              <div class="col-4 text-right">
                 <div class="btn-group">' . $submit . '
                 </div>
               </div>

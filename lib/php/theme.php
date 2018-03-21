@@ -95,10 +95,10 @@ error_log(__METHOD__);
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>' . $css . '
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>' . $doc . '</title>' . $css . $js . '
   </head>
-  <body>' . $head . $main . $foot . $end . $js . '
+  <body>' . $head . $main . $foot . $end . '
   </body>
 </html>
 ';

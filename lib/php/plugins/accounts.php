@@ -32,6 +32,8 @@ error_log(__METHOD__);
             $wval = $_SESSION['usr']['id'];
          }
 
+        return $this->t->list(db::read('*'));
+/*
         $pager = util::pager(
             (int) util::ses('p'),
             (int) $this->g->cfg['perp'],
@@ -42,6 +44,7 @@ error_log(__METHOD__);
             db::read('*', $where, $wval, 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
             ['pager' => $pager]
         ));
+*/
     }
 
     protected function switch_user()

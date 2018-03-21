@@ -29,13 +29,14 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        $buf = '';
+        $num = count($in);
+/*
         $buf = $pgr_top = $pgr_end = '';
         $pgr = $in['pager']; unset($in['pager']);
-        $num = count($in);
-
         if ($pgr['last'] > 1) {
             $pgr_top ='
-          <div class="col-md-6">' . $this->pager($pgr) . '
+          <div class="col-6">' . $this->pager($pgr) . '
           </div>';
             $pgr_end = '
           <div class="row">
@@ -43,7 +44,7 @@ error_log(__METHOD__);
             </div>
           </div>';
         }
-
+*/
         foreach ($in as $a) {
             extract($a);
             $buf .= '
@@ -62,18 +63,17 @@ error_log(__METHOD__);
         }
 
         return '
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="min60">
+          <div class="col-12">
+            <h3>
+              <i class="fas fa-users fa-fw"></i> Accounts
               <a href="?o=accounts&m=create" title="Add new account">
-                <i class="fa fa-users fa-fw"></i> Accounts
-                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+                <small><i class="fas fa-plus-circle fa-fw"></i></small>
               </a>
             </h3>
-          </div>' . $pgr_top . '
-        </div>
-        <div class="table-responsive">
-          <table class="table table-sm min600">
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <table id=accounts class="table table-sm">
             <thead class="nowrap">
               <tr>
                 <th>User ID</th>
@@ -87,7 +87,7 @@ error_log(__METHOD__);
             <tbody>' . $buf . '
             </tbody>
           </table>
-        </div>' . $pgr_end;
+          <script>$(document).ready(function() { $("#accounts").DataTable(); });</script>';
     }
 
     private function editor(array $in) : string
@@ -144,7 +144,7 @@ error_log(__METHOD__);
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="i" value="' . $id . '">
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-4">
                 <div class="form-group">
                   <label for="login">UserID</label>
                   <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
@@ -154,7 +154,7 @@ error_log(__METHOD__);
                   <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-4">
                 <div class="form-group">
                   <label for="fname">First Name</label>
                   <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
@@ -164,11 +164,11 @@ error_log(__METHOD__);
                   <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
                 </div>
               </div>
-              <div class="col-md-4">' . $aclgrp_buf . '
+              <div class="col-4">' . $aclgrp_buf . '
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">' . $switch . '
+              <div class="col-12">' . $switch . '
                 <div class="btn-group pull-right">' . $submit . '
                 </div>
               </div>

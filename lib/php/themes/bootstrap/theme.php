@@ -10,38 +10,38 @@ error_log(__METHOD__);
 
         return '
     <link href="https://fonts.googleapis.com/css?family=Quicksand:100,300,400,500,300italic" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
     <style>
 body{min-height:75rem;padding-top:5rem;}
-.mw30{min-width:30rem;}
-.mw60{min-width:60rem;}
+table,form{width:100%;}
+table.dataTable{border-collapse: collapse !important;}
 
-  .media {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .media-img {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 0.75rem;
-  }
-  .media img {
-    max-width: 100%;
-    height: auto;
-    /*margin-bottom: 0.75rem;*/
-  }
-  .media-blank {
-    width: 300px;
-  }
-  .media-title {
-    margin-bottom: 0.75rem;
-  }
+.media {
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.media-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.media img {
+  max-width: 100%;
+  height: auto;
+  /*margin-bottom: 0.75rem;*/
+}
+.media-blank {
+  width: 300px;
+}
+.media-title {
+  margin-bottom: 0.75rem;
+}
 
-  /*body{ background:yellow; }*/
+/*body{ background:yellow; }*/
 
 @media (min-width:576px) {
   /*body{ background:red; }*/
@@ -187,13 +187,15 @@ error_log(__METHOD__);
     public function js() : string
     {
 error_log(__METHOD__);
+
         return '
-<script defer src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<script defer src="https://use.fontawesome.com/releases/v5.0.2/js/all.js"></script>
-<script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-<script defer src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script defer src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>';
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script>
+';
     }
 
     protected function pager(array $ary) : string

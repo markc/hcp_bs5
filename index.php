@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20170305
+// index.php 20150101 - 20180318
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS  = DIRECTORY_SEPARATOR;
@@ -72,7 +72,7 @@ echo new Init(new class
         'adm' => [
             ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
             ['Admin',       [
-                ['Accounts',    '?o=accounts&p=1', 'fas fa-vcard fa-fw'],
+                ['Accounts',    '?o=accounts&p=1', 'fas fa-users fa-fw'],
                 ['Vhosts',      '?o=vhosts&p=1', 'fas fa-globe fa-fw'],
                 ['Vmails',      '?o=vmails&p=1', 'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias&p=1', 'fas fa-envelope-square fa-fw'],

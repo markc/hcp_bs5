@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugin.php 20150101 - 20170316
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugin.php 20150101 - 20180319
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
 {
@@ -95,16 +95,21 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $pager = util::pager(
-            (int) util::ses('p'),
-            (int) $this->g->cfg['perp'],
-            (int) db::read('count(id)', '', '', '', 'col')
-        );
+// Remove util::pager(), changeover to relying on bootstrap4 tables
 
-        return $this->t->list(array_merge(
-            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
-            ['pager' => $pager]
-        ));
+//        $pager = util::pager(
+//            (int) util::ses('p'),
+//            (int) $this->g->cfg['perp'],
+//            (int) db::read('count(id)', '', '', '', 'col')
+//        );
+
+        // this may still need to be LIMIT'd
+        return $this->t->list(db::read('*'));
+
+//        return $this->t->list(array_merge(
+//            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+//            ['pager' => $pager]
+//        ));
     }
 
     public function __call(string $name, array $args) : string
