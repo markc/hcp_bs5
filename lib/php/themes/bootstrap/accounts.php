@@ -100,14 +100,15 @@ error_log(__METHOD__);
             $header = 'Add Account';
             $switch = '';
             $submit = '
-                <a class="btn btn-outline-primary" href="?o=accounts&m=list">&laquo; Back</a>
+                <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
                 <button type="submit" name="m" value="create" class="btn btn-primary">Add This Account</button>';
         } else {
             $header = 'Update Account';
-            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
+//            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
+            $switch = util::is_adm() && (!util::is_usr(0) && !util::is_usr(1)) ? '
                   <a class="btn btn-outline-primary pull-left" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
             $submit = '
-                <a class="btn btn-outline-primary" href="?o=accounts&m=list">&laquo; Back</a>
+                <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=accounts&m=delete&i=' . $id . '" title="Remove this account" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
                 <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
         }
@@ -135,45 +136,49 @@ error_log(__METHOD__);
         }
 
         return '
-          <h3 class="min600">
-            <a href="?o=accounts&m=list">
-              <i class="fa fa-user fa-fw"></i> ' . $header . '
-            </a>
-          </h3>
-          <form method="post" action="' . $this->g->cfg['self'] . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="i" value="' . $id . '">
-            <div class="row">
-              <div class="col-4">
-                <div class="form-group">
-                  <label for="login">UserID</label>
-                  <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
+          <div class="col-12">
+            <h3><a href="?o=accounts&m=list">&laquo;</a> ' . $header . '</h3>
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <div class="col-12">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $id . '">
+              <div class="row">
+                <div class="col-4">
+                  <div class="form-group">
+                    <label for="login">UserID</label>
+                    <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="altemail">Alt Email</label>
+                    <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="altemail">Alt Email</label>
-                  <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
+                <div class="col-4">
+                  <div class="form-group">
+                    <label for="fname">First Name</label>
+                    <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="lname">Last Name</label>
+                    <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
+                  </div>
                 </div>
-              </div>
-              <div class="col-4">
-                <div class="form-group">
-                  <label for="fname">First Name</label>
-                  <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
-                </div>
-                <div class="form-group">
-                  <label for="lname">Last Name</label>
-                  <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
-                </div>
-              </div>
-              <div class="col-4">' . $aclgrp_buf . '
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">' . $switch . '
-                <div class="btn-group pull-right">' . $submit . '
+                <div class="col-4">' . $aclgrp_buf . '
                 </div>
               </div>
-            </div>
-          </form>';
+              <div class="row">
+                <div class="col-6">' . $switch . '
+                </div>
+                <div class="col-6 text-right">
+                  <div class="btn-group">' . $submit . '
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>';
     }
 }
 

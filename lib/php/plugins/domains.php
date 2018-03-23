@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/domains.php 20150101 - 20170423
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/domains.php 20150101 - 20180322
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
 {
@@ -15,6 +15,7 @@ class Plugins_Domains extends Plugin
         'type'        => '',
         'notified_serial' => '',
         'account'     => '',
+        'increment'   => 0,
     ];
 
     public function __construct(Theme $t)
@@ -138,8 +139,25 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
-            extract($_POST);
+        if ($_POST || $this->in['increment']) {
+            if ($this->in['increment']) {
+                $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+                $oldsoa   = explode(' ', db::qry($sql, ['did' => $this->g->in['i']], 'col'));
+                $primary  = $oldsoa[0];
+                $email    = $oldsoa[1];
+                $serial   = $oldsoa[2];
+                $refresh  = $oldsoa[3];
+                $retry    = $oldsoa[4];
+                $expire   = $oldsoa[5];
+                $ttl      = $oldsoa[6];
+            } else {
+                extract($_POST);
+            }
 
             $today = date('Ymd');
             $serial_day = substr($serial, 0, 8);
@@ -157,6 +175,7 @@ error_log(__METHOD__);
               $retry . ' ' .
               $expire . ' ' .
               $ttl;
+error_log("!!! soa=$soa");
 
             $sql = "
  UPDATE records SET
@@ -172,10 +191,15 @@ error_log(__METHOD__);
                 'ttl' => $ttl,
                 'updated' => date('Y-m-d H:i:s'),
             ]);
+
+            if ($this->in['increment']) return $serial;
+
             // TODO check $res ???
             util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
             return $this->list();
+
         } elseif ($this->g->in['i']) {
+
             $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
             if ($dom['type'] === 'SLAVE') {
                 return $this->t->update($dom);
@@ -216,6 +240,34 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        $sql = "
+ SELECT D.id,D.name,D.type,count(R.domain_id) AS records
+   FROM domains D
+   LEFT OUTER JOIN records R ON D.id = R.domain_id
+  GROUP BY D.id, D.name, D.type
+ HAVING (D.name LIKE '' OR 1)
+    AND (D.type='' OR 1)
+  ORDER BY D.`updated` DESC";
+
+        $domains = db::qry($sql);
+        $newary = [];
+        foreach($domains as $domain) {
+            $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            $soa = db::qry($sql, ['did' => $domain['id']], 'one');
+            $newary[] = array_merge($domain, $soa);
+        }
+        return $this->t->list($newary);
+    }
+
+    protected function list_ajax() : string
+    {
+error_log(__METHOD__);
+
         if ($this->g->in['x'] !== 'json')
           return $this->t->list([]);
 
@@ -243,5 +295,3 @@ error_log(__METHOD__);
         ));
     }
 }
-
-?>

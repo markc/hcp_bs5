@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/vhosts.php 20170225
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vhosts.php 20180323
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
 {
@@ -22,10 +22,11 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        $buf = '';
+        $adm = util::is_adm();
+/*
         $buf = $pgr_top = $pgr_end = '';
         $pgr = $in['pager']; unset($in['pager']);
-        $adm = util::is_adm();
-
         if ($pgr['last'] > 1) {
             $pgr_top ='
           <div class="col-6">' . $this->pager($pgr) . '
@@ -36,7 +37,7 @@ error_log(__METHOD__);
             </div>
           </div>';
         }
-
+*/
         foreach($in as $row) {
             extract($row);
 
@@ -62,8 +63,8 @@ error_log(__METHOD__);
             $num_mailboxes = db::qry($sql, ['did' => $id], 'col');
 
             $active_icon = (isset($active) && $active)
-                ? '<i class="fa fa-check text-success"></i>'
-                : '<i class="fa fa-times text-danger"></i>';
+                ? '<i class="fas fa-check text-success"></i>'
+                : '<i class="fas fa-times text-danger"></i>';
 
             $url = $adm ? '
                   <a href="?o=vhosts&m=update&i=' . $id . '" title="Vhost ID: ' . $id . '">' . $domain . '</a>' : $domain;
@@ -141,51 +142,52 @@ error_log(__METHOD__);
         $checked = $active ? ' checked' : '';
 
         return '
-          <h3 class="min600">
-            <a href="?o=vhosts&m=list">
-              <i class="fa fa-globe fa-fw"></i> ' . $header . '
-            </a>
-          </h3>
-          <form method="post" action="' . $this->g->cfg['self'] . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-            <div class="row">
-              <div class="form-group col-4">
-                <label for="domain">Domain</label>' . $enable . '
-              </div>
-              <div class="form-group col-2">
-                <label for="aliases">Max Aliases</label>
-                <input type="number" class="form-control" name="aliases" id="aliases" value="' . $aliases . '">
-              </div>
-              <div class="form-group col-2">
-                <label for="mailboxes">Max Mailboxes</label>
-                <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $mailboxes . '">
-              </div>
-              <div class="form-group col-2">
-                <label for="mailquota">Mail Quota (MB)</label>
-                <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($mailquota / 1048576) . '">
-              </div>
-              <div class="form-group col-2">
-                <label for="diskquota">Disk Quota (MB)</label>
-                <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($diskquota / 1048576) . '">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-2 offset-md-6">
-                <div class="form-group">
-                  <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
-                    <span class="custom-control-indicator"></span>
-                    <span class="custom-control-description">Active</span>
-                  </label>
+          <div class="col-12">
+            <h3><a href="?o=vhosts&m=list">&laquo;</a> ' . $header . '</h3>
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <div class="col-12">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+              <div class="row">
+                <div class="form-group col-4">
+                  <label for="domain">Domain</label>' . $enable . '
+                </div>
+                <div class="form-group col-2">
+                  <label for="aliases">Max Aliases</label>
+                  <input type="number" class="form-control" name="aliases" id="aliases" value="' . $aliases . '">
+                </div>
+                <div class="form-group col-2">
+                  <label for="mailboxes">Max Mailboxes</label>
+                  <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $mailboxes . '">
+                </div>
+                <div class="form-group col-2">
+                  <label for="mailquota">Mail Quota (MB)</label>
+                  <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($mailquota / 1000000) . '">
+                </div>
+                <div class="form-group col-2">
+                  <label for="diskquota">Disk Quota (MB)</label>
+                  <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($diskquota / 1000000) . '">
                 </div>
               </div>
-              <div class="col-4 text-right">
-                <div class="btn-group">' . $submit . '
-                </div>
+              <div class="row">
+                <div class="col-2 offset-md-6">
+            <div class="form-group">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
+                <label class="custom-control-label" for="active">Active</label>
               </div>
             </div>
-          </form>';
+                </div>
+                <div class="col-4 text-right">
+                  <div class="btn-group">' . $submit . '
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>';
     }
 }
 

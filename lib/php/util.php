@@ -93,6 +93,8 @@ error_log(__METHOD__);
         }
         return implode(' ', $result) . ' ago';
     }
+/*
+Not needed with Bootstrap4 DataTables, 20180303
 
     public static function pager(int $curr, int $perp, int $total) : array
     {
@@ -115,7 +117,7 @@ error_log(__METHOD__);
             'total' => $total
         ];
     }
-
+*/
     public static function is_adm() : bool
     {
 error_log(__METHOD__);

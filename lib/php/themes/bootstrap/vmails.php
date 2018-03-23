@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170225
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vmails.php 20180321
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
@@ -21,29 +21,14 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
-error_log(var_export($in, true));
 
         $buf = '';
         $adm = util::is_adm();
 
-/* not needed with bootstrap tables
-        $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pager']; unset($in['pager']);
-        if ($pgr['last'] > 1) {
-            $pgr_top ='
-          <div class="col-6">' . $this->pager($pgr) . '
-          </div>';
-            $pgr_end = '//error_log(var_export($quota, true));
-
-          <div class="row">
-            <div class="col-12">' . $this->pager($pgr) . '
-            </div>
-          </div>';
-        }
-*/
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
+            $spam = $spam ? 1 : 0;
             list($lhs, $rhs) = explode('@', $user);
             $sql = "
  SELECT mailquota
@@ -58,9 +43,8 @@ error_log(var_export($in, true));
   WHERE name = :user ORDER BY month DESC";
 
             $quota          = db::qry($sql, ['user' => $user], 'one');
-//error_log(var_export($quota, true));
-            $mailquota      = $quota['user_mail'];
-            $messages       = $quota['num_total'] ? $quota['num_total'] : 0;
+            $mailquota      = $quota['user_mail'] ?? 0;
+            $messages       = $quota['num_total'] ?? 0;
             $percent        = round(($mailquota / $maxquota) * 100);
 
             $percent_buf    = $percent > 9 ? $percent.'%' : '';
@@ -98,7 +82,7 @@ error_log(var_export($in, true));
         return '
           <div class="col-12">
             <h3>
-              <i class="fas fa-envelope fa-fw"></i> Vmails
+              <i class="fas fa-envelope fa-fw"></i> Mailboxes
               <a href="?o=vmails&m=create" title="Add Mailbox">
                 <small><i class="fas fa-plus-circle fa-fw"></i></small>
               </a>
@@ -112,9 +96,9 @@ error_log(var_export($in, true));
                 <th>UserID</th>
                 <th>Domain</th>
                 <th class="w-25" data-sortable="false"></th>
-                <th class="text-right">Mailbox Quota&nbsp;</th>
-                <th class="text-right">Msg #&nbsp;</th>
-                <th></th>
+                <th>Mailbox Quota</th>
+                <th>Msg #</th>
+                <th data-sortable="false"></th>
               </tr>
             </thead>
             <tbody>' . $buf . '
@@ -129,30 +113,27 @@ error_log(__METHOD__);
 
         extract($in);
 
-        $active = $active ? 1 : 0;
-        $checked = $active ? ' checked' : '';
-        $passwd1 = $passwd1 ?? '';
-        $passwd2 = $passwd2 ?? '';
+        $active   = $active ? 1 : 0;
+        $spam     = $spam ? 1 : 0;
+        $checked  = $active ? ' checked' : '';
+        $passwd1  = $passwd1 ?? '';
+        $passwd2  = $passwd2 ?? '';
 
-        $header = $this->g->in['m'] === 'create' ? 'Add Vmail' : 'Update Vmail';
-        $submit = $this->g->in['m'] === 'create' ? '
+        $header   = $this->g->in['m'] === 'create' ? 'Add Mailbox' : 'Update Mailbox';
+        $submit   = $this->g->in['m'] === 'create' ? '
                       <a class="btn btn-secondary" href="?o=vmails&m=list">&laquo; Back</a>
                       <button type="submit" name="m" value="create" class="btn btn-primary">Add Mailbox</button>' : '
                       <a class="btn btn-secondary" href="?o=vmails&m=list">&laquo; Back</a>
                       <a class="btn btn-danger" href="?o=vmails&m=delete&i=' . $this->g->in['i'] . '" title="Remove mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $user . '?\')">Remove</a>
                       <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
-        $enable = $this->g->in['m'] === 'create' ? '
+        $enable   = $this->g->in['m'] === 'create' ? '
                 <input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="user" id="user" value="' . $user . '">' : '
                 <input type="text" class="form-control" value="' . $user . '" disabled>
                 <input type="hidden" name="user" id="user" value="' . $user . '">';
 
         return '
           <div class="col-12">
-            <h3>
-              <a href="?o=vmails&m=list">
-                <i class="fa fa-envelope fa-fw"></i> ' . $header . '
-              </a>
-            </h3>
+            <h3><a href="?o=vmails&m=list">&laquo;</a> ' . $header . '</h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
@@ -166,7 +147,7 @@ error_log(__METHOD__);
                 </div>
                 <div class="form-group col-2">
                   <label for="quota">Mailbox Quota</label>
-                  <input type="number" class="form-control" name="quota" id="quota" value="' . intval($quota / 1048576) . '">
+                  <input type="number" class="form-control" name="quota" id="quota" value="' . intval($quota / 1000000) . '">
                 </div>
                 <div class="col-3">
                   <div class="form-group">
@@ -182,7 +163,15 @@ error_log(__METHOD__);
                 </div>
               </div>
               <div class="row">
-                <div class="col-2 offset-md-6">
+                <div class="col-4">
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="spam" id="spam"' . $spam . '>
+                      <label class="custom-control-label" for="spam">Spam Filter</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>

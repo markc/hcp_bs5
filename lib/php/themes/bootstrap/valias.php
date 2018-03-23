@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20180219
+// lib/php/themes/bootstrap/valias.php 20180323
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
@@ -23,8 +23,8 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $buf = '';
-        $pgr = $in['pager']; unset($in['pager']);
 /*
+        $pgr = $in['pager']; unset($in['pager']);
         $buf = $pgr_top = $pgr_end = '';
         if ($pgr['last'] > 1) {
             $pgr_top ='
@@ -51,8 +51,8 @@ error_log(__METHOD__);
             }
 
             $active_buf = $active
-                ? '<i class="fa fa-check text-success"></i>'
-                : '<i class="fa fa-times text-danger"></i>';
+                ? '<i class="fas fa-check text-success"></i>'
+                : '<i class="fas fa-times text-danger"></i>';
 
             $buf .= '
             <tr>
@@ -68,7 +68,7 @@ error_log(__METHOD__);
           <h3>
             <i class="fa fa-globe fa-fw"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
-              <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
             </a>
           </h3>
           </div>
@@ -109,43 +109,44 @@ error_log(__METHOD__);
         $checked = $active ? ' checked' : '';
 
         return '
-          <h3 class="min600">
-            <a href="?o=valias&m=list">
-              <i class="fa fa-globe fa-fw"></i> ' . $header . '
-            </a>
-          </h3>
-          <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
-          <form method="post" action="' . $this->g->cfg['self'] . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-            <div class="row">
-              <div class="form-group col-6">
-                <label class="control-label" for="source">Alias Address(es)</label>
-                <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source" id="source">' . $source . '</textarea>
-                <p>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>Locally hosted domains only</b>.</p>
-              </div>
-              <div class="form-group col-6">
-                <label class="control-label" for="target">Target Address(es)</label>
-                <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target" name="target">' . $target . '</textarea>
-                <p>Full email address/es (comma-separated).</p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-2 offset-md-6">
-                <div class="form-group">
-                  <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
-                    <span class="custom-control-indicator"></span>
-                    <span class="custom-control-description">Active</span>
-                  </label>
+          <div class="col-12">
+            <h3><a href="?o=valias&m=list">&laquo;</a> ' . $header . '</h3>
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <div class="col-12">
+            <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+              <div class="row">
+                <div class="form-group col-6">
+                  <label class="control-label" for="source">Alias Address(es)</label>
+                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source" id="source">' . $source . '</textarea>
+                  <p>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>Locally hosted domains only</b>.</p>
+                </div>
+                <div class="form-group col-6">
+                  <label class="control-label" for="target">Target Address(es)</label>
+                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target" name="target">' . $target . '</textarea>
+                  <p>Full email address/es (comma-separated).</p>
                 </div>
               </div>
-              <div class="col-4 text-right">
-                <div class="btn-group">' . $submit . '
+              <div class="row">
+                <div class="col-2 offset-md-6">
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
+                      <label class="custom-control-label" for="active">Active</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4 text-right">
+                  <div class="btn-group">' . $submit . '
+                  </div>
                 </div>
               </div>
-            </div>
-          </form>';
+            </form>
+          </div>';
     }
 }
 
