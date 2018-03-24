@@ -112,10 +112,11 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         extract($in);
+error_log("active=$active,spam=$spam");
+        $active_checked = ($active ? 1 : 0) ? ' checked' : '';
+        $filter_checked = ($spam ? 1 : 0) ? ' checked' : '';
+error_log("active_checked=$active_checked,filter_checked=$filter_checked");
 
-        $active   = $active ? 1 : 0;
-        $spam     = $spam ? 1 : 0;
-        $checked  = $active ? ' checked' : '';
         $passwd1  = $passwd1 ?? '';
         $passwd2  = $passwd2 ?? '';
 
@@ -166,7 +167,7 @@ error_log(__METHOD__);
                 <div class="col-4">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="spam" id="spam"' . $spam . '>
+                      <input type="checkbox" class="custom-control-input" name="spam" id="spam"' . $filter_checked . '>
                       <label class="custom-control-label" for="spam">Spam Filter</label>
                     </div>
                   </div>
@@ -174,7 +175,7 @@ error_log(__METHOD__);
                 <div class="col-4">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $active_checked . '>
                       <label class="custom-control-label" for="active">Active</label>
                     </div>
                   </div>

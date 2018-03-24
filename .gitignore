@@ -4,7 +4,7 @@ phpinfo.php
 status/
 phpmyadmin/
 webmail/
-lib/uploads/*
+lib/uploads/*.jpg
 whmcs/
 .well-known/
 delete_tblpricing.sh
