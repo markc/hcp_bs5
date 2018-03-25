@@ -13,21 +13,20 @@ error_log(var_export($in,true));
         extract($in);
 
         return '
-        <div class="row">
           <div class="col-6">
-            <h3><i class="fa fa-server fa-fw"></i> System Info</h3>
+            <h3><i class="fas fa-server fa-fw"></i> System Info</h3>
           </div>
           <div class="col-6">
-            <form method="post" class="form-inline pull-right">
+            <form method="post" class="form-inline">
               <input type="hidden" id="o" name="o" value="infosys">
-              <div class="form-group">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Refresh</button>
+              <div class="form-group ml-auto">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refresh</button>
               </div>
             </form>
           </div>
-        </div>
+        </div><!-- END UPPER ROW -->
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-6">
             <br>
             <h5>RAM <small>' . $mem_used . ' / ' . $mem_total . ', ' . $mem_free . ' free</small></h5>
             <div class="progress">
@@ -51,7 +50,7 @@ error_log(var_export($in,true));
             </div>
             <br>
           </div>
-          <div class="col-md-6">
+          <div class="col-6">
             <div class="table-responsive">
               <table class="table table-sm table-bordered">
                 <tbody>
@@ -89,7 +88,7 @@ error_log(var_export($in,true));
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-12">
             <h5>Process List <small>(' . $proc_num . ')</small></h5>
             <pre>' . $proc_list . '
             </pre>

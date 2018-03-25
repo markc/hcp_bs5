@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20180321
+// index.php 20150101 - 20180325
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS  = DIRECTORY_SEPARATOR;
@@ -56,7 +56,7 @@ echo new Init(new class
         'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',     // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
@@ -64,23 +64,29 @@ echo new Init(new class
             ['About',       '?o=about', 'fas fa-info-circle fa-fw'],
             ['Contact',     '?o=contact', 'fas fa-envelope fa-fw'],
             ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
+            ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
+            ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
             ['Sign in',     '?o=auth', 'fas fa-sign-in-alt fa-fw'],
         ],
         'usr' => [
             ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
+            ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
+            ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
         ],
         'adm' => [
             ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
+            ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
+            ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
             ['Admin',       [
                 ['Accounts',    '?o=accounts&p=1', 'fas fa-users fa-fw'],
                 ['Vhosts',      '?o=vhosts&p=1', 'fas fa-globe fa-fw'],
                 ['Vmails',      '?o=vmails&p=1', 'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias&p=1', 'fas fa-envelope-square fa-fw'],
                 ['Domains',     '?o=domains&p=1', 'fas fa-server fa-fw'],
-            ], 'fas fa-users fa-fw'],
+            ], 'fas fa-user-plus fa-fw'],
             ['Stats',       [
-                ['Sys Info',    '?o=infosys&p=1', 'fas fa-dashboard fa-fw'],
-                ['Mail Info',    '?o=infomail&p=1', 'fas fa-envelope-o fa-fw'],
+                ['Sys Info',    '?o=infosys&p=1', 'fas fa-tachometer-alt fa-fw'],
+                ['Mail Info',    '?o=infomail&p=1', 'fas fa-envelope-square fa-fw'],
                 ['Mail Graph',    '?o=mailgraph&p=1', 'fas fa-envelope fa-fw'],
             ], 'fas fa-info-circle fa-fw'],
         ],

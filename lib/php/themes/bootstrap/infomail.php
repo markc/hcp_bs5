@@ -11,32 +11,26 @@ error_log(__METHOD__);
         extract($in);
 
         return '
-        <div class="row">
-          <div class="col-md-6">
-            <h3 class="min300">
-              <i class="fa fa-envelope-o fa-fw"></i> MailServer Info
-            </h3>
+          <div class="col-6">
+            <h3><i class="fas fa-envelope fa-fw"></i> MailServer Info</h3>
           </div>
-          <div class="col-md-6">
-            <form method="post" class="form-inline pull-right">
-              <label class="mr-sm-2" for="m">
-                <i class="fa fa-clock-o fa-fw" aria-hidden="true"></i> ' . $pflog_time . '
-              </label>
-              <div class="form-group">
+          <div class="col-6">
+            <form method="post" class="form-inline">
+              <div class="form-group ml-auto">
                 <input type="hidden" id="m" name="m" value="pflog_renew">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Refresh</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refreshed ' . $pflog_time . ' ago</button>
               </div>
             </form>
           </div>
-        </div>
+        </div><!-- END UPPER ROW -->
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-12">
             <h5>Mail Queue</h5>
             <pre>' . $mailq . '</pre>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-12">
             <pre>' . $pflogs . '
             </pre>
           </div>
