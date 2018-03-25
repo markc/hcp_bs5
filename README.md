@@ -20,7 +20,7 @@ are...
 
 - NetServa HCP does not reqire Python or Ruby, just PHP and Bash
 - Fully functional Mail, Web and DNS server with Spam filtering
-- Built from the ground up using Bootstrap 4 and jQuery 3
+- Built from the ground up using [Bootstrap 4] with [DataTables]
 
 ## Usage
 
@@ -173,3 +173,5 @@ and Licensed [AGPL-3.0]_
 
 [Shell Helper]: https://github.com/netserva/sh
 [AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
+[Bootstrap 4]: https://getboostrap.com
+[DataTables]: https://datatables.net/examples/styling/bootstrap4
