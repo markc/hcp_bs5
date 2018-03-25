@@ -28,9 +28,12 @@ Some of the features are...
       </p>
 
       <ul>
-        <li> <b>NetServa</b> does not reqire Python or Ruby, just PHP and Bash</li>
-        <li> Fully functional Mail and Web server with personalised Spam filtering</li>
-        <li> Built from the ground up using Bootstrap 4 and jQuery with DataTables</li>
+        <li><b>NetServa</b> does not reqire Python or Ruby, just PHP and Bash</li>
+        <li>Fully functional Mail server with personalised Spam filtering</li>
+        <li>Secure SSL enabled <a href="http://nginx.org/">nginx</a> web server with <a href="http://www.php.net/manual/en/install.fpm.php">PHP FPM 7+</a></li>
+        <li>Always based and tested on the latest release of <a href="https://kubuntu.org">*buntu</a></li>
+        <li>Optional DNS server for local LAN or real-world DNS provisioning</li>
+        <li>Built from the ground up using <a href="https://getbootstrap.com">Bootstrap 4</a> and <a href="https://datatables.net/examples/styling/bootstrap4">DataTables</a></li>
       </ul>
 
       <p>
