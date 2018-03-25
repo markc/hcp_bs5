@@ -173,5 +173,5 @@ and Licensed [AGPL-3.0]_
 
 [Shell Helper]: https://github.com/netserva/sh
 [AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
-[Bootstrap 4]: https://getboostrap.com
+[Bootstrap 4]: https://getbootstrap.com
 [DataTables]: https://datatables.net/examples/styling/bootstrap4
