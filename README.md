@@ -27,24 +27,22 @@ are...
 The PHP web interface relies on the [Shell Helper] scripts being installed
 on the primary and target hosts so the first thing to do, as root...
 
-    curl -s
-https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
+    curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
 
 _Please review the very simple script by removing the `| bash` part first._
 
-This installs the `SH` aliases and scripts into a `/root/.sh` directory
-and activates the environment variables and special aliases. See the
-[Shell Helper] repo for more information about how to use the aliases and
-scripts. This `HCP` project is just a web based frontend for the `SH`
-system which does all their real work.
+This installs the `SH` aliases and scripts into a `/root/.sh` directory and
+activates the environment variables and special aliases. See the [Shell
+Helper] repo for more information about how to use these aliases and
+scripts directly. This `HCP` project is just a web based frontend for the
+`SH` system which does all their real work.
 
 The next step is to "normalize" the host by using `setup-host` which
 updates the Desktop or Server system to Bionic 18.04 (unless `os release`
 is defined.) By default it will use the current `hostname -f` unless a
 **hostname.FQDN** is passed in as the first `[domain]` argument...
 
-    Usage: setup-host [domain] [(mysql)|sqlite] [admin(sysadm)] [os
-release(bionic)] [os mirror(archive.ubuntu.com)]
+    Usage: setup-host [domain] [(mysql)|sqlite] [admin(sysadm)] [os release(bionic)] [os mirror(archive.ubuntu.com)]
 
 Assuming a LXD container is to be used for the actual server side
 (recommended for initial testing anyway) then use `setup-lxd` to install
@@ -54,11 +52,9 @@ and setup the basic LXD container system...
 
 Now we can setup the actual NetServa SH/HCP system for testing where `FQDN`
 needs to be a **hostname** plus **domainname**, like `c1.domain.name`,
-where
-`c1` will be the container label and `domain.name` can either be a real
-domainname (if the server has a public IP) or whatever you internal
-LAN-wide
-domainname you care to use...
+where `c1` will be the container label and `domain.name` can either be a
+real domainname (if the server has a public IP) or whatever internal
+LAN-wide domainname you care to use...
 
     Usage: newlxd FQDN [(small)|medium|large] [distro(bionic)] [(mysql)|sqlite]
 
@@ -74,21 +70,19 @@ The essential configuration settings for the default server will be in...
 
     cat ~/.vhosts/$(hostname -f)
 
-Or, if you already have a containter or remote server ready to use after
-a fresh Ubuntu install then you could install the entire NetServa SH
-and HCP system by ssh'ing into the system (or "lxc exec C1 bash" for
-a container.)
+Or, if you already have a containter or remote server ready to use after a
+fresh Ubuntu install then you could install the entire NetServa SH and HCP
+system by ssh'ing into the system (or for example, "lxc exec c1 bash" for a
+LXD container.)
 
-    curl -s
-https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
+    curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
     setup-all
 
 This may take 5 or 10 mintes to complete depending on the bandwidth
 available to the target server. Once finished you should be able to go to
-`https://$VHOST/adm` and login to the HCP web interface using the username
-and password presented at the end of the procedure, if all goes well.
-
----
+`https://$(hostname -f)/adm` and login to the HCP web interface using the
+simple sitewide HTTP `sysadm/1234` authentication first then the real admin
+username and password presented at the end of the setup procedure.
 
 ## Config Override
 
