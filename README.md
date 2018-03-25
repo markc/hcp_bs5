@@ -110,8 +110,6 @@ text file called `lib/.ht_pw` and put ONLY the MySQL password in that file
 but of course using `lib/.ht_conf.php` allows you to modify or extend any
 of the top level properties in `index.php`.
 
----
-
 ## Athentication
 
 During installation five random passwords will be auto-created in
