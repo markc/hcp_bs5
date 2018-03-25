@@ -61,9 +61,9 @@ LAN-wide domainname you care to use...
 On an internal LAN (without public IP access) this will go ahead and
 install the entire system ready to start using at a `http` address. If the
 installation procedure can detect an externally available public IP then
-it will attempt to install a LetsEncrypt SSL certificate so that web
-services can be access via `https` and the mail server will be SSL
-enabled and ready for the real-world. The mail, web, sftp and HCP login
+it will attempt to install a LetsEncrypt SSL certificate so that the web
+server can be access via `https` and the mail server will be SSL enabled
+and ready for real-world deployment. The mail, web, sftp and HCP login
 credentials will be presented during the installation output.
 
 The essential configuration settings for the default server will be inside
