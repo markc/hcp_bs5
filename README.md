@@ -61,26 +61,28 @@ LAN-wide domainname you care to use...
 On an internal LAN (without public IP access) this will go ahead and
 install the entire system ready to start using at a `http` address. If the
 installation procedure can detect an externally available public IP then
-it will go ahead and install a LetsEncrypt SSL certificate so that web
+it will attempt to install a LetsEncrypt SSL certificate so that web
 services can be access via `https` and the mail server will be SSL
-enabled. The mail, web, sftp and HCP login credentials will be presented
-during the installation output.
+enabled and ready for the real-world. The mail, web, sftp and HCP login
+credentials will be presented during the installation output.
 
-The essential configuration settings for the default server will be in...
+The essential configuration settings for the default server will be inside
+the container (example only for a local LAN domain called `sysadm.lan`)...
 
-    cat ~/.vhosts/$(hostname -f)
+    lxc exec c1 bash
+    cat ~/.vhosts/c1.sysadm.lan
 
 Or, if you already have a containter or remote server ready to use after a
 fresh Ubuntu install then you could install the entire NetServa SH and HCP
 system by ssh'ing into the system (or for example, "lxc exec c1 bash" for a
-LXD container.)
+LXD container) and...
 
     curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
     setup-all
 
 This may take 5 or 10 mintes to complete depending on the bandwidth
 available to the target server. Once finished you should be able to go to
-`https://$(hostname -f)/adm` and login to the HCP web interface using the
+`https://real.domain.name/adm` and login to the HCP web interface using the
 simple sitewide HTTP `sysadm/1234` authentication first then the real admin
 username and password presented at the end of the setup procedure.
 
