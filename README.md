@@ -35,7 +35,7 @@ This installs the `SH` aliases and scripts into a `/root/.sh` directory and
 activates the environment variables and special aliases. See the [Shell
 Helper] repo for more information about how to use these aliases and
 scripts directly. This `HCP` project is just a web based frontend for the
-`SH` system which does all their real work.
+`SH` system which does all the real provisioning and management work.
 
 The next step is to "normalize" the host by using `setup-host` which
 updates the Desktop or Server system to Bionic 18.04 (unless `os release`
@@ -95,7 +95,7 @@ is changed. To override the default settings (so sensitive information is
 not committed to some Git repo) a config override file can be put anywhere
 (the default being `lib/.ht_conf.php`) in which an array is returned where
 any of the top level property array values can be overridden. First review
-the main `index.php` file top level properties then compare below as an
+the main [index.php] file top level properties then compare below as an
 example of how to override these property values...
 
     <?php
@@ -109,8 +109,8 @@ to your email address and set the database to use MySQL with it's password.
 
 Another alternate option for a MySQL password is to create a simple plain
 text file called `lib/.ht_pw` and put ONLY the MySQL password in that file
-but of course using `lib/.ht_conf.php` allows you to modify or extend any
-of the top level properties in `index.php`.
+but of course using `lib/.ht_conf.php` instead allows you to modify or
+extend any of the top level properties in `index.php`.
 
 ## Athentication
 
@@ -175,3 +175,4 @@ and Licensed [AGPL-3.0]_
 [AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
 [Bootstrap 4]: https://getbootstrap.com
 [DataTables]: https://datatables.net/examples/styling/bootstrap4
+[index.php]: https://github.com/netserva/www/blob/master/index.php
