@@ -7,7 +7,7 @@ class Plugins_About extends Plugin
     public function list() : string
     {
 error_log(__METHOD__);
-
+/*
         $buf = '
       <div class="col-12">
         <h3>About</h3>
@@ -48,6 +48,7 @@ alert("a=" + a)
 }
       </script>';
         return $this->t->list(['buf' => $buf]);
+*/
     }
 }
 
