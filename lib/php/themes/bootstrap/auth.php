@@ -71,10 +71,10 @@ error_log(var_export($in,true));
               </div>
             </div>
             <div class="form-group text-right">
-            <div class="btn-group">
-              <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
-              <button class="btn btn-primary" type="submit" name="m" value="list">Sign in</button>
-            </div>
+              <div class="btn-group">
+                <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
+                <button class="btn btn-primary" type="submit" name="m" value="list">Sign in</button>
+              </div>
             </div>
           </form>
         </div>';
@@ -96,21 +96,24 @@ error_log(var_export($in,true));
             <input type="hidden" name="id" value="' . $id . '">
             <input type="hidden" name="login" value="' . $login . '">
             <p class="text-center"><b>For ' . $login . '</b></p>
-
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                <input type="password" name="passwd1" id="passwd1" class="form-control" placeholder="New Password" value="" required autofocus>
+            <label class="sr-only" for="passwd1">New Password</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
               </div>
+                <input class="form-control" type="password" name="passwd1" id="passwd1" placeholder="New Password" value="" required>
             </div>
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                <input type="password" name="passwd2" id="passwd2" class="form-control" placeholder="Confirm Password" value="" required>
+            <label class="sr-only" for="passwd2">Confirm Password</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
               </div>
+                <input class="form-control" type="password" name="passwd2" id="passwd2" placeholder="Confirm Password" value="" required>
             </div>
-            <div class="btn-group pull-right">
-              <button class="btn btn-primary" type="submit" name="m" value="update">Update my password</button>
+            <div class="form-group text-right">
+              <div class="btn-group">
+                <button class="btn btn-primary" type="submit" name="m" value="update">Update my password</button>
+              </div>
             </div>
           </form>
         </div>';
