@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20170307
+// lib/php/plugins/auth.php 20150101 - 20170329
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
@@ -56,8 +56,8 @@ error_log(__METHOD__);
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
                 extract($usr);
                 if ($acl !== 9) {
-                    if ($p == 'changeme') { // for testing a clear text password
-//                    if (password_verify(html_entity_decode($p), $webpw)) {
+//                    if ($p == 'changeme') { // for testing a clear text password
+                    if (password_verify(html_entity_decode($p), $webpw)) {
                         $uniq = md5(uniqid());
                         if ($c) {
                             db::update(['cookie' => $uniq], [['login', '=', $u]]);
