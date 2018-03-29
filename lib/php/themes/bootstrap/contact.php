@@ -10,7 +10,7 @@ error_log(__METHOD__);
 
         return '
         <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-envelope"></i> Contact us</h2>
+          <h3><i class="fa fa-envelope"></i> Contact us</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post" onsubmit="return mailform(this)">
             <input type="hidden" name="o" value="auth">
             <div class="form-group">
@@ -21,15 +21,16 @@ error_log(__METHOD__);
               <label for="message">Message</label>
               <textarea class="form-control" id="message" rows="9" placeholder="Your Message" required></textarea>
             </div>
-            <div class="form-group">
-              <a tabindex="0" role="button" data-toggle="popover" data-trigger="hover" title="Please Note" data-content="Submitting this form will attempt to start your local mail program. If it does not work then you may have to configure your browser to recognize mailto: links."> <i class="fa fa-question-circle fa-fw"></i></a>
-              <div class="btn-group pull-right">
+            <small class="form-text text-muted text-center">
+              Submitting this form will attempt to start your local mail program. If it does not work then you may have to configure your browser to recognize mailto: links.
+            </small>
+            <div class="form-group text-right">
+              <div class="btn-group">
                 <button class="btn btn-primary" type="submit">Send</button>
               </div>
             </div>
           </form>
-        </div>
-        <script> $(function() { $("[data-toggle=popover]").popover(); }); </script>' . $in['js'];
+        </div>';
     }
 }
 

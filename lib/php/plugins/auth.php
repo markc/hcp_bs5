@@ -56,8 +56,8 @@ error_log(__METHOD__);
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
                 extract($usr);
                 if ($acl !== 9) {
-//                    if ($p == 'changeme') { // for testing a clear text password
-                    if (password_verify(html_entity_decode($p), $webpw)) {
+                    if ($p == 'changeme') { // for testing a clear text password
+//                    if (password_verify(html_entity_decode($p), $webpw)) {
                         $uniq = md5(uniqid());
                         if ($c) {
                             db::update(['cookie' => $uniq], [['login', '=', $u]]);

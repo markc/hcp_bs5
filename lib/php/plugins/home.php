@@ -14,7 +14,7 @@ error_log(__METHOD__);
         <i class="fas fa-server fa-fw"></i> NetServa
         <small>(Hosting Control Panel)</small>
       </h3>
-      <p style="column-gap:1.5em;columns:2;">
+      <p class="columns">
 This is an ultra simple web based Hosting Control Panel for a lightweight Mail,
 Web and DNS server based on Ubuntu Bionic (18.04). It uses PowerDNS for DNS,
 Postfix/Dovecot + Spamprobe for SMTP and spam filtered IMAP email hosting along

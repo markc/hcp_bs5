@@ -62,10 +62,8 @@ echo new Init(new class
     $nav1 = [
         'non' => [
             ['About',       '?o=about', 'fas fa-info-circle fa-fw'],
-            ['Contact',     '?o=contact', 'fas fa-envelope fa-fw'],
             ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
-            ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
-            ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
+            ['Contact',     '?o=contact', 'fas fa-envelope fa-fw'],
             ['Sign in',     '?o=auth', 'fas fa-sign-in-alt fa-fw'],
         ],
         'usr' => [
@@ -74,9 +72,11 @@ echo new Init(new class
             ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
         ],
         'adm' => [
-            ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
-            ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
-            ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
+            ['Menu',        [
+                ['News',        '?o=news&p=1', 'fas fa-newspaper fa-fw'],
+                ['Webmail',     'webmail/', 'fas fa-envelope fa-fw'],
+                ['Phpmyadmin',  'phpmyadmin/', 'fas fa-globe fa-fw'],
+            ], 'fas fa-align-justify fa-fw'],
             ['Admin',       [
                 ['Accounts',    '?o=accounts&p=1', 'fas fa-users fa-fw'],
                 ['Vhosts',      '?o=vhosts&p=1', 'fas fa-globe fa-fw'],

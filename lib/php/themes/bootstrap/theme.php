@@ -41,6 +41,7 @@ table.dataTable{border-collapse: collapse !important;}
   margin-bottom: 0.75rem;
 }
 
+  .columns {column-gap:1.5em;columns:1;}
 /*body{ background:yellow; }*/
 
 @media (min-width:576px) {
@@ -48,6 +49,7 @@ table.dataTable{border-collapse: collapse !important;}
 }
 @media (min-width:768px) {
   /*body{ background:blue; }*/
+  .columns {column-gap:1.5em;columns:2;}
 
   .media {
     flex-direction: row;
@@ -68,6 +70,7 @@ table.dataTable{border-collapse: collapse !important;}
 }
 @media (min-width:1200px) {
   /*body{ background: white; }*/
+  .columns {column-gap:1.5em;columns:3;}
   .media-title {
     display: flex;
     flex-direction: row;
@@ -110,6 +113,10 @@ error_log(__METHOD__);
         <div class="collapse navbar-collapse" id="navbarsDefault">
           <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
           </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item ml-auto">' . $this->g->out['nav3'] . '
+          </li>
+        </ul>
         </div>
       </div>
     </nav>';
@@ -143,14 +150,14 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if (util::is_usr()) {
-            $usr[] = ['Change Profile', '?o=accounts&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-user fa-fw'];
-            $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-key fa-fw'];
-            $usr[] = ['Sign out', '?o=auth&m=delete', 'fa fa-sign-out fa-fw'];
+            $usr[] = ['Change Profile', '?o=accounts&m=update&i=' . $_SESSION['usr']['id'], 'fas fa-user fa-fw'];
+            $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fas fa-key fa-fw'];
+            $usr[] = ['Sign out', '?o=auth&m=delete', 'fas fa-sign-out-alt fa-fw'];
 
             if (util::is_adm() && !util::is_acl(0)) $usr[] =
-                ['Switch to sysadm', '?o=users&m=switch_user&i=' . $_SESSION['adm'], 'fa fa-user fa-fw'];
+                ['Switch to sysadm', '?o=users&m=switch_user&i=' . $_SESSION['adm'], 'fas fa-user fa-fw'];
 
-            return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fa fa-user fa-fw']);
+            return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fas fa-user fa-fw']);
         } else return '';
     }
 

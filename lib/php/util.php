@@ -240,7 +240,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $ary = $cfg = [];
-        $str = shell_exec("sudo rootcat ~/.sh/lib/defaults");
+        $str = shell_exec("sudo rootcat ~/.vhosts/$(hostname -f)");
         $ary = explode("\n", $str);
         foreach($ary as $line) {
             if (empty($line)) continue;

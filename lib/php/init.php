@@ -37,7 +37,8 @@ error_log('SESSION=' . var_export($_SESSION, true));
 
 //        $g->out['end'] = var_export($_SESSION['usr'], true); // debug
 
-        if (empty($g->in['x']) || (($g->in['x'] !== 'json') && ($g->in['x'] !== 'text')))
+//        if (empty($g->in['x']) || (($g->in['x'] !== 'json') && ($g->in['x'] !== 'text')))
+        if (empty($g->in['x']))
             foreach ($g->out as $k => $v)
                 $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
     }
@@ -52,15 +53,10 @@ error_log(var_export($g->in,true));
         if ($g->in['x'] === 'text') {
             return $g->out['main'];
         } elseif ($g->in['x'] === 'json') {
-//            $xhr = $g->out[$g->in['x']] ?? '';
+            $xhr = $g->out[$g->in['x']] ?? '';
             header('Content-Type: application/json');
-            return $g->out['main'];
-//            exit;
-//            if ($xhr) {
-//                if ($xhr == 'json') return $g->out['main'];
-//                else return $xhr;
-//            }
-//            return json_encode($g->out, JSON_PRETTY_PRINT);
+            if ($xhr) return json_encode($xhr, JSON_PRETTY_PRINT);
+            return json_encode($g->out, JSON_PRETTY_PRINT);
         }
         return $this->t->html();
     }
