@@ -18,9 +18,12 @@ pdns-recursor takes another ~30MB) on a fresh install so it is ideal for
 LXD containers or cheap 256MB to 512MB VPS plans. Some of the features
 are...
 
-- NetServa HCP does not reqire Python or Ruby, just PHP and Bash
-- Fully functional Mail, Web and DNS server with Spam filtering
-- Built from the ground up using [Bootstrap 4] with [DataTables]
+- **NetServa HCP/SH** does not reqire Python or Ruby, just PHP and Bash
+- Fully functional Mail server with personalised Spam filtering
+- Secure SSL enabled [nginx] web server with [PHP FPM 7+]
+- Always based and tested on the latest release of [*buntu]
+- Optional DNS server for local LAN or real-world DNS provisioning
+- Built from the ground up using [Bootstrap 4] and [DataTables]
 
 ## Usage
 
@@ -102,10 +105,16 @@ example of how to override these property values...
     return [
         'cfg' => ['email' => 'YOUR@EMAIL_ADDRESS'],
         'db' => ['type' => 'mysql', 'pass' => 'YOUR_MYSQL_PW'],
+        'out' => [
+            'doc'   => 'YOUR_SITE_LABEL',
+            'head'  => 'YOUR_SITE_LABEL',
+            'foot'  => 'Copyright (C) 2018 YOUR_SITE_LABEL',
+        ],
     ];
 
 which would change the default email address (for forgotten password etc)
-to your email address and set the database to use MySQL with it's password.
+to your email address, set the database to use MySQL with it's password
+and change the site titles and footer copyright notice.
 
 Another alternate option for a MySQL password is to create a simple plain
 text file called `lib/.ht_pw` and put ONLY the MySQL password in that file
@@ -176,3 +185,7 @@ and Licensed [AGPL-3.0]_
 [Bootstrap 4]: https://getbootstrap.com
 [DataTables]: https://datatables.net/examples/styling/bootstrap4
 [index.php]: https://github.com/netserva/www/blob/master/index.php
+[nginx]: http://nginx.org
+[PHP FPM 7+]: http://www.php.net/manual/en/install.fpm.php
+[*buntu]: https://kubuntu.org
+

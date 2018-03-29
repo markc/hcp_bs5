@@ -28,7 +28,7 @@ Some of the features are...
       </p>
 
       <ul>
-        <li><b>NetServa</b> does not reqire Python or Ruby, just PHP and Bash</li>
+        <li><b>NetServa HCP</b> does not reqire Python or Ruby, just PHP and Bash</li>
         <li>Fully functional Mail server with personalised Spam filtering</li>
         <li>Secure SSL enabled <a href="http://nginx.org/">nginx</a> web server with <a href="http://www.php.net/manual/en/install.fpm.php">PHP FPM 7+</a></li>
         <li>Always based and tested on the latest release of <a href="https://kubuntu.org">*buntu</a></li>
