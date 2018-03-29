@@ -97,14 +97,14 @@ error_log(var_export($in,true));
             <input type="hidden" name="login" value="' . $login . '">
             <p class="text-center"><b>For ' . $login . '</b></p>
             <label class="sr-only" for="passwd1">New Password</label>
-            <div class="input-group">
+            <div class="input-group mb-2 mr-sm-2">
               <div class="input-group-prepend">
                 <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
               </div>
                 <input class="form-control" type="password" name="passwd1" id="passwd1" placeholder="New Password" value="" required>
             </div>
             <label class="sr-only" for="passwd2">Confirm Password</label>
-            <div class="input-group">
+            <div class="input-group mb-2 mr-sm-2">
               <div class="input-group-prepend">
                 <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
               </div>
