@@ -12,13 +12,13 @@ class Plugins_Vmails extends Plugin
         'did'       => 1,
         'gid'       => 1000,
         'home'      => '',
-        'quota'     => 1000000000,
         'passwd1'   => '',
         'passwd2'   => '',
         'password'  => '',
+        'quota'     => 1000000000,
+        'spamf'     => 0,
         'uid'       => 1000,
         'user'      => '',
-        'spamf'     => 1,
     ];
 
     function create() : string
@@ -26,12 +26,12 @@ class Plugins_Vmails extends Plugin
 error_log(__METHOD__);
 
         if ($_POST) {
-//            $this->in['quota'] *= 1048576;
             $this->in['quota'] *= 1000000;
             extract($this->in);
+            $spamf_str = $spamf === 1 ? '' : 'nospam';
             $retArr = []; $retVal = null;
-            exec("sudo addvmail $user $spamf 2>&1", $retArr, $retVal);
-            util::log('<pre>'.implode("\n", $retArr).'</pre>', $retVal ? 'danger' : 'success');
+            exec("sudo addvmail $user $spamf_str 2>&1", $retArr, $retVal);
+            util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             util::ses('p', '', '1');
             return $this->list();
         }
@@ -51,9 +51,9 @@ error_log(__METHOD__);
 
         if ($_POST) {
             extract($this->in);
-//            $quota *= 1048576;
             $quota *= 1000000;
             $active = $active ? 1 : 0;
+            $spamf  = $spamf ? 1 : 0;
 
             if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
                 util::log('Email address is invalid');
@@ -78,10 +78,11 @@ error_log(__METHOD__);
                 ]);
             }
 
+            $spamf_old = db::read('spamf', 'id', $this->g->in['i'], '', 'col');
+
             $sql = "
  UPDATE `vmails` SET
         `active`    = :active,
-        `spamf`     = :spamf,
         `quota`     = :quota,
         `updated`   = :updated
   WHERE `id` = :id";
@@ -89,12 +90,18 @@ error_log(__METHOD__);
             $res = db::qry($sql, [
                 'id'      => $this->g->in['i'],
                 'active'  => $active,
-                'spamf'   => $spamf,
                 'quota'   => $quota,
                 'updated' => date('Y-m-d H:i:s'),
             ]);
 
-            util::log('Mailbox details for ' . $user . ' have been saved', 'success');
+            $spamf_buf = '';
+            if ($spamf_old !== $spamf) {
+                $spamf_str = ($spamf === 1) ? 'on' : 'off';
+                exec("sudo spamf $user $spamf_str 2>&1", $retArr, $retVal);
+                $spamf_buf = trim(implode("\n", $retArr));
+                $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
+            }
+            util::log($spamf_buf . 'Mailbox details for ' . $user . ' have been saved', 'success');
             util::ses('p', '', '1');
             return $this->list();
         } elseif ($this->g->in['i']) {
@@ -111,7 +118,7 @@ error_log(__METHOD__);
             if ($user) {
                 $retArr = []; $retVal = null;
                 exec("sudo delvmail $user 2>&1", $retArr, $retVal);
-                util::log('<pre>'.implode("\n", $retArr).'</pre>', $retVal ? 'danger' : 'success');
+                util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             } else {
                 util::log('ERROR: user does not exist');
             }

@@ -28,7 +28,7 @@ error_log(__METHOD__);
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
-            $spam = $spam ? 1 : 0;
+            $spamf = $spamf ? 1 : 0;
             list($lhs, $rhs) = explode('@', $user);
             $sql = "
  SELECT mailquota
@@ -112,9 +112,9 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         extract($in);
-error_log("active=$active,spam=$spam");
+error_log("active=$active,spamf=$spamf");
         $active_checked = ($active ? 1 : 0) ? ' checked' : '';
-        $filter_checked = ($spam ? 1 : 0) ? ' checked' : '';
+        $filter_checked = ($spamf ? 1 : 0) ? ' checked' : '';
 error_log("active_checked=$active_checked,filter_checked=$filter_checked");
 
         $passwd1  = $passwd1 ?? '';
@@ -167,8 +167,8 @@ error_log("active_checked=$active_checked,filter_checked=$filter_checked");
                 <div class="col-4">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="spam" id="spam"' . $filter_checked . '>
-                      <label class="custom-control-label" for="spam">Spam Filter</label>
+                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . $filter_checked . '>
+                      <label class="custom-control-label" for="spamf">Spam Filter</label>
                     </div>
                   </div>
                 </div>

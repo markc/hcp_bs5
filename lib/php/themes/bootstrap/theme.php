@@ -40,7 +40,9 @@ table.dataTable{border-collapse: collapse !important;}
 .media-title {
   margin-bottom: 0.75rem;
 }
-
+.alert pre {
+  margin: 0;
+}
   .columns {column-gap:1.5em;columns:1;}
 /*body{ background:yellow; }*/
 
