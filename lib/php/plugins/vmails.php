@@ -18,7 +18,7 @@ class Plugins_Vmails extends Plugin
         'password'  => '',
         'uid'       => 1000,
         'user'      => '',
-        'spam'      => 1,
+        'spamf'     => 1,
     ];
 
     function create() : string
@@ -30,7 +30,7 @@ error_log(__METHOD__);
             $this->in['quota'] *= 1000000;
             extract($this->in);
             $retArr = []; $retVal = null;
-            exec("sudo addvmail $user $spam 2>&1", $retArr, $retVal);
+            exec("sudo addvmail $user $spamf 2>&1", $retArr, $retVal);
             util::log('<pre>'.implode("\n", $retArr).'</pre>', $retVal ? 'danger' : 'success');
             util::ses('p', '', '1');
             return $this->list();
@@ -81,7 +81,7 @@ error_log(__METHOD__);
             $sql = "
  UPDATE `vmails` SET
         `active`    = :active,
-        `spam`      = :spam,
+        `spamf`     = :spamf,
         `quota`     = :quota,
         `updated`   = :updated
   WHERE `id` = :id";
@@ -89,7 +89,7 @@ error_log(__METHOD__);
             $res = db::qry($sql, [
                 'id'      => $this->g->in['i'],
                 'active'  => $active,
-                'spam'    => $spam,
+                'spamf'   => $spamf,
                 'quota'   => $quota,
                 'updated' => date('Y-m-d H:i:s'),
             ]);
