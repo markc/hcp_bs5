@@ -51,20 +51,22 @@ error_log(__METHOD__);
             else $size_mpath = $size_wpath = $size_upath = 0;
 
             $sql = "
- SELECT COUNT(*) FROM `valias`
+ SELECT COUNT(id)
+   FROM `valias`
   WHERE `did`= :did";
 
             $num_aliases = db::qry($sql, ['did' => $id], 'col');
 
             $sql = "
- SELECT COUNT(*) FROM `vmails`
+ SELECT COUNT(id)
+   FROM `vmails`
   WHERE `did`= :did";
 
             $num_mailboxes = db::qry($sql, ['did' => $id], 'col');
 
             $active_icon = (isset($active) && $active)
-                ? '<i class="fas fa-check text-success"></i>'
-                : '<i class="fas fa-times text-danger"></i>';
+                ? '<i class="fas fa-check text-success" title="Enabled"></i>'
+                : '<i class="fas fa-times text-danger" title="Disabled"></i>';
 
             $url = $adm ? '
                   <a href="?o=vhosts&m=update&i=' . $id . '" title="Vhost ID: ' . $id . '">' . $domain . '</a>' : $domain;
@@ -83,18 +85,29 @@ error_log(__METHOD__);
                 <td class="text-right">' . $num_mailboxes . ' / ' . $mailboxes . '</td>
                 <td class="text-right">' . $size_mpath . ' / ' . $mail_quota . '</td>
                 <td class="text-right">' . $size_upath . ' / ' . $disk_quota . '</td>
-                <td>' . $active_icon . '</td>
+                <td class="text-right">' . $active_icon . '
+                  <a href="?o=vhosts&m=delete&i=' . $id . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $domain . '?\')">
+                    <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
+                </td>
               </tr>';
         }
 
         if (empty($buf)) $buf .= '
                 <tr><td colspan="8" class="text-center">No Records</td></tr>';
+$plans = [
+  0 => [0 => 'Select Plan', 1 => ''],
+  1 => [0 => 'Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 1 => 'personal'],
+  2 => [0 => 'SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 1 => 'soho'],
+  3 => [0 => 'Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 1 => 'business'],
+  4 => [0 => 'Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 1 => 'enterprise'],
+];
+            $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
         return '
           <div class="col-12">
             <h3>
               <i class="fa fa-globe fa-fw"></i> Vhosts
-              <a href="?o=vhosts&m=create" title="Add Vhost">
+              <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
                 <small><i class="fa fa-plus-circle fa-fw"></i></small>
               </a>
             </h3>
@@ -111,13 +124,56 @@ error_log(__METHOD__);
                 <th>Mailboxes</th>
                 <th>Mail Quota</th>
                 <th>Disk Quota</th>
-                <th data-sortable="false"></th>
+                <th data-sortable="false">&nbsp;&nbsp;&nbsp;</th>
               </tr>
             </thead>
             <tbody>' . $buf . '
             </tbody>
           </table>
-          <script>$(document).ready(function() { $("#vhosts").DataTable(); });</script>';
+
+          <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"">Vhosts</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form method="post" action="' . $this->g->cfg['self'] . '">
+                  <div class="modal-body">
+                      <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                      <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                      <input type="hidden" name="m" value="create">
+                      <div class="form-group">
+                        <label for="domain class="form-control-label">Vhost</label>
+                        <input type="text" class="form-control" id="domain" name="domain">
+                      </div>
+                      <div class="form-group">
+                        <label for="plan class="form-control-label">Plan</label>' . $plans_buf . '
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add New Vhost</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <script>
+$(document).ready(function() {
+  $("#vhosts").DataTable({"order": []});
+//  $(".serial").click(function(id, serial){
+//    var a = $(this)
+//    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
+//      $(a).text(data);
+//    });
+//    return false;
+//  });
+});
+        </script>';
     }
 
     private function editor(array $in) : string

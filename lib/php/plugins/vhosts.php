@@ -10,13 +10,14 @@ class Plugins_Vhosts extends Plugin
         'active'    => 0,
         'aid'       => 0,
         'aliases'   => 10,
-        'diskquota' => 2147483648,
+        'diskquota' => 1000000000,
         'domain'    => '',
         'gid'       => 1000,
-        'mailboxes' => 2,
-        'mailquota' => 1073741824,
+        'mailboxes' => 1,
+        'mailquota' => 500000000,
         'uid'       => 1000,
         'uname'     => '',
+        'plan'      => 'personal',
     ];
 
     protected function create() : string
@@ -24,17 +25,17 @@ class Plugins_Vhosts extends Plugin
 error_log(__METHOD__);
 
         if ($_POST) {
-            $this->in['diskquota'] *= 1000000;
-            $this->in['mailquota'] *= 1000000;
+//            $this->in['diskquota'] *= 1000000;
+//            $this->in['mailquota'] *= 1000000;
             extract($this->in);
             $active = $active ? 1 : 0;
 
-            if (strpos($domain, '@'))
-                list($uname, $domain) = explode('@', $domain);
+//            if (strpos($domain, '@'))
+//                list($uname, $domain) = explode('@', $domain);
 
             if (file_exists('/home/u/' . $domain)) {
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
-//                $_POST = []; return $this->t->create($this->in);
+                $_POST = []; return $this->t->create($this->in);
             }
 
             if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
@@ -42,30 +43,27 @@ error_log(__METHOD__);
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            if ($mailquota > $diskquota) {
-                util::log('Mailbox quota exceeds domain disk quota');
-                $_POST = []; return $this->t->create($this->in);
-            }
+//            if ($mailquota > $diskquota) {
+//                util::log('Mailbox quota exceeds domain disk quota');
+//                $_POST = []; return $this->t->create($this->in);
+//            }
 
-            $sql = "
- SELECT `domain` FROM `vhosts`
-  WHERE `domain` = :domain";
+//            $sql = "
+// SELECT COUNT(id)
+//   FROM `vhosts`
+//  WHERE `domain` = :domain";
 
-            $num_results = db::qry($sql, ['domain' => $domain], 'one');
-
-            if ($num_results != 0) {
+//            $num_results = db::qry($sql, ['domain' => $domain], 'col');
+            $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
+error_log("num_results=$num_results");
+            if ($num_results !== 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
-
-            $vhost = $uname ? "$uname@$domain" : $domain;
-            $dtype = $this->g->db['type'];
-            $pws = shell_exec("sudo newpw 3");
-            $ret = shell_exec("sudo addvhost $vhost $dtype $pws");
-            util::redirect($this->g->cfg['self'] . '?o=vhosts', 5, $ret);
-            util::log('Created ' . $vhost, 'success');
-            shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
-            exit;
+// add plan, default to personal
+            shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
+            util::log('Added ' . $domain, 'success');
+            util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
         return $this->t->create($this->in);
     }
@@ -143,19 +141,12 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if ($this->g->in['i']) {
-
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-
-            db::qry("DELETE FROM `vhosts` WHERE `id` = :did", ['did' => $this->g->in['i']]);
-            db::qry("DELETE FROM `valias` WHERE `did` = :did", ['did' => $this->g->in['i']]);
-            db::qry("DELETE FROM `vmails` WHERE `did` = :did", ['did' => $this->g->in['i']]);
-            db::qry("DELETE FROM `logging` WHERE `did` = :did", ['did' => $this->g->in['i']]);
-
-            $ret = shell_exec("sudo delvhost $vhost " . $this->g->db['type']);
-            util::redirect($this->g->cfg['self'] . '?o=vhosts', 5, $ret);
+            shell_exec("nohup sh -c 'sudo delvhost $vhost' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
-            shell_exec("nohup sh -c 'sudo serva restart web' > /tmp/serva.log 2>&1 &");
-            exit;
+            util::redirect($this->g->cfg['self'] . '?o=vhosts', 5);
+//            shell_exec("nohup sh -c 'sudo serva reload web' > /tmp/serva.log 2>&1 &");
+//            exit;
         }
         return 'Error deleting item';
     }

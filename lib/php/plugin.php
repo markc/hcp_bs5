@@ -104,7 +104,7 @@ error_log(__METHOD__);
 //        );
 
         // this may still need to be LIMIT'd
-        return $this->t->list(db::read('*'));
+        return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
 
 //        return $this->t->list(array_merge(
 //            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),

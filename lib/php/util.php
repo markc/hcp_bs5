@@ -227,11 +227,12 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-            header('refresh:' . $ttl . '; url=' . $url);
-            echo '<!DOCTYPE html>
+        header('refresh:' . $ttl . '; url=' . $url);
+        echo '<!DOCTYPE html>
 <title>Redirect...</title>
 <h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
+        exit;
     }
 
     // not used 20180319
@@ -249,8 +250,6 @@ error_log(__METHOD__);
         }
         return $cfg;
     }
-
-    // mail utilities
 
     public static function numfmt(float $size, int $precision = null) : string
     {

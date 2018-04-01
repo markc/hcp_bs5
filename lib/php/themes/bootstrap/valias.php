@@ -87,7 +87,7 @@ error_log(__METHOD__);
               </tbody>
             </table>
           </div>
-          <script>$(document).ready(function() { $("#valias").DataTable(); });</script>';
+          <script>$(document).ready(function() { $("#valias").DataTable({"order": []}); });</script>';
 
     }
 

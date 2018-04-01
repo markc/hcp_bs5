@@ -87,7 +87,7 @@ error_log(__METHOD__);
             <tbody>' . $buf . '
             </tbody>
           </table>
-          <script>$(document).ready(function() { $("#accounts").DataTable(); });</script>';
+          <script>$(document).ready(function() { $("#accounts").DataTable({"order": []}); });</script>';
     }
 
     private function editor(array $in) : string
@@ -106,7 +106,7 @@ error_log(__METHOD__);
             $header = 'Update Account';
 //            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
             $switch = util::is_adm() && (!util::is_usr(0) && !util::is_usr(1)) ? '
-                  <a class="btn btn-outline-primary pull-left" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
+                  <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
             $submit = '
                 <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=accounts&m=delete&i=' . $id . '" title="Remove this account" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
@@ -118,7 +118,8 @@ error_log(__METHOD__);
             foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
             $acl_buf = $this->dropdown($acl_ary, 'acl', $acl, '', 'custom-select');
             $res = db::qry("
- SELECT login,id FROM `accounts`
+ SELECT login,id
+   FROM `accounts`
   WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
 
             foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];

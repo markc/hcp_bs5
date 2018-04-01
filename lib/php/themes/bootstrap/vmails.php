@@ -104,7 +104,7 @@ error_log(__METHOD__);
             <tbody>' . $buf . '
             </tbody>
           </table>
-          <script>$(document).ready(function() { $("#vmails").DataTable(); });</script>';
+          <script>$(document).ready(function() { $("#vmails").DataTable({"order": []}); });</script>';
     }
 
     function editor(array $in) : string
