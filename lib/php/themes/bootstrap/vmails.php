@@ -97,7 +97,7 @@ error_log(__METHOD__);
           <table id=vmails class="table table-sm">
             <thead class="nowrap">
               <tr>
-                <th>UserID</th>
+                <th class="w-25">UserID</th>
                 <th>Domain</th>
                 <th class="w-25" data-sortable="false"></th>
                 <th>Mailbox Quota</th>
