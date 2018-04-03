@@ -26,8 +26,10 @@ class Plugins_Vmails extends Plugin
 error_log(__METHOD__);
 
         if ($_POST) {
-            $this->in['quota'] *= 1000000;
             extract($this->in);
+            $quota *= 1000000;
+//            $active = $active ? 1 : 0;
+            $spamf  = $spamf ? 1 : 0;
             $spamf_str = $spamf === 1 ? '' : 'nospam';
             $retArr = []; $retVal = null;
             exec("sudo addvmail $user $spamf_str 2>&1", $retArr, $retVal);

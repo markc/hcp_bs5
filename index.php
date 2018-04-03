@@ -80,7 +80,7 @@ echo new Init(new class
             ['Admin',       [
                 ['Accounts',    '?o=accounts&p=1', 'fas fa-users fa-fw'],
                 ['Vhosts',      '?o=vhosts&p=1', 'fas fa-globe fa-fw'],
-                ['Vmails',      '?o=vmails&p=1', 'fas fa-envelope fa-fw'],
+                ['Mailoxes',    '?o=vmails&p=1', 'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias&p=1', 'fas fa-envelope-square fa-fw'],
                 ['Domains',     '?o=domains&p=1', 'fas fa-server fa-fw'],
             ], 'fas fa-user-plus fa-fw'],

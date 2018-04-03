@@ -94,13 +94,15 @@ error_log(__METHOD__);
 
         if (empty($buf)) $buf .= '
                 <tr><td colspan="8" class="text-center">No Records</td></tr>';
-$plans = [
-  0 => [0 => 'Select Plan', 1 => ''],
-  1 => [0 => 'Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 1 => 'personal'],
-  2 => [0 => 'SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 1 => 'soho'],
-  3 => [0 => 'Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 1 => 'business'],
-  4 => [0 => 'Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 1 => 'enterprise'],
-];
+
+            $plans = [
+                ['Select Plan', ''],
+                ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
+                ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
+                ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
+                ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
+            ];
+
             $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
         return '
@@ -124,7 +126,7 @@ $plans = [
                 <th>Mailboxes</th>
                 <th>Mail Quota</th>
                 <th>Disk Quota</th>
-                <th data-sortable="false">&nbsp;&nbsp;&nbsp;</th>
+                <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
               </tr>
             </thead>
             <tbody>' . $buf . '

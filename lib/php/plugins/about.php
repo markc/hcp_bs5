@@ -7,6 +7,8 @@ class Plugins_About extends Plugin
     public function list() : string
     {
 error_log(__METHOD__);
+
+        return $this->t->list([]);
 /*
         $buf = '
       <div class="col-12">

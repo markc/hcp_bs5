@@ -59,7 +59,10 @@ error_log(__METHOD__);
               <td><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
               <td>' . $target_buf . ' </td>
               <td>' . $rhs . '</td>
-              <td class="text-right">' . $active_buf . '</td>
+              <td class="text-right">' . $active_buf . '
+                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove ALias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
+                  <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
+              </td>
             </tr>';
         }
 
@@ -80,7 +83,7 @@ error_log(__METHOD__);
                   <th>Alias</th>
                   <th>Target Address</th>
                   <th>Domain</th>
-                  <th></th>
+                  <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
