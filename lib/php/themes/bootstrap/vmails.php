@@ -97,11 +97,11 @@ error_log(__METHOD__);
           <table id=vmails class="table table-sm" style="table-layout:fixed">
             <thead class="nowrap">
               <tr>
-                <th style="width:20%;">UserID</th>
-                <th style="width:20%;">Domain</th>
-                <th style="width:20%;" data-sortable="false"></th>
-                <th>Mailbox Quota</th>
-                <th>Msg #</th>
+                <th class="w-25">UserID</th>
+                <th class="w-25">Domain</th>
+                <th data-sortable="false"></th>
+                <th>Mailbox&nbsp;Quota</th>
+                <th>Msg&nbsp;#</th>
                 <th data-sortable="false" class="text-right" style="width:3rem;"></th>
               </tr>
             </thead>
