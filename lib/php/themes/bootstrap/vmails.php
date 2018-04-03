@@ -62,7 +62,7 @@ error_log(__METHOD__);
 
             $buf .= '
                   <tr>
-                    <td><strong>' . $url . '</strong></td>
+                    <td class="text-truncate"><strong>' . $url . '</strong></td>
                     <td>' . $rhs . '</td>
                     <td class="align-middle">
                       <div class="progress">
