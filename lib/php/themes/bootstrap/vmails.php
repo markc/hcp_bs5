@@ -63,7 +63,7 @@ error_log(__METHOD__);
             $buf .= '
                   <tr>
                     <td class="text-truncate"><strong>' . $url . '</strong></td>
-                    <td>' . $rhs . '</td>
+                    <td class="text-truncate">' . $rhs . '</td>
                     <td class="align-middle">
                       <div class="progress">
                         <div class="progress-bar ' . $pbar . '" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $percent . '%;">
@@ -97,12 +97,12 @@ error_log(__METHOD__);
           <table id=vmails class="table table-sm">
             <thead class="nowrap">
               <tr>
-                <th class="w-25">UserID</th>
-                <th>Domain</th>
-                <th class="w-25" data-sortable="false"></th>
+                <th style="width:20%;">UserID</th>
+                <th style="width:20%;">Domain</th>
+                <th style="width:20%;" data-sortable="false"></th>
                 <th>Mailbox Quota</th>
                 <th>Msg #</th>
-                <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
+                <th data-sortable="false" class="text-right" style="width:3rem;"></th>
               </tr>
             </thead>
             <tbody>' . $buf . '
