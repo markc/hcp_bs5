@@ -126,7 +126,7 @@ error_log(__METHOD__);
                 <th>Mailboxes</th>
                 <th>Mail Quota</th>
                 <th>Disk Quota</th>
-                <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
+                <th data-sortable="false" class="text-right" style="width:3rem;"></th>
               </tr>
             </thead>
             <tbody>' . $buf . '
