@@ -94,7 +94,7 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=vmails class="table table-sm">
+          <table id=vmails class="table table-sm" style="table-layout:fixed">
             <thead class="nowrap">
               <tr>
                 <th style="width:20%;">UserID</th>
