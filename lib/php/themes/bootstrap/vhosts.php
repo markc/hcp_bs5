@@ -137,7 +137,7 @@ error_log(__METHOD__);
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title"">Vhosts</h5>
+                  <h5 class="modal-title">Vhosts</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -148,7 +148,7 @@ error_log(__METHOD__);
                       <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
                       <input type="hidden" name="m" value="create">
                       <div class="form-group">
-                        <label for="domain class="form-control-label">Vhost</label>
+                        <label for="domain" class="form-control-label">Vhost</label>
                         <input type="text" class="form-control" id="domain" name="domain">
                       </div>
                       <div class="form-group">
