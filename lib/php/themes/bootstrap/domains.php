@@ -108,7 +108,7 @@ error_log(__METHOD__);
         <script>
 $(document).ready(function() {
   $("#domains").DataTable();
-  $(".serial").click(function(id, serial){
+  $(document).on("click", ".serial", {}, (function(id, serial){
     var a = $(this)
     $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
       $(a).text(data);
