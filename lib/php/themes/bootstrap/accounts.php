@@ -136,7 +136,7 @@ error_log(__METHOD__);
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $id . '">
               <div class="row">
-                <div class="col-4">
+                <div class="col-12 col-sm-6 col-lg-4">
                   <div class="form-group">
                     <label for="login">UserID</label>
                     <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
@@ -146,7 +146,7 @@ error_log(__METHOD__);
                     <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                   </div>
                 </div>
-                <div class="col-4">
+                <div class="col-12 col-sm-6 col-lg-4">
                   <div class="form-group">
                     <label for="fname">First Name</label>
                     <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
@@ -156,7 +156,7 @@ error_log(__METHOD__);
                     <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
                   </div>
                 </div>
-                <div class="col-4">' . $aclgrp_buf . '
+                <div class="col-12 col-sm-6 col-lg-4">' . $aclgrp_buf . '
                 </div>
               </div>
               <div class="row">
