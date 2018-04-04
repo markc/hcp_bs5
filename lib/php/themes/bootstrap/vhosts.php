@@ -212,22 +212,22 @@ error_log(__METHOD__);
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
-                <div class="form-group col-12 col-sm-6 col-lg-4">
+                <div class="form-group col-12 col-md-6 col-lg-4">
                   <label for="domain">Domain</label>' . $enable . '
                 </div>
-                <div class="form-group col-6 col-sm-3 col-lg-2">
+                <div class="form-group col-6 col-md-3 col-lg-2">
                   <label for="aliases">Max Aliases</label>
                   <input type="number" class="form-control" name="aliases" id="aliases" value="' . $aliases . '">
                 </div>
-                <div class="form-group col-6 col-sm-3 col-lg-2">
+                <div class="form-group col-6 col-md-3 col-lg-2">
                   <label for="mailboxes">Max Mailboxes</label>
                   <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $mailboxes . '">
                 </div>
-                <div class="form-group col-6 col-sm-3 col-lg-2">
+                <div class="form-group col-6 col-md-3 col-lg-2">
                   <label for="mailquota">Mail Quota (MB)</label>
                   <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($mailquota / 1000000) . '">
                 </div>
-                <div class="form-group col-6 col-sm-3 col-lg-2">
+                <div class="form-group col-6 col-md-3 col-lg-2">
                   <label for="diskquota">Disk Quota (MB)</label>
                   <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($diskquota / 1000000) . '">
                 </div>
