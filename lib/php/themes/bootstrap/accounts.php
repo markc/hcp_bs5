@@ -160,9 +160,9 @@ error_log(__METHOD__);
                 </div>
               </div>
               <div class="row">
-                <div class="col-6">' . $switch . '
+                <div class="col-12 col-sm-6">' . $switch . '
                 </div>
-                <div class="col-6 text-right">
+                <div class="col-12 col-sm-6 text-right">
                   <div class="btn-group">' . $submit . '
                   </div>
                 </div>
