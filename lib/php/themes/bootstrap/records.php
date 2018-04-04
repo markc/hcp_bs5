@@ -179,7 +179,7 @@ error_log('records::editor = '.var_export($in,true));
                   <th class="w-25">Content</th>
                   <th>Priority</th>
                   <th>TTL</th>
-                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                  <th data-sortable="false" class="text-right" style="width:4rem"></th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
