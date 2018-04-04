@@ -121,10 +121,10 @@ error_log(__METHOD__);
               <thead class="nowrap">
                 <tr>
                   <th>Domain</th>
-                  <th>Uname</th>
-                  <th>UID:GID</th>
-                  <th>Aliases</th>
-                  <th>Mailboxes</th>
+                  <th style="width:6rem;">Uname</th>
+                  <th style="width:6rem;">UID:GID</th>
+                  <th style="width:6rem;">Aliases</th>
+                  <th style="width:6rem;">Mailboxes</th>
                   <th>Mail Quota</th>
                   <th>Disk Quota</th>
                   <th data-sortable="false" class="text-right" style="width:3rem;"></th>
