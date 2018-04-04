@@ -94,20 +94,22 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=vmails class="table table-sm" style="table-layout:fixed">
-            <thead class="nowrap">
-              <tr>
-                <th class="w-25">UserID</th>
-                <th class="w-25">Domain</th>
-                <th data-sortable="false"></th>
-                <th>Mailbox&nbsp;Quota</th>
-                <th>Msg&nbsp;#</th>
-                <th data-sortable="false" class="text-right" style="width:3rem;"></th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table id=vmails class="table table-sm" style="table-layout:fixed">
+              <thead class="nowrap">
+                <tr>
+                  <th class="w-25">UserID</th>
+                  <th class="w-25">Domain</th>
+                  <th data-sortable="false"></th>
+                  <th>Mailbox&nbsp;Quota</th>
+                  <th>Msg&nbsp;#</th>
+                  <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody>' . $buf . '
+              </tbody>
+            </table>
+          </div>
 
           <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
             <div class="modal-dialog" role="document">
