@@ -23,20 +23,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $buf = '';
-/*
-        $pgr = $in['pager']; unset($in['pager']);
-        $buf = $pgr_top = $pgr_end = '';
-        if ($pgr['last'] > 1) {
-            $pgr_top ='
-          <div class="col-6">' . $this->pager($pgr) . '
-          </div>';
-            $pgr_end = '
-          <div class="row">
-            <div class="col-12">' . $this->pager($pgr) . '
-            </div>
-          </div>';
-        }
-*/
+
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
@@ -56,7 +43,7 @@ error_log(__METHOD__);
 
             $buf .= '
             <tr>
-              <td><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
+              <td class="text-truncate"><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
               <td>' . $target_buf . ' </td>
               <td>' . $rhs . '</td>
               <td class="text-right">' . $active_buf . '
@@ -67,7 +54,7 @@ error_log(__METHOD__);
         }
 
         return '
-          <div class="col-6">
+          <div class="col-12">
           <h3>
             <i class="fa fa-globe fa-fw"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
@@ -77,18 +64,20 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
           <div class="row">
-            <table id=valias class="table table-sm">
-              <thead class="nowrap">
-                <tr>
-                  <th>Alias</th>
-                  <th>Target Address</th>
-                  <th>Domain</th>
-                  <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table id=valias class="table table-sm" style="min-width:1000px;table-layout:fixed">
+                <thead class="nowrap">
+                  <tr>
+                    <th>Alias</th>
+                    <th>Target Address</th>
+                    <th>Domain</th>
+                    <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                  </tr>
+                </thead>
+                <tbody>' . $buf . '
+                </tbody>
+              </table>
+            </div>
           </div>
           <script>$(document).ready(function() { $("#valias").DataTable({"order": []}); });</script>';
 

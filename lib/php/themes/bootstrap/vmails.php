@@ -98,8 +98,8 @@ error_log(__METHOD__);
             <table id=vmails class="table table-sm" style="min-width:1000px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
-                  <th class="w-25">UserID</th>
-                  <th class="w-25">Domain</th>
+                  <th>UserID</th>
+                  <th>Domain</th>
                   <th data-sortable="false"></th>
                   <th>Mailbox&nbsp;Quota</th>
                   <th style="width:4rem">Msg&nbsp;#</th>
