@@ -95,15 +95,15 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vmails class="table table-sm" style="table-layout:fixed">
+            <table id=vmails class="table table-sm" style="min-width:1000px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
                   <th class="w-25">UserID</th>
                   <th class="w-25">Domain</th>
                   <th data-sortable="false"></th>
                   <th>Mailbox&nbsp;Quota</th>
-                  <th>Msg&nbsp;#</th>
-                  <th data-sortable="false" class="text-right">&nbsp;&nbsp;&nbsp;</th>
+                  <th style="width:4rem">Msg&nbsp;#</th>
+                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
