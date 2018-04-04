@@ -78,7 +78,7 @@ error_log(__METHOD__);
 
             $buf .= '
               <tr id="data">
-                <td><strong>' . $url . '</strong></td>
+                <td class="text-truncate"><strong>' . $url . '</strong></td>
                 <td>' . $uname . '</td>
                 <td>' . $uid . ':' . $gid . '</td>
                 <td class="text-right">' . $num_aliases . ' / ' . $aliases . '</td>
@@ -116,22 +116,24 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=vhosts class="table table-sm">
-            <thead class="nowrap">
-              <tr>
-                <th>Domain</th>
-                <th>Uname</th>
-                <th>UID:GID</th>
-                <th>Aliases</th>
-                <th>Mailboxes</th>
-                <th>Mail Quota</th>
-                <th>Disk Quota</th>
-                <th data-sortable="false" class="text-right" style="width:3rem;"></th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table id=vhosts class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <thead class="nowrap">
+                <tr>
+                  <th>Domain</th>
+                  <th>Uname</th>
+                  <th>UID:GID</th>
+                  <th>Aliases</th>
+                  <th>Mailboxes</th>
+                  <th>Mail Quota</th>
+                  <th>Disk Quota</th>
+                  <th data-sortable="false" class="text-right" style="width:3rem;"></th>
+                </tr>
+              </thead>
+              <tbody>' . $buf . '
+              </tbody>
+            </table>
+          </div>
 
           <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
             <div class="modal-dialog" role="document">

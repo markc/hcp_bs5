@@ -30,7 +30,7 @@ error_log(__METHOD__);
             $soa_ary = explode(' ', $soa);
             $buf .= '
                 <tr>
-                  <td class="nowrap">
+                  <td class="text-truncate">
                     <a href="?o=records&m=update&i=' . $id . '" title="Show item ' . $id . '">
                       <strong>' . $name . '</strong>
                     </a>
@@ -63,19 +63,21 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=domains class="table table-sm">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Records</th>
-                <th>Serial</th>
-                <th data-sortable="false">&nbsp;&nbsp</th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table id=domains class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <thead>
+                <tr>
+                  <th class="w-25">Name</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Serial</th>
+                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                </tr>
+              </thead>
+              <tbody>' . $buf . '
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">

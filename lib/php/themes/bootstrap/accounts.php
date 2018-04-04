@@ -31,32 +31,19 @@ error_log(__METHOD__);
 
         $buf = '';
         $num = count($in);
-/*
-        $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pager']; unset($in['pager']);
-        if ($pgr['last'] > 1) {
-            $pgr_top ='
-          <div class="col-6">' . $this->pager($pgr) . '
-          </div>';
-            $pgr_end = '
-          <div class="row">
-            <div class="col-12">' . $this->pager($pgr) . '
-            </div>
-          </div>';
-        }
-*/
+
         foreach ($in as $a) {
             extract($a);
             $buf .= '
         <tr>
-          <td>
+          <td class="text-truncate">
             <a href="?o=accounts&m=read&i=' . $id . '" title="Show account: ' . $id . '">
               <strong>' . $login . '</strong>
             </a>
           </td>
           <td>' . $fname . '</td>
           <td>' . $lname . '</td>
-          <td>' . $altemail . '</td>
+          <td class="text-truncate">' . $altemail . '</td>
           <td>' . $this->g->acl[$acl] . '</td>
           <td>' . $grp . '</td>
         </tr>';
@@ -73,20 +60,22 @@ error_log(__METHOD__);
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=accounts class="table table-sm">
-            <thead class="nowrap">
-              <tr>
-                <th>User ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Alt Email</th>
-                <th>ACL</th>
-                <th>Grp</th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table id=accounts class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <thead class="nowrap">
+                <tr>
+                  <th class="w-25">User ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th class="w-25">Alt Email</th>
+                  <th>ACL</th>
+                  <th>Grp</th>
+                </tr>
+              </thead>
+              <tbody>' . $buf . '
+              </tbody>
+            </table>
+          </div>
           <script>$(document).ready(function() { $("#accounts").DataTable({"order": []}); });</script>';
     }
 

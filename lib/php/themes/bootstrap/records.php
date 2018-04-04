@@ -149,7 +149,7 @@ error_log('records::editor = '.var_export($in,true));
                 : '<i class="fas fa-times fa-fw text-danger"></i>';
             $buf .= '
                 <tr class="editrow" data-rowid="' . $id . '" data-active="' . $active . '">
-                  <td><b title="DNS record ID: ' . $id . '">' . $name . '</b></td>
+                  <td class="text-truncate"><b title="DNS record ID: ' . $id . '">' . $name . '</b></td>
                   <td>' . $type . '</td>
                   <td class="text-truncate">' . $content . '</td>
                   <td class="text-right">' . $priority . '</td>
