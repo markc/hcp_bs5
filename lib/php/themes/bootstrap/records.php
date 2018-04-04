@@ -170,19 +170,21 @@ error_log('records::editor = '.var_export($in,true));
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
-          <table id=records class="table table-sm" style="table-layout:fixed">
-            <thead>
-              <tr>
-                <th class="w-25">Name</th>
-                <th>Type</th>
-                <th class="w-25">Content</th>
-                <th>Priority</th>
-                <th>TTL</th>
-                <th data-sortable="false"></th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-        </table>
+          <div class="table-responsive">
+            <table id=records class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <thead>
+                <tr>
+                  <th class="w-25">Name</th>
+                  <th>Type</th>
+                  <th class="w-25">Content</th>
+                  <th>Priority</th>
+                  <th>TTL</th>
+                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                </tr>
+              </thead>
+              <tbody>' . $buf . '
+          </table>
+        </div>
       </div>
       <br>
       <form method="post" action="' . $this->g->cfg['self'] . '">
