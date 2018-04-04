@@ -174,9 +174,9 @@ error_log('records::editor = '.var_export($in,true));
             <table id=records class="table table-sm" style="min-width:1000px;table-layout:fixed">
               <thead>
                 <tr>
-                  <th class="w-25">Name</th>
+                  <th>Name</th>
                   <th>Type</th>
-                  <th class="w-25">Content</th>
+                  <th>Content</th>
                   <th>Priority</th>
                   <th>TTL</th>
                   <th data-sortable="false" class="text-right" style="width:4rem"></th>
