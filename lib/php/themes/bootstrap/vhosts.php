@@ -212,36 +212,36 @@ error_log(__METHOD__);
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
-                <div class="form-group col-4">
+                <div class="form-group col-12 col-sm-6 col-lg-4">
                   <label for="domain">Domain</label>' . $enable . '
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-6 col-sm-3 col-lg-2">
                   <label for="aliases">Max Aliases</label>
                   <input type="number" class="form-control" name="aliases" id="aliases" value="' . $aliases . '">
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-6 col-sm-3 col-lg-2">
                   <label for="mailboxes">Max Mailboxes</label>
                   <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $mailboxes . '">
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-6 col-sm-3 col-lg-2">
                   <label for="mailquota">Mail Quota (MB)</label>
                   <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($mailquota / 1000000) . '">
                 </div>
-                <div class="form-group col-2">
+                <div class="form-group col-6 col-sm-3 col-lg-2">
                   <label for="diskquota">Disk Quota (MB)</label>
                   <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($diskquota / 1000000) . '">
                 </div>
               </div>
               <div class="row">
-                <div class="col-2 offset-md-6">
-            <div class="form-group">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
-                <label class="custom-control-label" for="active">Active</label>
-              </div>
-            </div>
+                <div class="col-12 col-sm-6">
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
+                      <label class="custom-control-label" for="active">Active</label>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-4 text-right">
+                <div class="col-12 col-sm-6 text-right">
                   <div class="btn-group">' . $submit . '
                   </div>
                 </div>
