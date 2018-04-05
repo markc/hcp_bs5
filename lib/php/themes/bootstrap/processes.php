@@ -86,6 +86,13 @@ error_log(var_export($in,true));
               </table>
             </div>
           </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <h5>Process List <small>(' . $proc_num . ')</small></h5>
+            <pre>' . $proc_list . '
+            </pre>
+          </div>
         </div>';
     }
 }

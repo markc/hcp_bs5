@@ -1,8 +1,8 @@
 <?php
-// plugins/infosys.php 20170225 - 20180405
+// plugins/processes.php 20170225 - 20180405
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Plugins_InfoSys extends Plugin
+class Plugins_Processes extends Plugin
 {
     public function list() : string
     {
@@ -74,7 +74,7 @@ error_log(__METHOD__);
         $knl = is_readable('/proc/version')
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
-//        $procs = shell_exec('sudo processes');
+        $procs = shell_exec('sudo processes');
 
         $day_str = $day < 1 ? '' : $day . ($day === 1 ? ' day ' : ' days ');
         $hrs_str = $hrs < 1 ? '' : $hrs . ($hrs === 1 ? ' hour ' : ' hours ');
@@ -105,6 +105,8 @@ error_log(__METHOD__);
             'cpu_color' => $cpu_pcnt > 90 ? 'danger' : ($cpu_pcnt > 80 ? 'warning' : 'default'),
             'cpu_pcnt'  => $cpu_pcnt,
             'cpu_text'  => $cpu_pcnt > 5 ? $cpu_pcnt. '%' : '',
+            'proc_list' => $procs,
+            'proc_num'  => count(explode("\n", $procs)) - 1,
         ]);
     }
 }
