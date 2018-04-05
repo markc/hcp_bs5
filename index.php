@@ -76,7 +76,7 @@ echo new Init(new class
                 ['News',        '?o=news&p=1',  'fas fa-newspaper fa-fw'],
                 ['Webmail',     'webmail/',     'fas fa-envelope fa-fw'],
                 ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
-            ], 'fas fa-align-justify fa-fw'],
+            ], 'fas fa-bars fa-fw'],
             ['Admin',       [
                 ['Accounts',    '?o=accounts',  'fas fa-users fa-fw'],
                 ['Vhosts',      '?o=vhosts',    'fas fa-globe fa-fw'],
