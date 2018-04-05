@@ -83,13 +83,13 @@ echo new Init(new class
                 ['Mailoxes',    '?o=vmails',    'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias',    'fas fa-envelope-square fa-fw'],
                 ['Domains',     '?o=domains',   'fas fa-server fa-fw'],
-            ], 'fas fas-user-plus fa-fw'],
+            ], 'fas fas-user-secret fa-fw'],
             ['Stats',       [
-                ['Sys Info',    '?o=infosys1',  'fas fa-tachometer-alt fa-fw'],
+                ['Sys Info',    '?o=infosys',   'fas fa-tachometer-alt fa-fw'],
                 ['Processes',   '?o=processes', 'fas fa-code-branch fa-fw'],
                 ['Mail Info',   '?o=infomail',  'fas fa-envelope-square fa-fw'],
                 ['Mail Graph',  '?o=mailgraph', 'fas fa-envelope fa-fw'],
-            ], 'fas fas-user-secret fa-fw'],
+            ], 'fas fas-server fa-fw'],
         ],
     ],
     $nav2 = [
