@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/users.php 20150101 - 20170306
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/users.php 20150101 - 20180405
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Accounts extends Plugin
 {
@@ -32,7 +32,8 @@ error_log(__METHOD__);
             $wval = $_SESSION['usr']['id'];
          }
 
-        return $this->t->list(db::read('*'));
+//        return $this->t->list(db::read('*')),
+        return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
 /*
         $pager = util::pager(
             (int) util::ses('p'),

@@ -93,8 +93,8 @@ error_log(__METHOD__);
                 <button type="submit" name="m" value="create" class="btn btn-primary">Add This Account</button>';
         } else {
             $header = 'Update Account';
-//            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
-            $switch = util::is_adm() && (!util::is_usr(0) && !util::is_usr(1)) ? '
+//            $switch = util::is_adm() && (!util::is_usr(0) && !util::is_usr(1)) ? '
+            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
                   <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
             $submit = '
                 <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>

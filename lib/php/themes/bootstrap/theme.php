@@ -157,7 +157,7 @@ error_log(__METHOD__);
             $usr[] = ['Sign out', '?o=auth&m=delete', 'fas fa-sign-out-alt fa-fw'];
 
             if (util::is_adm() && !util::is_acl(0)) $usr[] =
-                ['Switch to sysadm', '?o=users&m=switch_user&i=' . $_SESSION['adm'], 'fas fa-user fa-fw'];
+                ['Switch to sysadm', '?o=accounts&m=switch_user&i=' . $_SESSION['adm'], 'fas fa-user fa-fw'];
 
             return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fas fa-user fa-fw']);
         } else return '';
