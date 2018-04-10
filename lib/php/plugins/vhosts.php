@@ -54,7 +54,7 @@ error_log(__METHOD__);
 //  WHERE `domain` = :domain";
 
 //            $num_results = db::qry($sql, ['domain' => $domain], 'col');
-            $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
+            $num_results = intval(db::read('COUNT(id)', 'domain', $domain, '', 'col'));
 error_log("num_results=$num_results, type=".gettype($num_results));
             if ($num_results !== 0) {
                 util::log('Domain already exists');
