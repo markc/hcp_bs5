@@ -39,7 +39,7 @@ error_log(__METHOD__);
             }
 
             if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
-                util::log('Invalid domain name');
+                util::log("Invalid domain name: gethostbyname($domain)");
                 $_POST = []; return $this->t->create($this->in);
             }
 
@@ -62,7 +62,7 @@ error_log("num_results=$num_results");
             }
 // add plan, default to personal
             shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
-            util::log('Added ' . $domain, 'success');
+            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
         return $this->t->create($this->in);

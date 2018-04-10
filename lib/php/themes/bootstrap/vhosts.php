@@ -76,15 +76,20 @@ error_log(__METHOD__);
             $size_mpath = util::numfmt($size_mpath);
             $size_upath = util::numfmt($size_upath);
 
+//                <td>' . $uname . '</td>
+//                <td>' . $uid . ':' . $gid . '</td>
+
             $buf .= '
               <tr id="data">
                 <td class="text-truncate"><strong>' . $url . '</strong></td>
-                <td>' . $uname . '</td>
-                <td>' . $uid . ':' . $gid . '</td>
-                <td class="text-right">' . $num_aliases . ' / ' . $aliases . '</td>
-                <td class="text-right">' . $num_mailboxes . ' / ' . $mailboxes . '</td>
-                <td class="text-right">' . $size_mpath . ' / ' . $mail_quota . '</td>
-                <td class="text-right">' . $size_upath . ' / ' . $disk_quota . '</td>
+                <td class="text-right">' . $num_mailboxes . '&nbsp;&nbsp;/</td>
+                <td>' . $mailboxes . '</td>
+                <td class="text-right">' . $num_aliases . '&nbsp;&nbsp;/</td>
+                <td>' . $aliases . '</td>
+                <td class="text-right">' . $size_mpath . '&nbsp;&nbsp;/</td>
+                <td>' . $mail_quota . '</td>
+                <td class="text-right">' . $size_upath . '&nbsp;&nbsp;/</td>
+                <td>' . $disk_quota . '</td>
                 <td class="text-right">' . $active_icon . '
                   <a href="?o=vhosts&m=delete&i=' . $id . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $domain . '?\')">
                     <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
@@ -120,14 +125,24 @@ error_log(__METHOD__);
             <table id=vhosts class="table table-sm" style="min-width:1000px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
-                  <th>Domain</th>
-                  <th style="width:6rem;">Uname</th>
-                  <th style="width:6rem;">UID:GID</th>
-                  <th style="width:6rem;">Aliases</th>
-                  <th style="width:6rem;">Mailboxes</th>
-                  <th>Mail Quota</th>
-                  <th>Disk Quota</th>
-                  <th data-sortable="false" class="text-right" style="width:3rem;"></th>
+                  <th class="w-25"></th>
+                  <th colspan=2 class=text-center>Mailbox</th>
+                  <th colspan=2 class=text-center>Alias</th>
+                  <th colspan=2 class=text-center>Mail</th>
+                  <th colspan=2 class=text-center>Disk</th>
+                  <th style="width:2rem;"></th>
+                </tr>
+                <tr>
+                  <th class="w-25">Domain</th>
+                  <th class="text-right">Usage&nbsp;&nbsp;</th>
+                  <th>Quota</th>
+                  <th class="text-right">Usage&nbsp;&nbsp;</th>
+                  <th>Quota</th>
+                  <th class="text-right">Usage&nbsp;&nbsp;</th>
+                  <th>Quota</th>
+                  <th class="text-right">Usage&nbsp;&nbsp;</th>
+                  <th>Quota</th>
+                  <th data-sortable="false" class="text-right" style="width:2rem;"></th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
