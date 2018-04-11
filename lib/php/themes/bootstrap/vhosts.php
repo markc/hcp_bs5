@@ -21,23 +21,10 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
-
+/*
         $buf = '';
         $adm = util::is_adm();
-/*
-        $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pager']; unset($in['pager']);
-        if ($pgr['last'] > 1) {
-            $pgr_top ='
-          <div class="col-6">' . $this->pager($pgr) . '
-          </div>';
-            $pgr_end = '
-          <div class="row">
-            <div class="col-12">' . $this->pager($pgr) . '
-            </div>
-          </div>';
-        }
-*/
+
         foreach($in as $row) {
             extract($row);
 
@@ -99,6 +86,7 @@ error_log(__METHOD__);
 
         if (empty($buf)) $buf .= '
                 <tr><td colspan="8" class="text-center">No Records</td></tr>';
+*/
 
             $plans = [
                 ['Select Plan', ''],
@@ -122,31 +110,19 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vhosts class="table table-sm" style="min-width:1000px;table-layout:fixed">
-              <thead class="nowrap">
+            <table id=vhosts class="table table-sm">
+              <thead>
                 <tr>
-                  <th class="w-25"></th>
-                  <th colspan=2 class=text-center>Mailbox</th>
-                  <th colspan=2 class=text-center>Alias</th>
-                  <th colspan=2 class=text-center>Mail</th>
-                  <th colspan=2 class=text-center>Disk</th>
-                  <th style="width:2rem;"></th>
-                </tr>
-                <tr>
-                  <th class="w-25">Domain</th>
-                  <th class="text-right">Usage&nbsp;&nbsp;</th>
-                  <th>Quota</th>
-                  <th class="text-right">Usage&nbsp;&nbsp;</th>
-                  <th>Quota</th>
-                  <th class="text-right">Usage&nbsp;&nbsp;</th>
-                  <th>Quota</th>
-                  <th class="text-right">Usage&nbsp;&nbsp;</th>
-                  <th>Quota</th>
-                  <th data-sortable="false" class="text-right" style="width:2rem;"></th>
+                  <th>Domain</th>
+                  <th>Aliases</th>
+                  <th>Mailboxes</th>
+                  <th>MailQuota</th>
+                  <th>DiskQuota</th>
+                  <th>Updated</th>
                 </tr>
               </thead>
-              <tbody>' . $buf . '
-              </tbody>
+              <tfoot>
+              </tfoot>
             </table>
           </div>
 
@@ -183,7 +159,14 @@ error_log(__METHOD__);
 
           <script>
 $(document).ready(function() {
-  $("#vhosts").DataTable({"order": []});
+//  $("#vhosts").DataTable({"order": []});
+
+  $("#vhosts").DataTable( {
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=vhosts&m=list"
+  } );
+
 //  $(".serial").click(function(id, serial){
 //    var a = $(this)
 //    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {

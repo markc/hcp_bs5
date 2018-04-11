@@ -1,6 +1,6 @@
 <?php
-// lib/php/theme.php 20150101 - 20170305
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/theme.php 20150101 - 20170411
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
 {

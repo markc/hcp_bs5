@@ -55,7 +55,7 @@ error_log(__METHOD__);
 
 //            $num_results = db::qry($sql, ['domain' => $domain], 'col');
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
-error_log("num_results=$num_results, type=".gettype($num_results));
+//error_log("num_results=$num_results, type=".gettype($num_results));
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
@@ -144,12 +144,31 @@ error_log(__METHOD__);
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
             shell_exec("nohup sh -c 'sudo delvhost $vhost' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
-            util::redirect($this->g->cfg['self'] . '?o=vhosts', 5);
-//            shell_exec("nohup sh -c 'sudo serva reload web' > /tmp/serva.log 2>&1 &");
-//            exit;
+            util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
         return 'Error deleting item';
     }
+
+    protected function list() : string
+    {
+error_log(__METHOD__);
+
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['db' => 'domain',    'dt' => 0],
+                ['db' => 'aliases',   'dt' => 1],
+                ['db' => 'mailboxes', 'dt' => 2],
+                ['db' => 'mailquota', 'dt' => 3, 'formatter' => function($d) { return util::numfmt($d); }],
+                ['db' => 'diskquota', 'dt' => 4, 'formatter' => function($d) { return util::numfmt($d); }],
+                ['db' => 'updated',   'dt' => 5, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
+            ];
+
+            echo json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
+            exit;
+        }
+        return $this->t->list([]);
+    }
+
 }
 
 ?>

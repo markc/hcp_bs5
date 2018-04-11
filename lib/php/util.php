@@ -1,6 +1,6 @@
 <?php
-// lib/php/util.php 20150225 - 20170306
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/util.php 20150225 - 20180411
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
@@ -26,7 +26,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         foreach ($in as $k => $v)
-            $in[$k] = isset($_REQUEST[$k])
+            $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
         return $in;
     }
@@ -44,7 +44,7 @@ error_log(__METHOD__."($k, $v, $x)");
                 : ($_SESSION[$k] ?? $v));
     }
 
-//    public static function cfg($g) : void  // php7.1 only
+//    public static function cfg($g) : void  // php7.1+ only
     public static function cfg($g)
     {
 error_log(__METHOD__);
