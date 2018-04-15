@@ -103,14 +103,14 @@ error_log(__METHOD__);
             <h3>
               <i class="fa fa-globe fa-fw"></i> Vhosts
               <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
-                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+                <small><i class="fas fa-plus-circle fa-fw"></i></small>
               </a>
             </h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vhosts class="table table-sm">
+            <table id=vhosts class="table">
               <thead>
                 <tr>
                   <th>Domain</th>

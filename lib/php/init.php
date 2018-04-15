@@ -46,17 +46,21 @@ error_log('SESSION=' . var_export($_SESSION, true));
     public function __toString() : string
     {
 error_log(__METHOD__);
-//error_log(var_export($this->t->g->out,true));
+error_log(var_export($this->t->g->out,true));
 
         $g = $this->t->g;
-error_log(var_export($g->in,true));
-        if ($g->in['x'] === 'text') {
+        $x = $g->in['x'];
+        if ($x === 'text') {
             return $g->out['main'];
-        } elseif ($g->in['x'] === 'json') {
-            $xhr = $g->out[$g->in['x']] ?? '';
+        } elseif ($x === 'json') {
             header('Content-Type: application/json');
-            if ($xhr) return json_encode($xhr, JSON_PRETTY_PRINT);
-            return json_encode($g->out, JSON_PRETTY_PRINT);
+            return $g->out['main'];
+        } elseif ($x) {
+            $out = $g->out[$x] ?? '';
+            if ($out) {
+                header('Content-Type: application/json');
+                return json_encode($out, JSON_PRETTY_PRINT);
+            }
         }
         return $this->t->html();
     }

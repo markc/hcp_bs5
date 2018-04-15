@@ -163,8 +163,9 @@ error_log(__METHOD__);
                 ['db' => 'updated',   'dt' => 5, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
             ];
 
-            echo json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
-            exit;
+            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
+//            echo json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
+//            exit;
         }
         return $this->t->list([]);
     }

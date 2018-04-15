@@ -20,9 +20,9 @@ design and some of the new features of PHP7.
           <p class="text-center">
             <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
             <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'1\')">JSON</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'\')">HTML</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'foot\')">FOOT</a>
+            <a class="btn btn-secondary" href="" onclick="ajax(\'json\');return false;">JSON</a>
+            <a class="btn btn-secondary" href="" onclick="ajax(\'head\');return false;">HTML</a>
+            <a class="btn btn-secondary" href="" onclick="ajax(\'foot\');return false;">FOOT</a>
           </p>
         </form>
         <pre id="dbg"></pre>
