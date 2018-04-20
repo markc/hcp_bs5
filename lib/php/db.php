@@ -10,6 +10,7 @@ class Db extends \PDO
     public function __construct(array $dbcfg)
     {
 error_log(__METHOD__);
+//error_log(var_export($dbcfg,true));
 
         if (is_null(self::$dbh)) {
             extract($dbcfg);
@@ -17,6 +18,7 @@ error_log(__METHOD__);
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
             $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+error_log("dsn=$dsn");
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,
@@ -34,7 +36,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $fields = $values = '';
-        foreach($ary as $k=>$v) {
+        foreach($ary as $k =>$v) {
             $fields .= "
                 $k,";
             $values .= "
@@ -85,13 +87,13 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $set_str = '';
-        foreach($set as $k=>$v) $set_str .= "
+        foreach($set as $k =>$v) $set_str .= "
         $k = :$k,";
         $set_str = rtrim($set_str, ',');
 
         $where_str = '';
         $where_ary = [];
-        foreach($where as $k=>$v) {
+        foreach($where as $k =>$v) {
             $where_str .= " " . $v[0] . " " . $v[1] . " :" . $v[0];
             $where_ary[$v[0]] = $v[2] ;
         }
@@ -118,7 +120,7 @@ error_log(__METHOD__);
 
         $where_str = '';
         $where_ary = [];
-        foreach($where as $k=>$v) {
+        foreach($where as $k =>$v) {
             $where_str .= " " . $v[0] . " " . $v[1] . " :" . $v[0];
             $where_ary[$v[0]] = $v[2] ;
         }
@@ -145,7 +147,7 @@ error_log(__METHOD__);
 error_log("qry sql = $sql");
 
         try {
-            if ($type !== 'all') $sql .= ' LIMIT 1';
+            if ($type !==  'all') $sql .= ' LIMIT 1';
             $stm = self::$dbh->prepare($sql);
             if ($ary) self::bvs($stm, $ary);
             if ($stm->execute()) {
@@ -175,7 +177,7 @@ error_log("bvs = ".var_export($ary, true));
                 elseif (is_null($v))    $p = \PDO::PARAM_NULL;
                 elseif (is_string($v))  $p = \PDO::PARAM_STR;
                 else $p = false;
-                if ($p !== false) $stm->bindValue(":$k", $v, $p);
+                if ($p !==  false) $stm->bindValue(":$k", $v, $p);
             }
         }
     }
@@ -186,86 +188,38 @@ error_log("bvs = ".var_export($ary, true));
 
     // See http://datatables.net/usage/server-side
 
-    public static function simple($request, $table, $primaryKey, $columns)
+    public static function simple($request, $table, $primaryKey, $columns, string $sql = '')
     {
 error_log(__METHOD__);
 
-        $bindings = array();
+        $bindings = [];
         $db = self::$dbh;
 
-        // Build the SQL query string from the request
-        $limit = self::limit( $request, $columns);
-        $order = self::order( $request, $columns);
-        $where = self::filter( $request, $columns, $bindings);
+        $limit = self::limit($request, $columns);
+        $order = self::order($request, $columns);
+        $where = self::filter($request, $columns, $bindings);
+        $extra = $where . ' ' . $order . ' ' . $limit;
+        $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
+        $sql   = $sql ? $sql . ' ' . $extra : "
+ SELECT $cols
+   FROM `$table` $where $order $limit";
 
-        // Main query to actually get the data
-        $data = self::sql_exec( $db, $bindings,
-            "SELECT `".implode("`, `", self::pluck($columns, 'db'))."`
-             FROM `$table`
-             $where
-             $order
-             $limit"
-       );
+        $data = self::sql_exec($db, $bindings, $sql);
 
-        // Data set length after filtering
-        $resFilterLength = self::sql_exec( $db, $bindings,
-            "SELECT COUNT(`{$primaryKey}`)
-             FROM   `$table`
-             $where"
-       );
-        $recordsFiltered = $resFilterLength[0][0];
+        $recordsFiltered = self::sql_exec($db, $bindings, "
+ SELECT COUNT(`$primaryKey`)
+   FROM `$table`$where", 'col');
 
-        // Total data set length
-        $resTotalLength = self::sql_exec( $db,
-            "SELECT COUNT(`{$primaryKey}`)
-             FROM   `$table`"
-       );
-        $recordsTotal = $resTotalLength[0][0];
+        $recordsTotal = self::qry("
+ SELECT COUNT(`$primaryKey`)
+   FROM `$table`", [], 'col');
 
-        /*
-         * Output
-         */
-        return array(
-            "draw"            => isset($request['draw']) ?
-                intval( $request['draw']) :
-                0,
-            "recordsTotal"    => intval( $recordsTotal),
-            "recordsFiltered" => intval( $recordsFiltered),
-            "data"            => self::data_output( $columns, $data)
-       );
-    }
-
-    public static function sql_connect($sql_details)
-    {
-error_log(__METHOD__);
-
-        try {
-            $db = @new PDO(
-                "mysql:host={$sql_details['host']};dbname={$sql_details['db']}",
-                $sql_details['user'],
-                $sql_details['pass'],
-                array( PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-           );
-        }
-        catch (PDOException $e) {
-            self::fatal(
-                "An error occurred while connecting to the database. ".
-                "The error reported by the server was: ".$e->getMessage()
-           );
-        }
-
-        return $db;
-    }
-
-    public static function db($conn)
-    {
-error_log(__METHOD__);
-
-        if(is_array( $conn)) {
-            return self::sql_connect( $conn);
-        }
-
-        return $conn;
+        return [
+            "draw"            => isset($request['draw']) ? intval($request['draw']) : 0,
+            "recordsTotal"    => intval($recordsTotal),
+            "recordsFiltered" => intval($recordsFiltered),
+            "data"            => self::data_output($columns, $data)
+        ];
     }
 
     public static function data_output($columns, $data)
@@ -274,18 +228,17 @@ error_log(__METHOD__);
 
         $out = array();
 
-        for($i=0, $ien=count($data) ; $i<$ien ; $i++) {
-            $row = array();
+        for($i = 0, $ien = count($data); $i < $ien ; $i++) {
+            $row = [];
 
-            for($j=0, $jen=count($columns) ; $j<$jen ; $j++) {
+            for($j = 0, $jen = count($columns); $j < $jen ; $j++) {
                 $column = $columns[$j];
 
                 // Is there a formatter?
-                if(isset( $column['formatter'])) {
-                    $row[ $column['dt'] ] = $column['formatter']( $data[$i][ $column['db'] ], $data[$i]);
-                }
-                else {
-                    $row[ $column['dt'] ] = $data[$i][ $columns[$j]['db'] ];
+                if (isset($column['formatter'])) {
+                    $row[$column['dt']] = $column['formatter']($data[$i][$column['db']], $data[$i]);
+                } else {
+                    $row[$column['dt']] = $data[$i][$columns[$j]['db']];
                 }
             }
 
@@ -301,8 +254,8 @@ error_log(__METHOD__);
 
         $limit = '';
 
-        if(isset($request['start']) && $request['length'] != -1) {
-            $limit = "LIMIT ".intval($request['start']).", ".intval($request['length']);
+        if (isset($request['start']) && $request['length'] != -1) {
+            $limit = 'LIMIT ' . intval($request['start']) . ', ' . intval($request['length']);
         }
 
         return $limit;
@@ -314,30 +267,26 @@ error_log(__METHOD__);
 
         $order = '';
 
-        if(isset($request['order']) && count($request['order'])) {
-            $orderBy = array();
-            $dtColumns = self::pluck( $columns, 'dt');
+        if (isset($request['order']) && count($request['order'])) {
+            $orderBy = [];
+            $dtColumns = self::pluck($columns, 'dt');
 
-            for($i=0, $ien=count($request['order']) ; $i<$ien ; $i++) {
+            for($i = 0, $ien = count($request['order']) ; $i < $ien ; $i++) {
                 // Convert the column index into the column data property
                 $columnIdx = intval($request['order'][$i]['column']);
                 $requestColumn = $request['columns'][$columnIdx];
 
-                $columnIdx = array_search( $requestColumn['data'], $dtColumns);
-                $column = $columns[ $columnIdx ];
+                $columnIdx = array_search($requestColumn['data'], $dtColumns);
+                $column = $columns[$columnIdx];
 
-                if($requestColumn['orderable'] == 'true') {
-                    $dir = $request['order'][$i]['dir'] === 'asc' ?
-                        'ASC' :
-                        'DESC';
-
+                if ($requestColumn['orderable'] == 'true') {
+                    $dir = $request['order'][$i]['dir'] === 'asc' ? 'ASC' : 'DESC';
                     $orderBy[] = '`'.$column['db'].'` '.$dir;
                 }
             }
 
-            $order = 'ORDER BY '.implode(', ', $orderBy);
+            $order = 'ORDER BY ' . implode(', ', $orderBy);
         }
-
         return $order;
     }
 
@@ -345,38 +294,37 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $globalSearch = array();
-        $columnSearch = array();
-        $dtColumns = self::pluck( $columns, 'dt');
+        $globalSearch = $columnSearch = [];
+        $dtColumns = self::pluck($columns, 'dt');
 
-        if(isset($request['search']) && $request['search']['value'] != '') {
+        if (isset($request['search']) && $request['search']['value'] != '') {
             $str = $request['search']['value'];
 
-            for($i=0, $ien=count($request['columns']) ; $i<$ien ; $i++) {
+            for($i = 0, $ien = count($request['columns']) ; $i < $ien ; $i++) {
                 $requestColumn = $request['columns'][$i];
-                $columnIdx = array_search( $requestColumn['data'], $dtColumns);
+                $columnIdx = array_search($requestColumn['data'], $dtColumns);
                 $column = $columns[ $columnIdx ];
 
-                if($requestColumn['searchable'] == 'true') {
-                    $binding = self::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR);
-                    $globalSearch[] = "`".$column['db']."` LIKE ".$binding;
+                if ($requestColumn['searchable'] ==  'true') {
+                    $binding = self::bind($bindings, '%'.$str.'%', PDO::PARAM_STR);
+                    $globalSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                 }
             }
         }
 
         // Individual column filtering
-        if(isset( $request['columns'])) {
-            for($i=0, $ien=count($request['columns']) ; $i<$ien ; $i++) {
+        if (isset($request['columns'])) {
+            for($i = 0, $ien = count($request['columns']) ; $i < $ien ; $i++) {
                 $requestColumn = $request['columns'][$i];
-                $columnIdx = array_search( $requestColumn['data'], $dtColumns);
-                $column = $columns[ $columnIdx ];
+                $columnIdx = array_search($requestColumn['data'], $dtColumns);
+                $column = $columns[$columnIdx];
 
                 $str = $requestColumn['search']['value'];
 
-                if($requestColumn['searchable'] == 'true' &&
+                if ($requestColumn['searchable'] == 'true' &&
                  $str != '') {
-                    $binding = self::bind( $bindings, '%'.$str.'%', PDO::PARAM_STR);
-                    $columnSearch[] = "`".$column['db']."` LIKE ".$binding;
+                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
+                    $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                 }
             }
         }
@@ -384,64 +332,60 @@ error_log(__METHOD__);
         // Combine the filters into a single string
         $where = '';
 
-        if(count( $globalSearch)) {
-            $where = '('.implode(' OR ', $globalSearch).')';
+        if (count($globalSearch)) {
+            $where = '(' . implode(' OR ', $globalSearch) . ')';
         }
 
-        if(count( $columnSearch)) {
+        if (count($columnSearch)) {
             $where = $where === '' ?
                 implode(' AND ', $columnSearch) :
                 $where .' AND '. implode(' AND ', $columnSearch);
         }
 
-        if($where !== '') {
-            $where = 'WHERE '.$where;
+        if ($where !== '') {
+            $where = 'WHERE ' . $where;
         }
-
         return $where;
     }
 
 
-    public static function sql_exec($db, $bindings, $sql=null)
+    public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
 error_log(__METHOD__);
 
         // Argument shifting
-        if($sql === null) {
+        if ($sql === null) {
             $sql = $bindings;
         }
-
-        $stmt = $db->prepare( $sql);
-        //echo $sql;
+//error_log("sql=$sql");
+        $stmt = $db->prepare($sql);
 
         // Bind parameters
-        if(is_array( $bindings)) {
-            for($i=0, $ien=count($bindings) ; $i<$ien ; $i++) {
+        if (is_array($bindings)) {
+            for($i = 0, $ien = count($bindings) ; $i < $ien ; $i++) {
                 $binding = $bindings[$i];
-                $stmt->bindValue( $binding['key'], $binding['val'], $binding['type']);
+                $stmt->bindValue($binding['key'], $binding['val'], $binding['type']);
             }
         }
 
         // Execute
         try {
             $stmt->execute();
-        }
-        catch (PDOException $e) {
-            self::fatal( "An SQL error occurred: ".$e->getMessage());
+        } catch (PDOException $e) {
+            self::fatal("An SQL error occurred: ".$e->getMessage());
         }
 
-        // Return all
-        return $stmt->fetchAll( PDO::FETCH_BOTH);
+        if ($type === 'all')      return $stmt->fetchAll();
+        elseif ($type === 'both') return $stmt->fetchAll(PDO::FETCH_BOTH);
+        elseif ($type === 'one')  return $stmt->fetch();
+        elseif ($type === 'col')  return $stmt->fetchColumn();
     }
 
     private static function fatal($msg)
     {
 error_log(__METHOD__);
 
-        echo json_encode( array(
-            "error" => $msg
-       ));
-
+        echo json_encode(["error" => $msg]);
         exit(0);
     }
 
@@ -449,14 +393,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $key = ':binding_'.count( $a);
-
-        $a[] = array(
-            'key' => $key,
-            'val' => $val,
-            'type' => $type
-       );
-
+        $key = ':binding_' . count($a);
+        $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
         return $key;
     }
 
@@ -464,12 +402,10 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $out = array();
-
-        for($i=0, $len=count($a) ; $i<$len ; $i++) {
+        $out = [];
+        for($i = 0, $len = count($a) ; $i < $len ; $i++) {
             $out[] = $a[$i][$prop];
         }
-
         return $out;
     }
 
@@ -477,15 +413,13 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if(! $a) {
+        if (! $a) {
             return '';
-        }
-        else if($a && is_array($a)) {
-            return implode( $join, $a);
+        } elseif ($a && is_array($a)) {
+            return implode($join, $a);
         }
         return $a;
     }
-
 }
 
 ?>

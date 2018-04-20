@@ -244,10 +244,10 @@ error_log(__METHOD__);
  SELECT D.id,D.name,D.type,count(R.domain_id) AS records
    FROM domains D
    LEFT OUTER JOIN records R ON D.id = R.domain_id
-  GROUP BY D.id, D.name, D.type
- HAVING (D.name LIKE '' OR 1)
-    AND (D.type='' OR 1)
-  ORDER BY D.`updated` DESC";
+          GROUP BY D.id, D.name, D.type
+         HAVING (D.name LIKE '' OR 1)
+            AND (D.type='' OR 1)
+          ORDER BY D.`updated` DESC";
 
         $domains = db::qry($sql);
         $newary = [];

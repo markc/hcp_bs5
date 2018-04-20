@@ -46,7 +46,7 @@ error_log('SESSION=' . var_export($_SESSION, true));
     public function __toString() : string
     {
 error_log(__METHOD__);
-error_log(var_export($this->t->g->out,true));
+//error_log(var_export($this->t->g->out,true));
 
         $g = $this->t->g;
         $x = $g->in['x'];

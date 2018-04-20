@@ -128,6 +128,36 @@ error_log(__METHOD__);
         util::ses('p', '', '1');
         return $this->list();
     }
+
+    protected function list() : string
+    {
+error_log(__METHOD__);
+
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['db' => 'user',    'dt' => 0],
+                ['db' => 'domain',  'dt' => 1],
+                ['db' => '',  'dt' => 2],
+                ['db' => 'user_mail',  'dt' => 3],
+                ['db' => 'quota',  'dt' => 4],
+                ['db' => 'num_total',  'dt' => 5],
+//                ['db' => 'mailusage',   'dt' => 2, 'formatter' => function($d) { return util::numfmt($d); }],
+//                ['db' => 'updated', 'dt' => 3, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
+            ];
+        $sql = "
+ SELECT v.user,
+        d.domain,
+        user_mail,
+        quota,
+        num_total
+   FROM vmails v
+        JOIN vhosts d ON v.did=d.id
+            LEFT JOIN vmail_log l ON v.id=l.mid";
+
+            return json_encode(db::simple($_GET, 'vmails', 'id', $columns, $sql), JSON_PRETTY_PRINT);
+        }
+        return $this->t->list([]);
+    }
 }
 
 ?>

@@ -18,6 +18,7 @@ error_log(__METHOD__);
         return $this->editor($in);
     }
 
+
     public function list(array $in) : string
     {
 error_log(__METHOD__);
@@ -145,7 +146,15 @@ error_log(__METHOD__);
             </div>
           </div>
 
-          <script>$(document).ready(function() { $("#vmails").DataTable({"order": []}); });</script>';
+          <script>
+$(document).ready(function() {
+  $("#vmails").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=vmails&m=list"
+  });
+});
+          </script>';
     }
 
     function editor(array $in) : string
