@@ -18,7 +18,6 @@ error_log(__METHOD__);
         return $this->editor($in);
     }
 
-
     public function list(array $in) : string
     {
 error_log(__METHOD__);
@@ -99,12 +98,14 @@ error_log(__METHOD__);
             <table id=vmails class="table table-sm" style="min-width:1000px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
-                  <th>UserID</th>
+                  <th>Email</th>
                   <th>Domain</th>
                   <th data-sortable="false"></th>
-                  <th>Mailbox&nbsp;Quota</th>
-                  <th style="width:4rem">Msg&nbsp;#</th>
-                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                  <th class="text-left">Usage&nbsp;&nbsp;</th>
+                  <th data-sortable="false"></th>
+                  <th>Quota</th>
+                  <th class="text-left">Msg&nbsp;#&nbsp;</th>
+                  <th data-sortable="false"></th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
@@ -151,7 +152,15 @@ $(document).ready(function() {
   $("#vmails").DataTable({
     "processing": true,
     "serverSide": true,
-    "ajax": "?x=json&o=vmails&m=list"
+    "ajax": "?x=json&o=vmails&m=list",
+    "columnDefs": [
+      {"targets":0, "width":"25%"},
+      {"targets":2, "className":"align-middle"},
+      {"targets":3, "className":"text-right"},
+      {"targets":4, "width":"0.5rem", "className":"text-center"},
+      {"targets":6, "width":"3rem", "className":"text-right"},
+      {"targets":7, "width":"3rem"}
+    ]
   });
 });
           </script>';

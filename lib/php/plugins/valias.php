@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/valias.php 20170225 - 20170704
-// Copyright (C) 1995-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/valias.php 20170225 - 20180420
+// Copyright (C) 1995-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
@@ -8,7 +8,7 @@ class Plugins_Valias extends Plugin
     $tbl = 'valias',
     $in = [
         'aid'    => 1,
-        'did'    => 1,
+        'hid'    => 1,
         'source' => '',
         'target' => '',
         'active' => 0,
@@ -50,12 +50,13 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
- SELECT `id` FROM `vhosts`
+ SELECT `id`
+   FROM `vhosts`
   WHERE `domain` = :domain";
 
-                $did = db::qry($sql, ['domain' => $domain], 'col');
+                $hid = db::qry($sql, ['domain' => $domain], 'col');
 
-                if (!$did) {
+                if (!$hid) {
                     util::log($domain . ' does not exist as a local domain');
                     $_POST = []; return $this->t->create($this->in);
                 }
@@ -74,7 +75,8 @@ error_log(__METHOD__);
 
                 if ($catchall !== 1) {
                     $sql = "
- SELECT `source` FROM `valias`
+ SELECT `source`
+   FROM `valias`
   WHERE `source` = :source";
 
                     $num_results = count(db::qry($sql, ['source' => $s]));
@@ -86,7 +88,8 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
- SELECT `user` FROM `vmails`
+ SELECT `user`
+   FROM `vmails`
   WHERE `user` = :source";
 
                 $num_results = count(db::qry($sql, ['source' => $s]));
@@ -123,14 +126,14 @@ error_log(__METHOD__);
                 $sql = "
  INSERT INTO `valias` (
         `active`,
-        `did`,
+        `hid`,
         `source`,
         `target`,
         `updated`,
         `created`
 ) VALUES (
         :active,
-        :did,
+        :hid,
         :source,
         :target,
         :updated,
@@ -142,7 +145,7 @@ error_log(__METHOD__);
 
                 $result = db::qry($sql, [
                     'active'  => $active ? 1 : 0,
-                    'did'     => $did,
+                    'hid'     => $hid,
                     'source'  => $s,
                     'target'  => $target,
                     'updated' => date('Y-m-d H:i:s'),
@@ -196,12 +199,13 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
- SELECT `id` FROM `vhosts`
+ SELECT `id`
+   FROM `vhosts`
   WHERE `domain` = :domain";
 
-                $did = db::qry($sql, ['domain' => $domain], 'col');
+                $hid = db::qry($sql, ['domain' => $domain], 'col');
 
-                if (!$did) {
+                if (!$hid) {
                     util::log($domain . ' does not exist as a local domain');
                     $_POST = []; return $this->read();
                 }
@@ -212,7 +216,8 @@ error_log(__METHOD__);
                 }
 
                 $sql = "
- SELECT 1 FROM `valias`
+ SELECT 1
+   FROM `valias`
   WHERE `source` = :catchall";
 
                 $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
@@ -220,7 +225,8 @@ error_log(__METHOD__);
 
                 if ($catchall !== 1) {
                     $sql = "
- SELECT `user` FROM `vmails`
+ SELECT `user`
+   FROM `vmails`
   WHERE `user` = :source";
 
                     $num_results = count(db::qry($sql, ['source' => $s]));
@@ -259,7 +265,8 @@ error_log(__METHOD__);
                     : '@' . $domain;
 
                 $sql = "
- SELECT `source` FROM `valias`
+ SELECT `source`
+   FROM `valias`
   WHERE `source` = :source";
 
                 $exists = count(db::qry($sql, ['source' => $s]));
@@ -284,14 +291,14 @@ error_log(__METHOD__);
                     $sql = "
  INSERT INTO `valias` (
         `active`,
-        `did`,
+        `hid`,
         `source`,
         `target`,
         `updated`,
         `created`
 ) VALUES (
         :active,
-        :did,
+        :hid,
         :source,
         :target,
         :updated,
@@ -299,7 +306,7 @@ error_log(__METHOD__);
 )";
                     $result = db::qry($sql, [
                         'active'  => $active ? 1 : 0,
-                        'did'     => $did,
+                        'hid'     => $hid,
                         'source'  => $s,
                         'target'  => $target,
                         'updated' => date('Y-m-d H:i:s'),

@@ -9,11 +9,10 @@ class Themes_Bootstrap_Theme extends Theme
 error_log(__METHOD__);
 
         return '
-    <link href="https://fonts.googleapis.com/css?family=Quicksand:100,300,400,500,300italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
     <style>
-body{min-height:75rem;padding-top:5rem;font-family:"Quicksand",sans-serif;}
+body{min-height:75rem;padding-top:5rem;}
 table,form{width:100%;}
 table.dataTable{border-collapse: collapse !important;}
 
