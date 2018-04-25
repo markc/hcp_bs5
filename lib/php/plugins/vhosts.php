@@ -177,8 +177,8 @@ error_log(__METHOD__);
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
             ];
-//               ['db' => 'updated',   'dt' => 5, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
-            $sql = "
+
+            $sql1 = "
  SELECT vh.id,
         vh.domain,
         vh.aliases,
@@ -194,12 +194,12 @@ error_log(__METHOD__);
    FROM vhosts vh
         LEFT JOIN vhost_log vl ON vh.id=vl.hid
             LEFT JOIN vmails vm ON vh.id=vm.hid
-                LEFT JOIN valias va ON vh.id=va.hid
+                LEFT JOIN valias va ON vh.id=va.hid";
+
+            $sql2 = "
   GROUP BY vh.id, vl.size_mpath, vl.size_upath";
 
-//        GROUP BY vh.id, vl.size_mpath, vl.size_wpath, vl.size_upath";
-
-            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns, $sql), JSON_PRETTY_PRINT);
+            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns, $sql1, $sql2), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
     }

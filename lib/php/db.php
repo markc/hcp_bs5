@@ -188,7 +188,7 @@ error_log("bvs = ".var_export($ary, true));
 
     // See http://datatables.net/usage/server-side
 
-    public static function simple($request, $table, $primaryKey, $columns, string $sql = '')
+    public static function simple($request, $table, $primaryKey, $columns, string $sql1 = '', string $sql2 = '')
     {
 error_log(__METHOD__);
 
@@ -198,19 +198,22 @@ error_log(__METHOD__);
         $limit = self::limit($request, $columns);
         $order = self::order($request, $columns);
         $where = self::filter($request, $columns, $bindings);
-        $extra = $where . ' ' . $order . ' ' . $limit;
         $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
-        $sql   = $sql ? $sql . ' ' . $extra : "
+        $query = $sql1 && $sql2
+            ? $sql1 . ' ' . $where . ' ' . $sql2 . ' ' . $order . ' ' . $limit
+            : "
  SELECT $cols
    FROM `$table` $where $order $limit";
 
-        $data = self::sql_exec($db, $bindings, $sql);
+error_log("query=$query");
 
-//error_log('data='.var_export($data, true));
+        $data = self::sql_exec($db, $bindings, $query);
+
+error_log('data='.var_export($data, true));
 
         $recordsFiltered = self::sql_exec($db, $bindings, "
  SELECT COUNT(`$primaryKey`)
-   FROM `$table`$where", 'col');
+   FROM `$table` $where", 'col');
 
         $recordsTotal = self::qry("
  SELECT COUNT(`$primaryKey`)
