@@ -155,17 +155,51 @@ error_log(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['db' => 'domain',    'dt' => 0],
-                ['db' => 'aliases',   'dt' => 1],
-                ['db' => 'mailboxes', 'dt' => 2],
-                ['db' => 'mailquota', 'dt' => 3, 'formatter' => function($d) { return util::numfmt($d); }],
-                ['db' => 'diskquota', 'dt' => 4, 'formatter' => function($d) { return util::numfmt($d); }],
-                ['db' => 'updated',   'dt' => 5, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
+                ['dt' => 0,  'db' => 'domain'],
+                ['dt' => 1,  'db' => 'num_aliases'],
+                ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 3,  'db' => 'aliases'],
+                ['dt' => 4,  'db' => 'num_mailboxes'],
+                ['dt' => 5,  'db' => null,  'formatter' => function($d) { return '/'; } ],
+                ['dt' => 6,  'db' => 'mailboxes'],
+                ['dt' => 7,  'db' => 'size_mpath',  'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 8,  'db' => null,  'formatter' => function($d) { return '/'; } ],
+                ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 11,  'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 13, 'db' => 'active', 'formatter' => function($d, $row) {
+                    $active_buf = $d
+                        ? '<i class="fas fa-check text-success"></i>'
+                        : '<i class="fas fa-times text-danger"></i>';
+                    return $active_buf . '
+                      <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
             ];
+//               ['db' => 'updated',   'dt' => 5, 'formatter' => function($d) { return date('jS M y', strtotime($d)); }],
+            $sql = "
+ SELECT vh.id,
+        vh.domain,
+        vh.aliases,
+        vh.mailboxes,
+        vh.mailquota,
+        vh.diskquota,
+        vh.active,
+        vh.updated,
+        vl.size_mpath,
+        vl.size_upath,
+        count(distinct vm.id) num_mailboxes,
+        count(distinct va.id) num_aliases
+   FROM vhosts vh
+        LEFT JOIN vhost_log vl ON vh.id=vl.hid
+            LEFT JOIN vmails vm ON vh.id=vm.hid
+                LEFT JOIN valias va ON vh.id=va.hid
+  GROUP BY vh.id, vl.size_mpath, vl.size_upath";
 
-            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
-//            echo json_encode(db::simple($_GET, 'vhosts', 'id', $columns), JSON_PRETTY_PRINT);
-//            exit;
+//        GROUP BY vh.id, vl.size_mpath, vl.size_wpath, vl.size_upath";
+
+            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns, $sql), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
     }

@@ -110,15 +110,23 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vhosts class="table">
-              <thead>
+            <table id=vhosts class="table table-sm" style="min-width:1100px;table-layout:fixed">
+              <thead class="nowrap">
                 <tr>
                   <th>Domain</th>
-                  <th>Aliases</th>
-                  <th>Mailboxes</th>
-                  <th>MailQuota</th>
-                  <th>DiskQuota</th>
-                  <th>Updated</th>
+                  <th>Alias&nbsp;</th>
+                  <th data-sortable="false"></th>
+                  <th class="text-left"></th>
+                  <th>Mbox&nbsp;</th>
+                  <th data-sortable="false"></th>
+                  <th class="text-left"></th>
+                  <th>Mail&nbsp;</th>
+                  <th data-sortable="false"></th>
+                  <th class="text-left"></th>
+                  <th>Disk&nbsp;</th>
+                  <th data-sortable="false"></th>
+                  <th class="text-left"></th>
+                  <th data-sortable="false"></th>
                 </tr>
               </thead>
               <tfoot>
@@ -161,11 +169,24 @@ error_log(__METHOD__);
 $(document).ready(function() {
 //  $("#vhosts").DataTable({"order": []});
 
-  $("#vhosts").DataTable( {
+  $("#vhosts").DataTable({
     "processing": true,
     "serverSide": true,
-    "ajax": "?x=json&o=vhosts&m=list"
-  } );
+    "ajax": "?x=json&o=vhosts&m=list",
+    "columnDefs": [
+      {"targets":0, "width":"20%"},
+      {"targets":1, "className":"text-right"},
+      {"targets":2, "className":"text-center", "width":"0.5rem"},
+      {"targets":4, "className":"text-right"},
+      {"targets":5, "className":"text-center", "width":"0.5rem"},
+      {"targets":7, "className":"text-right"},
+      {"targets":8, "className":"text-center", "width":"0.5rem"},
+      {"targets":10, "className":"text-right"},
+      {"targets":11, "className":"text-center", "width":"0.5rem"},
+      {"targets":13, "className":"text-right", "width":"3rem"}
+    ]
+  });
+
 
 //  $(".serial").click(function(id, serial){
 //    var a = $(this)

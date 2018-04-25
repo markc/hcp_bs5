@@ -152,8 +152,8 @@ error_log('formatter row'.var_export($row,true));
                     $pbar    = $percent >= 90 ? 'bg-danger' : ($percent >= 75 ? 'bg-warning' : '');
                     return '
                       <div class="progress">
-                        <div class="progress-bar '.$pbar.'" role="progressbar" aria-valuenow="'.$percent.'" aria-valuemin="0" aria-valuemax="100" style="width: '.$percent.'%;">
-                          '.$pbuf.'
+                        <div class="progress-bar ' . $pbar . '" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $percent . '%;">
+                          ' . $pbuf . '
                         </div>
                       </div>';
                 }],
@@ -166,7 +166,7 @@ error_log('formatter row'.var_export($row,true));
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                     return $active_buf . '
-                      <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $user . '?\')">
+                      <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
             ];

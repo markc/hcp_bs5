@@ -101,7 +101,7 @@ error_log(__METHOD__);
                   <th>Email</th>
                   <th>Domain</th>
                   <th data-sortable="false"></th>
-                  <th class="text-left">Usage&nbsp;&nbsp;</th>
+                  <th>Usage&nbsp;</th>
                   <th data-sortable="false"></th>
                   <th>Quota</th>
                   <th class="text-left">Msg&nbsp;#&nbsp;</th>
@@ -157,9 +157,9 @@ $(document).ready(function() {
       {"targets":0, "width":"25%"},
       {"targets":2, "className":"align-middle"},
       {"targets":3, "className":"text-right"},
-      {"targets":4, "width":"0.5rem", "className":"text-center"},
-      {"targets":6, "width":"3rem", "className":"text-right"},
-      {"targets":7, "width":"3rem"}
+      {"targets":4, "className":"text-center", "width":"0.5rem"},
+      {"targets":6, "className":"text-right", "width":"3rem"},
+      {"targets":7, "className":"text-right", "width":"3rem"}
     ]
   });
 });

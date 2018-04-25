@@ -206,6 +206,8 @@ error_log(__METHOD__);
 
         $data = self::sql_exec($db, $bindings, $sql);
 
+//error_log('data='.var_export($data, true));
+
         $recordsFiltered = self::sql_exec($db, $bindings, "
  SELECT COUNT(`$primaryKey`)
    FROM `$table`$where", 'col');
@@ -357,7 +359,7 @@ error_log(__METHOD__);
         if ($sql === null) {
             $sql = $bindings;
         }
-//error_log("sql=$sql");
+//error_log("sql_exec sql=$sql");
         $stmt = $db->prepare($sql);
 
         // Bind parameters
