@@ -128,25 +128,17 @@ error_log(__METHOD__);
         util::ses('p', '', '1');
         return $this->list();
     }
-    /*
-                      <div class="progress">
-                        <div class="progress-bar " role="progressbar" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100" style="width: 44%;">
-                          44%
-                        </div>
-                      </div>
-*/
+
     protected function list() : string
     {
 error_log(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['db' => 'id'],
-                ['db' => 'user', 'dt' => 0, 'formatter' => function($d) { return "<b>$d</b>"; }],
-                ['db' => 'domain', 'dt' => 1],
-                ['db' => '',  'dt' => 2, 'formatter' => function($d, $row) {
-error_log('formatter row'.var_export($row,true));
-
+                ['dt' => null, 'db' => 'id'],
+                ['dt' => 0, 'db' => 'user', 'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 1, 'db' => 'domain'],
+                ['dt' => 2, 'db' => '',  'formatter' => function($d, $row) {
                     $percent = round(($row['size_mail'] / $row['quota']) * 100);
                     $pbuf    = $percent > 9 ? $percent.'%' : '';
                     $pbar    = $percent >= 90 ? 'bg-danger' : ($percent >= 75 ? 'bg-warning' : '');
@@ -157,11 +149,11 @@ error_log('formatter row'.var_export($row,true));
                         </div>
                       </div>';
                 }],
-                ['db' => 'size_mail', 'dt' => 3, 'formatter' => function($d) { return util::numfmt($d); }],
-                ['db' => '', 'dt' => 4, 'formatter' => function($d) { return '/'; } ],
-                ['db' => 'quota', 'dt' => 5, 'formatter' => function($d) { return util::numfmt($d); }],
-                ['db' => 'num_total', 'dt' => 6],
-                ['db' => 'active', 'dt' => 7, 'formatter' => function($d, $row) {
+                ['dt' => 3, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 4, 'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 5, 'db' => 'quota', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 6, 'db' => 'num_total'],
+                ['dt' => 7, 'db' => 'active', 'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
@@ -170,6 +162,7 @@ error_log('formatter row'.var_export($row,true));
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
             ];
+/*
             $sql = "
  SELECT m.id,
         m.user,
@@ -181,8 +174,8 @@ error_log('formatter row'.var_export($row,true));
    FROM vmails m
         JOIN vhosts h ON m.hid=h.id
             LEFT JOIN vmail_log ml ON m.id=ml.mid";
-
-            return json_encode(db::simple($_GET, 'vmails', 'id', $columns, $sql), JSON_PRETTY_PRINT);
+*/
+            return json_encode(db::simple($_GET, 'vmails_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
     }
