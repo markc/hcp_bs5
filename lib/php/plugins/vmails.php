@@ -149,9 +149,15 @@ error_log(__METHOD__);
                         </div>
                       </div>';
                 }],
+<<<<<<< HEAD
                 ['dt' => 3, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 4, 'db' => null, 'formatter' => function($d) { return '/'; } ],
                 ['dt' => 5, 'db' => 'quota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
+=======
+                ['dt' => 3, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 4, 'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 5, 'db' => 'quota', 'formatter' => function($d) { return util::numfmt($d); }],
+>>>>>>> 6cffc775066f19b1dad3e915a5ebe05b8190c64d
                 ['dt' => 6, 'db' => 'num_total'],
                 ['dt' => 7, 'db' => 'active', 'formatter' => function($d, $row) {
                     $active_buf = $d

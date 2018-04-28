@@ -164,10 +164,17 @@ error_log(__METHOD__);
                 ['dt' => 6,  'db' => 'mailboxes'],
                 ['dt' => 7,  'db' => 'size_mpath',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 8,  'db' => null,  'formatter' => function($d) { return '/'; } ],
+<<<<<<< HEAD
                 ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 11, 'db' => null, 'formatter' => function($d) { return '/'; } ],
                 ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
+=======
+                ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 11, 'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt($d); }],
+>>>>>>> 6cffc775066f19b1dad3e915a5ebe05b8190c64d
                 ['dt' => 13, 'db' => 'active', 'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
