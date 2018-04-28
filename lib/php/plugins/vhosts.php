@@ -153,21 +153,21 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['x'] === 'json') {
+//                 ['dt' => null, 'db' => 'id'],
+       if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => 0,  'db' => 'domain'],
                 ['dt' => 1,  'db' => 'num_aliases'],
-                ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
                 ['dt' => 3,  'db' => 'aliases'],
                 ['dt' => 4,  'db' => 'num_mailboxes'],
                 ['dt' => 5,  'db' => null,  'formatter' => function($d) { return '/'; } ],
                 ['dt' => 6,  'db' => 'mailboxes'],
-                ['dt' => 7,  'db' => 'size_mpath',  'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 7,  'db' => 'size_mpath',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 8,  'db' => null,  'formatter' => function($d) { return '/'; } ],
-                ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt($d); }],
-                ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt($d); }],
-                ['dt' => 11,  'db' => null, 'formatter' => function($d) { return '/'; } ],
-                ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt($d); }],
+                ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 11, 'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 13, 'db' => 'active', 'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
@@ -176,8 +176,11 @@ error_log(__METHOD__);
                       <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
+                ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
+                ['dt' => null, 'db' => 'id'],
+                ['dt' => null, 'db' => 'updated'],
             ];
-
+/*
             $sql1 = "
  SELECT vh.id,
         vh.domain,
@@ -194,12 +197,10 @@ error_log(__METHOD__);
    FROM vhosts vh
         LEFT JOIN vhost_log vl ON vh.id=vl.hid
             LEFT JOIN vmails vm ON vh.id=vm.hid
-                LEFT JOIN valias va ON vh.id=va.hid";
-
-            $sql2 = "
+                LEFT JOIN valias va ON vh.id=va.hid
   GROUP BY vh.id, vl.size_mpath, vl.size_upath";
-
-            return json_encode(db::simple($_GET, 'vhosts', 'id', $columns, $sql1, $sql2), JSON_PRETTY_PRINT);
+*/
+            return json_encode(db::simple($_GET, 'vhosts_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
     }

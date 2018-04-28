@@ -194,22 +194,18 @@ error_log(__METHOD__);
 
         $bindings = [];
         $db = self::$dbh;
+        $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
 
         $limit = self::limit($request, $columns);
         $order = self::order($request, $columns);
         $where = self::filter($request, $columns, $bindings);
-        $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
-        $query = $sql1 && $sql2
-            ? $sql1 . ' ' . $where . ' ' . $sql2 . ' ' . $order . ' ' . $limit
-            : "
+        $query = "
  SELECT $cols
    FROM `$table` $where $order $limit";
 
 error_log("query=$query");
 
         $data = self::sql_exec($db, $bindings, $query);
-
-error_log('data='.var_export($data, true));
 
         $recordsFiltered = self::sql_exec($db, $bindings, "
  SELECT COUNT(`$primaryKey`)
@@ -241,9 +237,9 @@ error_log(__METHOD__);
 
                 // Is there a formatter?
                 if (isset($column['formatter'])) {
-                    $row[$column['dt']] = $column['formatter']($data[$i][$column['db']], $data[$i]);
+                    $row[$column['dt']] = $column['formatter'](($data[$i][$column['db']] ?? ''), $data[$i]);
                 } else {
-                    $row[$column['dt']] = $data[$i][$columns[$j]['db']];
+                    if ($column['dt'] !== null) $row[$column['dt']] = $data[$i][$columns[$j]['db']];
                 }
             }
 
@@ -274,14 +270,13 @@ error_log(__METHOD__);
 
         if (isset($request['order']) && count($request['order'])) {
             $orderBy = [];
-            $dtColumns = self::pluck($columns, 'dt');
+//            $dtColumns = self::pluck($columns, 'dt');
 
             for($i = 0, $ien = count($request['order']) ; $i < $ien ; $i++) {
-                // Convert the column index into the column data property
                 $columnIdx = intval($request['order'][$i]['column']);
                 $requestColumn = $request['columns'][$columnIdx];
-
-                $columnIdx = array_search($requestColumn['data'], $dtColumns);
+//                $columnIdx = array_search($requestColumn['data'], $dtColumns); // don't use $dtColumns
+                $columnIdx = array_search($requestColumn['data'], array_column($columns, 'dt'));
                 $column = $columns[$columnIdx];
 
                 if ($requestColumn['orderable'] == 'true') {
@@ -290,7 +285,7 @@ error_log(__METHOD__);
                 }
             }
 
-            $order = 'ORDER BY ' . implode(', ', $orderBy);
+            if (count($orderBy)) $order = 'ORDER BY ' . implode(', ', $orderBy);
         }
         return $order;
     }
@@ -310,7 +305,7 @@ error_log(__METHOD__);
                 $columnIdx = array_search($requestColumn['data'], $dtColumns);
                 $column = $columns[ $columnIdx ];
 
-                if ($requestColumn['searchable'] ==  'true') {
+                if ($requestColumn['searchable'] == 'true' && $column['db']) {
                     $binding = self::bind($bindings, '%'.$str.'%', PDO::PARAM_STR);
                     $globalSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                 }
@@ -326,10 +321,9 @@ error_log(__METHOD__);
 
                 $str = $requestColumn['search']['value'];
 
-                if ($requestColumn['searchable'] == 'true' &&
-                 $str != '') {
+                if ($requestColumn['searchable'] == 'true' && $str != '' && $column['db'] !== null) {
                     $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
-                    $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
+                    if ($column['db']) $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                 }
             }
         }
@@ -362,7 +356,7 @@ error_log(__METHOD__);
         if ($sql === null) {
             $sql = $bindings;
         }
-//error_log("sql_exec sql=$sql");
+
         $stmt = $db->prepare($sql);
 
         // Bind parameters
@@ -409,7 +403,7 @@ error_log(__METHOD__);
 
         $out = [];
         for($i = 0, $len = count($a) ; $i < $len ; $i++) {
-            $out[] = $a[$i][$prop];
+            if ($a[$i][$prop]) $out[] = $a[$i][$prop];
         }
         return $out;
     }
