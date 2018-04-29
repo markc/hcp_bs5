@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# ~/.sh/build.sh 20170301 - 20170519
-# Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+# ~/.sh/build.sh 20170301 - 20180429
+# Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-[ -n $1 ] && cd $1
+[[ $1 =~ '-h' ]] && echo "Usage: [bash] buildall.sh [path(pwd)]" && exit 1
+
+[[ $1 ]] && cd $1
 
 echo '<?php declare(strict_types = 1);
 
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 ' > all.php
 
 (

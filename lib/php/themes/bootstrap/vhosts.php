@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vhosts.php 20180323
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180429
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
@@ -21,74 +21,8 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
-/*
-        $buf = '';
-        $adm = util::is_adm();
 
-        foreach($in as $row) {
-            extract($row);
-
-            $sql = "
- SELECT size_mpath, size_wpath, size_upath
-   FROM `logging`
-  WHERE `name`= :domain AND month = :month";
-
-            $logging = db::qry($sql, ['domain' => $domain, 'month' => date('Ym')], 'one');
-            if (is_array($logging)) extract($logging);
-            else $size_mpath = $size_wpath = $size_upath = 0;
-
-            $sql = "
- SELECT COUNT(id)
-   FROM `valias`
-  WHERE `did`= :did";
-
-            $num_aliases = db::qry($sql, ['did' => $id], 'col');
-
-            $sql = "
- SELECT COUNT(id)
-   FROM `vmails`
-  WHERE `did`= :did";
-
-            $num_mailboxes = db::qry($sql, ['did' => $id], 'col');
-
-            $active_icon = (isset($active) && $active)
-                ? '<i class="fas fa-check text-success" title="Enabled"></i>'
-                : '<i class="fas fa-times text-danger" title="Disabled"></i>';
-
-            $url = $adm ? '
-                  <a href="?o=vhosts&m=update&i=' . $id . '" title="Vhost ID: ' . $id . '">' . $domain . '</a>' : $domain;
-
-            $mail_quota = util::numfmt($mailquota);
-            $disk_quota = util::numfmt($diskquota);
-            $size_mpath = util::numfmt($size_mpath);
-            $size_upath = util::numfmt($size_upath);
-
-//                <td>' . $uname . '</td>
-//                <td>' . $uid . ':' . $gid . '</td>
-
-            $buf .= '
-              <tr id="data">
-                <td class="text-truncate"><strong>' . $url . '</strong></td>
-                <td class="text-right">' . $num_mailboxes . '&nbsp;&nbsp;/</td>
-                <td>' . $mailboxes . '</td>
-                <td class="text-right">' . $num_aliases . '&nbsp;&nbsp;/</td>
-                <td>' . $aliases . '</td>
-                <td class="text-right">' . $size_mpath . '&nbsp;&nbsp;/</td>
-                <td>' . $mail_quota . '</td>
-                <td class="text-right">' . $size_upath . '&nbsp;&nbsp;/</td>
-                <td>' . $disk_quota . '</td>
-                <td class="text-right">' . $active_icon . '
-                  <a href="?o=vhosts&m=delete&i=' . $id . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $domain . '?\')">
-                    <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
-                </td>
-              </tr>';
-        }
-
-        if (empty($buf)) $buf .= '
-                <tr><td colspan="8" class="text-center">No Records</td></tr>';
-*/
-
-            $plans = [
+        $plans = [
                 ['Select Plan', ''],
                 ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
                 ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
@@ -167,8 +101,6 @@ error_log(__METHOD__);
 
           <script>
 $(document).ready(function() {
-//  $("#vhosts").DataTable({"order": []});
-
   $("#vhosts").DataTable({
     "processing": true,
     "serverSide": true,
@@ -186,15 +118,6 @@ $(document).ready(function() {
       {"targets":13, "className":"text-right", "width":"3rem"}
     ]
   });
-
-
-//  $(".serial").click(function(id, serial){
-//    var a = $(this)
-//    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
-//      $(a).text(data);
-//    });
-//    return false;
-//  });
 });
         </script>';
     }

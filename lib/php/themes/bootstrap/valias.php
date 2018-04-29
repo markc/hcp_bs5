@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20180323
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180323
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme

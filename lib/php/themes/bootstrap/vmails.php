@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20180321
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180321
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
@@ -171,10 +171,9 @@ $(document).ready(function() {
 error_log(__METHOD__);
 
         extract($in);
-error_log("active=$active,spamf=$spamf");
+
         $active_checked = ($active ? 1 : 0) ? ' checked' : '';
         $filter_checked = ($spamf ? 1 : 0) ? ' checked' : '';
-error_log("active_checked=$active_checked,filter_checked=$filter_checked");
 
         $passwd1  = $passwd1 ?? '';
         $passwd2  = $passwd2 ?? '';

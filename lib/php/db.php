@@ -1,6 +1,6 @@
 <?php
-// lib/php/db.php 20150225 - 20170316
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/db.php 20150225 - 20180429
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
 {
@@ -10,7 +10,6 @@ class Db extends \PDO
     public function __construct(array $dbcfg)
     {
 error_log(__METHOD__);
-//error_log(var_export($dbcfg,true));
 
         if (is_null(self::$dbh)) {
             extract($dbcfg);
@@ -18,7 +17,7 @@ error_log(__METHOD__);
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
             $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
-error_log("dsn=$dsn");
+
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,
@@ -48,8 +47,6 @@ error_log(__METHOD__);
         $sql = "
  INSERT INTO `" . self::$tbl . "` ($fields)
  VALUES ($values)";
-
-error_log("create sql = $sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
@@ -103,8 +100,6 @@ error_log(__METHOD__);
  UPDATE `" . self::$tbl . "` SET$set_str
   WHERE$where_str";
 
-error_log("update sql = $sql");
-
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
@@ -129,8 +124,6 @@ error_log(__METHOD__);
  DELETE FROM `" . self::$tbl . "`
   WHERE $where_str";
 
-error_log("delete sql = $sql");
-
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $where_ary);
@@ -143,8 +136,6 @@ error_log("delete sql = $sql");
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
 error_log(__METHOD__);
-
-error_log("qry sql = $sql");
 
         try {
             if ($type !==  'all') $sql .= ' LIMIT 1';
@@ -167,8 +158,6 @@ error_log("qry sql = $sql");
     public static function bvs($stm, array $ary)
     {
 error_log(__METHOD__);
-
-error_log("bvs = ".var_export($ary, true));
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {
@@ -202,8 +191,6 @@ error_log(__METHOD__);
         $query = "
  SELECT $cols
    FROM `$table` $where $order $limit";
-
-error_log("query=$query");
 
         $data = self::sql_exec($db, $bindings, $query);
 
