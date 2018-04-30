@@ -110,12 +110,16 @@ $(document).ready(function() {
       {"targets":0, "className":"text-truncate", "width":"25%"},
       {"targets":1, "className":"text-right", "width":"4rem"},
       {"targets":2, "className":"text-center", "width":"0.5rem"},
+      {"targets":3, "width":"4rem"},
       {"targets":4, "className":"text-right", "width":"4rem"},
       {"targets":5, "className":"text-center", "width":"0.5rem"},
+      {"targets":6, "width":"4rem"},
       {"targets":7, "className":"text-right", "width":"4rem"},
       {"targets":8, "className":"text-center", "width":"0.5rem"},
+      {"targets":9, "width":"4rem"},
       {"targets":10, "className":"text-right", "width":"4rem"},
       {"targets":11, "className":"text-center", "width":"0.5rem"},
+      {"targets":12, "width":"4rem"},
       {"targets":13, "className":"text-right", "width":"4rem"}
     ]
   });
