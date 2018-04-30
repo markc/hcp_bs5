@@ -115,7 +115,7 @@ $(document).ready(function() {
       {"targets":8, "className":"text-center", "width":"0.5rem"},
       {"targets":10, "className":"text-right"},
       {"targets":11, "className":"text-center", "width":"0.5rem"},
-      {"targets":13, "className":"text-right", "width":"3rem"}
+      {"targets":13, "className":"text-right", "width":"4rem"}
     ]
   });
 });

@@ -24,7 +24,7 @@ error_log(__METHOD__);
 
         $buf = '';
         $adm = util::is_adm();
-
+/*
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
@@ -81,7 +81,7 @@ error_log(__METHOD__);
         }
         if (empty($buf)) $buf .= '
                 <tr><td colspan="6" class="text-center">No Records</td></tr>';
-
+*/
         return '
           <div class="col-12">
             <h3>
@@ -154,14 +154,14 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vmails&m=list",
     "columnDefs": [
-      {"targets":0, "className":"ellide", "width":"25%"},
-      {"targets":0, "className":"ellide", "width":"20%"},
+      {"targets":0, "className":"text-truncate", "width":"25%"},
+      {"targets":0, "className":"text-truncate", "width":"20%"},
       {"targets":2, "className":"align-middle"},
       {"targets":3, "className":"text-right", "width":"4rem"},
       {"targets":4, "className":"text-center", "width":"0.5rem"},
       {"targets":5, "width":"4rem"},
       {"targets":6, "className":"text-right", "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"3rem"}
+      {"targets":7, "className":"text-right", "width":"4rem"}
     ]
   });
 });

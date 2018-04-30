@@ -158,7 +158,9 @@ error_log(__METHOD__);
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                     return $active_buf . '
-                      <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
+                    <a class="editlink" href="?o=vmails&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['user'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
             ];

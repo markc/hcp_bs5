@@ -153,10 +153,9 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-//                 ['dt' => null, 'db' => 'id'],
        if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['dt' => 0,  'db' => 'domain'],
+                ['dt' => 0,  'db' => 'domain', 'formatter' => function($d) { return "<b>$d</b>"; }],
                 ['dt' => 1,  'db' => 'num_aliases'],
                 ['dt' => 3,  'db' => 'aliases'],
                 ['dt' => 4,  'db' => 'num_mailboxes'],
@@ -173,7 +172,9 @@ error_log(__METHOD__);
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                     return $active_buf . '
-                      <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
+                    <a class="editlink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['domain'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
                 ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
