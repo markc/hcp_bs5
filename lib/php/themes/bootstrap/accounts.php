@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20170317
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20180430
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 {
@@ -105,11 +105,11 @@ error_log(__METHOD__);
         if (util::is_adm()) {
             $acl_ary = $grp_ary = [];
             foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
-            $acl_buf = $this->dropdown($acl_ary, 'acl', $acl, '', 'custom-select');
+            $acl_buf = $this->dropdown($acl_ary, 'acl', "$acl", '', 'custom-select');
             $res = db::qry("
  SELECT login,id
    FROM `accounts`
-  WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
+  WHERE acl = :0 OR acl = :1", ['0' => 0, '1' => 1]);
 
             foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
             $grp_buf = $this->dropdown($grp_ary, 'grp', $grp, '', 'custom-select');

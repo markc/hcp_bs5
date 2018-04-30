@@ -1,5 +1,5 @@
 <?php
-// lib/php/db.php 20150225 - 20180429
+// lib/php/db.php 20150225 - 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
