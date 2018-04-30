@@ -2038,7 +2038,7 @@ class Themes_Bootstrap_MailGraph extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180429
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180430
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
 {
@@ -2054,15 +2054,16 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
 
     public function list(array $in) : string
     {
+        // TODO migrate plans to a database table
         $plans = [
-                ['Select Plan', ''],
-                ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
-                ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
-                ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
-                ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
-            ];
+            ['Select Plan', ''],
+            ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
+            ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
+            ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
+            ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
+        ];
 
-            $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
+        $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
         return '
           <div class="col-12">
@@ -2138,15 +2139,19 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vhosts&m=list",
     "columnDefs": [
-      {"targets":0, "width":"20%"},
-      {"targets":1, "className":"text-right"},
+      {"targets":0, "className":"text-truncate", "width":"25%"},
+      {"targets":1, "className":"text-right", "width":"4rem"},
       {"targets":2, "className":"text-center", "width":"0.5rem"},
-      {"targets":4, "className":"text-right"},
+      {"targets":3, "width":"4rem"},
+      {"targets":4, "className":"text-right", "width":"4rem"},
       {"targets":5, "className":"text-center", "width":"0.5rem"},
-      {"targets":7, "className":"text-right"},
+      {"targets":6, "width":"4rem"},
+      {"targets":7, "className":"text-right", "width":"4rem"},
       {"targets":8, "className":"text-center", "width":"0.5rem"},
-      {"targets":10, "className":"text-right"},
+      {"targets":9, "width":"4rem"},
+      {"targets":10, "className":"text-right", "width":"4rem"},
       {"targets":11, "className":"text-center", "width":"0.5rem"},
+      {"targets":12, "width":"4rem"},
       {"targets":13, "className":"text-right", "width":"4rem"}
     ]
   });
