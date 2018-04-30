@@ -108,13 +108,13 @@ $(document).ready(function() {
     "ajax": "?x=json&o=vhosts&m=list",
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"25%"},
-      {"targets":1, "className":"text-right"},
+      {"targets":1, "className":"text-right", "width":"4rem"},
       {"targets":2, "className":"text-center", "width":"0.5rem"},
-      {"targets":4, "className":"text-right"},
+      {"targets":4, "className":"text-right", "width":"4rem"},
       {"targets":5, "className":"text-center", "width":"0.5rem"},
-      {"targets":7, "className":"text-right"},
+      {"targets":7, "className":"text-right", "width":"4rem"},
       {"targets":8, "className":"text-center", "width":"0.5rem"},
-      {"targets":10, "className":"text-right"},
+      {"targets":10, "className":"text-right", "width":"4rem"},
       {"targets":11, "className":"text-center", "width":"0.5rem"},
       {"targets":13, "className":"text-right", "width":"4rem"}
     ]
