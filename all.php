@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// all.php 20180430
+// all.php 2018-04-30 12:30:58 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 // lib/php/init.php 20150101 - 20170305
@@ -2140,12 +2140,12 @@ $(document).ready(function() {
     "ajax": "?x=json&o=vhosts&m=list",
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"25%"},
-      {"targets":1, "className":"text-right", "width":"4rem"},
+      {"targets":1, "className":"text-right", "width":"3rem"},
       {"targets":2, "className":"text-center", "width":"0.5rem"},
-      {"targets":3, "width":"4rem"},
-      {"targets":4, "className":"text-right", "width":"4rem"},
+      {"targets":3, "width":"3rem"},
+      {"targets":4, "className":"text-right", "width":"3rem"},
       {"targets":5, "className":"text-center", "width":"0.5rem"},
-      {"targets":6, "width":"4rem"},
+      {"targets":6, "width":"3rem"},
       {"targets":7, "className":"text-right", "width":"4rem"},
       {"targets":8, "className":"text-center", "width":"0.5rem"},
       {"targets":9, "width":"4rem"},

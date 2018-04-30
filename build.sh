@@ -14,7 +14,7 @@ bash build.sh .
 [[ $1 ]] && cd $1
 
 echo "<?php declare(strict_types = 1);
-// all.php $(date +%Y%m%d)
+// all.php $(date -u +'%Y-%m-%d %H:%M:%S') UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 " > all.php
 
@@ -26,9 +26,5 @@ echo "<?php declare(strict_types = 1);
   -e '/^<?php/d' \
   -e '/^\/\/ Copyright.*/d' \
   -e '/^error_log.*/,+1 d' >> all.php
-
-#  -e 's/^?>//g' \
-#  -e 's/^<?php//g' \
-#  -e 's/^\/\/ Copyright.*//g' \
 
 chmod 640 all.php
