@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180429
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
@@ -22,15 +22,16 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        // TODO migrate plans to a database table
         $plans = [
-                ['Select Plan', ''],
-                ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
-                ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
-                ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
-                ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
-            ];
+            ['Select Plan', ''],
+            ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
+            ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
+            ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
+            ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
+        ];
 
-            $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
+        $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
         return '
           <div class="col-12">
@@ -106,7 +107,7 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vhosts&m=list",
     "columnDefs": [
-      {"targets":0, "width":"20%"},
+      {"targets":0, "className":"text-truncate", "width":"25%"},
       {"targets":1, "className":"text-right"},
       {"targets":2, "className":"text-center", "width":"0.5rem"},
       {"targets":4, "className":"text-right"},
