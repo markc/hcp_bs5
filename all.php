@@ -3470,7 +3470,7 @@ table.dataTable{border-collapse: collapse !important;}
     }
 }
 
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20170317
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20180430
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 {
@@ -3565,11 +3565,11 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
         if (util::is_adm()) {
             $acl_ary = $grp_ary = [];
             foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
-            $acl_buf = $this->dropdown($acl_ary, 'acl', $acl, '', 'custom-select');
+            $acl_buf = $this->dropdown($acl_ary, 'acl', "$acl", '', 'custom-select');
             $res = db::qry("
  SELECT login,id
    FROM `accounts`
-  WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
+  WHERE acl = :0 OR acl = :1", ['0' => 0, '1' => 1]);
 
             foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
             $grp_buf = $this->dropdown($grp_ary, 'grp', $grp, '', 'custom-select');
@@ -4352,7 +4352,7 @@ class Util
     }
 }
 
-// lib/php/db.php 20150225 - 20180429
+// lib/php/db.php 20150225 - 20180430
 
 class Db extends \PDO
 {
