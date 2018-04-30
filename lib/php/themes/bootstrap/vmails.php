@@ -95,7 +95,7 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vmails class="table table-sm" style="min-width:1000px;table-layout:fixed">
+            <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
                   <th>Email</th>
@@ -154,10 +154,12 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vmails&m=list",
     "columnDefs": [
-      {"targets":0, "width":"25%"},
+      {"targets":0, "className":"ellide", "width":"25%"},
+      {"targets":0, "className":"ellide", "width":"20%"},
       {"targets":2, "className":"align-middle"},
-      {"targets":3, "className":"text-right"},
+      {"targets":3, "className":"text-right", "width":"4rem"},
       {"targets":4, "className":"text-center", "width":"0.5rem"},
+      {"targets":5, "width":"4rem"},
       {"targets":6, "className":"text-right", "width":"3rem"},
       {"targets":7, "className":"text-right", "width":"3rem"}
     ]
