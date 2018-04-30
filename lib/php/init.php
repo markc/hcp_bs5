@@ -1,6 +1,6 @@
 <?php
-// lib/php/init.php 20150101 - 20170305
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/init.php 20150101 - 20180430
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
@@ -35,9 +35,6 @@ error_log('SESSION=' . var_export($_SESSION, true));
             $g->out['main'] = (string) new $p($thm);
         } else $g->out['main'] = "Error: no plugin object!";
 
-//        $g->out['end'] = var_export($_SESSION['usr'], true); // debug
-
-//        if (empty($g->in['x']) || (($g->in['x'] !== 'json') && ($g->in['x'] !== 'text')))
         if (empty($g->in['x']))
             foreach ($g->out as $k => $v)
                 $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
@@ -46,7 +43,6 @@ error_log('SESSION=' . var_export($_SESSION, true));
     public function __toString() : string
     {
 error_log(__METHOD__);
-//error_log(var_export($this->t->g->out,true));
 
         $g = $this->t->g;
         $x = $g->in['x'];
@@ -67,7 +63,6 @@ error_log(__METHOD__);
 
     public function __destruct()
     {
-//dbg($this->t->g);
         error_log($_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }
@@ -82,4 +77,5 @@ function dbg($var = null)
     ob_end_clean();
     error_log($ob);
 }
+
 ?>
