@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180321
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
@@ -22,66 +22,6 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $buf = '';
-        $adm = util::is_adm();
-/*
-        foreach($in as $row) {
-            extract($row);
-            $active = $active ? 1 : 0;
-            $spamf = $spamf ? 1 : 0;
-            list($lhs, $rhs) = explode('@', $user);
-            $sql = "
- SELECT mailquota
-   FROM vhosts
-  WHERE domain = :rhs";
-
-            $maxquota = db::qry($sql, ['rhs' => $rhs], 'col');
-
-            $sql = "
- SELECT user_mail,num_total
-   FROM logging
-  WHERE name = :user ORDER BY month DESC";
-
-            $quota          = db::qry($sql, ['user' => $user], 'one');
-            $mailquota      = $quota['user_mail'] ?? 0;
-            $messages       = $quota['num_total'] ?? 0;
-            $percent        = round(($mailquota / $maxquota) * 100);
-
-            $percent_buf    = $percent > 9 ? $percent.'%' : '';
-            $mailquota_buf  = util::numfmt($mailquota);
-            $maxquota_buf   = util::numfmt($maxquota);
-
-            $pbar           = $percent >= 90
-                ? 'bg-danger'
-                : ($percent >= 75 ? 'bg-warning' : '');
-            $active_buf     = $active
-                ? '<i class="fas fa-check text-success"></i>'
-                : '<i class="fas fa-times text-danger"></i>';
-            $url = $adm ? '
-              <a href="?o=vmails&m=update&i=' . $id . '">' . $user . '</a>' : $user;
-
-            $buf .= '
-                  <tr>
-                    <td class="text-truncate"><strong>' . $url . '</strong></td>
-                    <td class="text-truncate">' . $rhs . '</td>
-                    <td class="align-middle">
-                      <div class="progress">
-                        <div class="progress-bar ' . $pbar . '" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $percent . '%;">
-                          ' . $percent_buf . '
-                        </div>
-                      </div>
-                    </td>
-                    <td class="text-right">' . $mailquota_buf . ' / ' . $maxquota_buf . '</td>
-                    <td class="text-right">' . $messages . '</td>
-                    <td class="text-right">' . $active_buf . '
-                      <a href="?o=vmails&m=delete&i=' . $id . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $user . '?\')">
-                        <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
-                    </td>
-                  </tr>';
-        }
-        if (empty($buf)) $buf .= '
-                <tr><td colspan="6" class="text-center">No Records</td></tr>';
-*/
         return '
           <div class="col-12">
             <h3>
@@ -108,7 +48,7 @@ error_log(__METHOD__);
                   <th data-sortable="false"></th>
                 </tr>
               </thead>
-              <tbody>' . $buf . '
+              <tbody>
               </tbody>
             </table>
           </div>
@@ -155,7 +95,7 @@ $(document).ready(function() {
     "ajax": "?x=json&o=vmails&m=list",
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"25%"},
-      {"targets":0, "className":"text-truncate", "width":"20%"},
+      {"targets":1, "className":"text-truncate", "width":"20%"},
       {"targets":2, "className":"align-middle"},
       {"targets":3, "className":"text-right", "width":"4rem"},
       {"targets":4, "className":"text-center", "width":"0.5rem"},
