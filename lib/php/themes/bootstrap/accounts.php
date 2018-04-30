@@ -112,7 +112,7 @@ error_log(__METHOD__);
   WHERE acl = :0 OR acl = :1", ['0' => 0, '1' => 1]);
 
             foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
-            $grp_buf = $this->dropdown($grp_ary, 'grp', $grp, '', 'custom-select');
+            $grp_buf = $this->dropdown($grp_ary, 'grp', "$grp", '', 'custom-select');
             $aclgrp_buf = '
                 <div class="form-group">
                   <label for="acl">ACL</label><br>' . $acl_buf . '
