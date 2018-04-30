@@ -1,5 +1,5 @@
 <?php
-// lib/php/util.php 20150225 - 20180411
+// lib/php/util.php 20150225 - 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -274,7 +274,7 @@ error_log(__METHOD__);
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
-    public static function is_valid_domain_name($domainname)
+    public static function is_valid_domain_name($domainname) : string
     {
 error_log(__METHOD__);
 
@@ -294,6 +294,14 @@ error_log(__METHOD__);
             : '{SSHA256}' . base64_encode(hash('sha256', $pw . $salt_str, true) . $salt_str);
     }
 
+    public static function sec2time(int $seconds) : string
+    {
+error_log(__METHOD__);
+
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@$seconds");
+        return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
+    }
 }
 
 ?>

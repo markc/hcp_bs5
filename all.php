@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-
+// all.php 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 // lib/php/init.php 20150101 - 20170305
@@ -441,7 +441,9 @@ class Plugins_Vmails extends Plugin
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                     return $active_buf . '
-                      <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
+                    <a class="editlink" href="?o=vmails&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['user'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
             ];
@@ -464,116 +466,17 @@ class Plugins_Vmails extends Plugin
     }
 }
 
-// plugins/processes.php 20170225 - 20180405
+// plugins/processes.php 20170225 - 20180430
 
 class Plugins_Processes extends Plugin
 {
     public function list() : string
     {
-        $mem = $dif = $cpu = [];
-        $cpu_name = $procs = '';
-        $cpu_num = 0;
-        $os  = 'Unknown OS';
-
-        $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        $upt = (int) (file_get_contents('/proc/uptime') / 60);
-        $lav = join(', ', sys_getloadavg());
-        $stat1 = file('/proc/stat');
-        sleep(1);
-        $stat2 = file('/proc/stat');
-
-        if (is_readable('/proc/cpuinfo')) {
-            $tmp = trim(file_get_contents('/proc/cpuinfo'));
-            $ret = preg_match_all('/model name.+/', $tmp, $matches);
-            $cpu_name = $ret ? explode(': ', $matches[0][0])[1] : 'Unknown CPU';
-            $cpu_num = count($matches[0]);
-        }
-
-        if (is_readable('/etc/os-release')) {
-            $tmp = explode("\n", trim(file_get_contents('/etc/os-release')));
-            $osr = [];
-            foreach ($tmp as $line) {
-                list($k, $v) = explode('=', $line);
-                $osr[$k] = trim($v, '" ');
-            }
-            $os = $osr['PRETTY_NAME'] ?? 'Unknown OS';
-        }
-
-        foreach ($pmi as $line) {
-            list($k, $v) = explode(':', $line);
-            list($mem[$k],) = explode(' ', trim($v));
-        }
-
-        $info1 = explode(" ", preg_replace("!cpu +!", "", $stat1[0]));
-        $info2 = explode(" ", preg_replace("!cpu +!", "", $stat2[0]));
-        $dif['user'] = $info2[0] - $info1[0];
-        $dif['nice'] = $info2[1] - $info1[1];
-        $dif['sys']  = $info2[2] - $info1[2];
-        $dif['idle'] = $info2[3] - $info1[3];
-        $total = array_sum($dif);
-        foreach($dif as $x=>$y) $cpu[$x] = round($y / $total * 100, 2);
-        $cpu_all = sprintf("User: %01.2f, System: %01.2f, Nice: %01.2f, Idle: %01.2f", $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
-        $cpu_pcnt = intval(round(100 - $cpu['idle']));
-
-        $dt  = (float) disk_total_space('/');
-        $df  = (float) disk_free_space('/');
-        $du  = (float) $dt - $df;
-        $dp  = floor(($du / $dt) * 100);
-
-        $mt  = (float) $mem['MemTotal'] * 1024;
-        $mf  = (float) ($mem['MemFree'] + $mem['Cached']) * 1024;
-        $mu  = (float) $mt - $mf;
-        $mp  = floor(($mu / $mt) * 100);
-
-        $min = $upt % 60; $upt = (int) ($upt / 60);
-        $hrs = $upt % 24; $upt = (int) ($upt / 24);
-        $day = $upt;
-
-        $hn  = is_readable('/proc/sys/kernel/hostname')
-            ? trim(file_get_contents('/proc/sys/kernel/hostname'))
-            : 'Unknown';
-        $ip  = gethostbyname($hn);
-        $knl = is_readable('/proc/version')
-            ? explode(' ', trim(file_get_contents('/proc/version')))[2]
-            : 'Unknown';
-        $procs = shell_exec('sudo processes');
-
-        $day_str = $day < 1 ? '' : $day . ($day === 1 ? ' day ' : ' days ');
-        $hrs_str = $hrs < 1 ? '' : $hrs . ($hrs === 1 ? ' hour ' : ' hours ');
-        $min_str = $min < 1 ? '' : $min . ($min === 1 ? ' minute ' : ' minutes ');
-
-        return $this->t->list([
-            'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
-            'dsk_free'  => util::numfmt($df),
-            'dsk_pcnt'  => $dp,
-            'dsk_text'  => $dp > 5 ? $dp. '%' : '',
-            'dsk_total' => util::numfmt($dt),
-            'dsk_used'  => util::numfmt($du),
-            'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
-            'mem_free'  => util::numfmt($mf),
-            'mem_pcnt'  => $mp,
-            'mem_text'  => $mp > 5 ? $mp . '%' : '',
-            'mem_total' => util::numfmt($mt),
-            'mem_used'  => util::numfmt($mu),
-            'os_name'   => $os,
-            'uptime'    => $day_str . $hrs_str . $min_str,
-            'loadav'    => $lav,
-            'hostname'  => $hn,
-            'host_ip'   => $ip,
-            'kernel'    => $knl,
-            'cpu_all'   => $cpu_all,
-            'cpu_name'  => $cpu_name,
-            'cpu_num'   => $cpu_num,
-            'cpu_color' => $cpu_pcnt > 90 ? 'danger' : ($cpu_pcnt > 80 ? 'warning' : 'default'),
-            'cpu_pcnt'  => $cpu_pcnt,
-            'cpu_text'  => $cpu_pcnt > 5 ? $cpu_pcnt. '%' : '',
-            'proc_list' => $procs,
-            'proc_num'  => count(explode("\n", $procs)) - 1,
-        ]);
+        return $this->t->list(['procs' => shell_exec('sudo processes')]);
     }
 }
 
-// plugins/infosys.php 20170225 - 20180405
+// plugins/infosys.php 20170225 - 20180430
 
 class Plugins_InfoSys extends Plugin
 {
@@ -585,7 +488,6 @@ class Plugins_InfoSys extends Plugin
         $os  = 'Unknown OS';
 
         $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        $upt = (int) (file_get_contents('/proc/uptime') / 60);
         $lav = join(', ', sys_getloadavg());
         $stat1 = file('/proc/stat');
         sleep(1);
@@ -634,10 +536,6 @@ class Plugins_InfoSys extends Plugin
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
 
-        $min = $upt % 60; $upt = (int) ($upt / 60);
-        $hrs = $upt % 24; $upt = (int) ($upt / 24);
-        $day = $upt;
-
         $hn  = is_readable('/proc/sys/kernel/hostname')
             ? trim(file_get_contents('/proc/sys/kernel/hostname'))
             : 'Unknown';
@@ -645,11 +543,6 @@ class Plugins_InfoSys extends Plugin
         $knl = is_readable('/proc/version')
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
-//        $procs = shell_exec('sudo processes');
-
-        $day_str = $day < 1 ? '' : $day . ($day === 1 ? ' day ' : ' days ');
-        $hrs_str = $hrs < 1 ? '' : $hrs . ($hrs === 1 ? ' hour ' : ' hours ');
-        $min_str = $min < 1 ? '' : $min . ($min === 1 ? ' minute ' : ' minutes ');
 
         return $this->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
@@ -665,7 +558,7 @@ class Plugins_InfoSys extends Plugin
             'mem_total' => util::numfmt($mt),
             'mem_used'  => util::numfmt($mu),
             'os_name'   => $os,
-            'uptime'    => $day_str . $hrs_str . $min_str,
+            'uptime'    => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
             'loadav'    => $lav,
             'hostname'  => $hn,
             'host_ip'   => $ip,
@@ -1482,10 +1375,9 @@ class Plugins_Vhosts extends Plugin
 
     protected function list() : string
     {
-//                 ['dt' => null, 'db' => 'id'],
        if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['dt' => 0,  'db' => 'domain'],
+                ['dt' => 0,  'db' => 'domain', 'formatter' => function($d) { return "<b>$d</b>"; }],
                 ['dt' => 1,  'db' => 'num_aliases'],
                 ['dt' => 3,  'db' => 'aliases'],
                 ['dt' => 4,  'db' => 'num_mailboxes'],
@@ -1502,7 +1394,9 @@ class Plugins_Vhosts extends Plugin
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                     return $active_buf . '
-                      <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
+                    <a class="editlink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['domain'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
                 ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
@@ -2253,7 +2147,7 @@ $(document).ready(function() {
       {"targets":8, "className":"text-center", "width":"0.5rem"},
       {"targets":10, "className":"text-right"},
       {"targets":11, "className":"text-center", "width":"0.5rem"},
-      {"targets":13, "className":"text-right", "width":"3rem"}
+      {"targets":13, "className":"text-right", "width":"4rem"}
     ]
   });
 });
@@ -2798,8 +2692,6 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
-        extract($in);
-
         return '
           <div class="col-12 col-sm-6">
             <h3><i class="fas fa-code-branch fa-fw"></i> Processes</h3>
@@ -2815,8 +2707,8 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <h5>Process List <small>(' . $proc_num . ')</small></h5>
-            <pre><code>' . $proc_list . '
+            <h5>Process List <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h5>
+            <pre><code>' . $in['procs'] . '
             </code></pre>
           </div>
         </div>';
@@ -3758,7 +3650,7 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
     {
         $buf = '';
         $adm = util::is_adm();
-
+/*
         foreach($in as $row) {
             extract($row);
             $active = $active ? 1 : 0;
@@ -3815,7 +3707,7 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
         }
         if (empty($buf)) $buf .= '
                 <tr><td colspan="6" class="text-center">No Records</td></tr>';
-
+*/
         return '
           <div class="col-12">
             <h3>
@@ -3829,7 +3721,7 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=vmails class="table table-sm" style="min-width:1000px;table-layout:fixed">
+            <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
                   <th>Email</th>
@@ -3888,12 +3780,14 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vmails&m=list",
     "columnDefs": [
-      {"targets":0, "width":"25%"},
+      {"targets":0, "className":"text-truncate", "width":"25%"},
+      {"targets":0, "className":"text-truncate", "width":"20%"},
       {"targets":2, "className":"align-middle"},
-      {"targets":3, "className":"text-right"},
+      {"targets":3, "className":"text-right", "width":"4rem"},
       {"targets":4, "className":"text-center", "width":"0.5rem"},
+      {"targets":5, "width":"4rem"},
       {"targets":6, "className":"text-right", "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"3rem"}
+      {"targets":7, "className":"text-right", "width":"4rem"}
     ]
   });
 });
@@ -4200,7 +4094,7 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/util.php 20150225 - 20180411
+// lib/php/util.php 20150225 - 20180430
 
 class Util
 {
@@ -4434,7 +4328,7 @@ class Util
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
-    public static function is_valid_domain_name($domainname)
+    public static function is_valid_domain_name($domainname) : string
     {
         $domainname = idn_to_ascii($domainname);
         return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domainname)
@@ -4450,6 +4344,12 @@ class Util
             : '{SSHA256}' . base64_encode(hash('sha256', $pw . $salt_str, true) . $salt_str);
     }
 
+    public static function sec2time(int $seconds) : string
+    {
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@$seconds");
+        return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
+    }
 }
 
 // lib/php/db.php 20150225 - 20180429

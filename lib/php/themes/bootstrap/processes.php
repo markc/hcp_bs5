@@ -8,8 +8,6 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
     {
 error_log(__METHOD__);
 
-        extract($in);
-
         return '
           <div class="col-12 col-sm-6">
             <h3><i class="fas fa-code-branch fa-fw"></i> Processes</h3>
@@ -25,8 +23,8 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <h5>Process List <small>(' . $proc_num . ')</small></h5>
-            <pre><code>' . $proc_list . '
+            <h5>Process List <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h5>
+            <pre><code>' . $in['procs'] . '
             </code></pre>
           </div>
         </div>';

@@ -1,5 +1,5 @@
 <?php
-// plugins/infosys.php 20170225 - 20180405
+// plugins/infosys.php 20170225 - 20180430
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_InfoSys extends Plugin
@@ -14,7 +14,6 @@ error_log(__METHOD__);
         $os  = 'Unknown OS';
 
         $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        $upt = (int) (file_get_contents('/proc/uptime') / 60);
         $lav = join(', ', sys_getloadavg());
         $stat1 = file('/proc/stat');
         sleep(1);
@@ -63,10 +62,6 @@ error_log(__METHOD__);
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
 
-        $min = $upt % 60; $upt = (int) ($upt / 60);
-        $hrs = $upt % 24; $upt = (int) ($upt / 24);
-        $day = $upt;
-
         $hn  = is_readable('/proc/sys/kernel/hostname')
             ? trim(file_get_contents('/proc/sys/kernel/hostname'))
             : 'Unknown';
@@ -74,11 +69,6 @@ error_log(__METHOD__);
         $knl = is_readable('/proc/version')
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
-//        $procs = shell_exec('sudo processes');
-
-        $day_str = $day < 1 ? '' : $day . ($day === 1 ? ' day ' : ' days ');
-        $hrs_str = $hrs < 1 ? '' : $hrs . ($hrs === 1 ? ' hour ' : ' hours ');
-        $min_str = $min < 1 ? '' : $min . ($min === 1 ? ' minute ' : ' minutes ');
 
         return $this->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
@@ -94,7 +84,7 @@ error_log(__METHOD__);
             'mem_total' => util::numfmt($mt),
             'mem_used'  => util::numfmt($mu),
             'os_name'   => $os,
-            'uptime'    => $day_str . $hrs_str . $min_str,
+            'uptime'    => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
             'loadav'    => $lav,
             'hostname'  => $hn,
             'host_ip'   => $ip,
