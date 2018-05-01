@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// all.php 2018-04-30 12:39:23 UTC
+// netserva.php 2018-05-01 01:00:14 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 // lib/php/init.php 20150101 - 20180430
