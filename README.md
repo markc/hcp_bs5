@@ -26,7 +26,7 @@ on the primary and target hosts so the first thing to do, as root...
 
     curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
 
-_Please review the very simple script by removing the `| bash` part first._
+_Please first review the very simple script by removing the `| bash` part._
 
 This installs the `SH` (Shell Helper) aliases and scripts into a `/root/.sh`
 directory and activates the environment variables and special aliases. See
@@ -34,16 +34,17 @@ the [NetServa SH] repo for more information about how to use these aliases
 and scripts directly. This `HCP` project is just a web based frontend for
 the `SH` system which does all the real provisioning and management work.
 
-The first step, after installing the `SH` scripts, is to make sure the
-current host has a hostname and a domainname. The domainname needs to be
-valid if using a publically accessible server and that needs the assistence
-of a real DNS service. Otherwise, if using a local LAN with private IPs
-(like 192.168.*, 10.* or 172.*) then you can make up any domainname as long
-as your are consistent within your local LAN. Using something like `netserva.lan`
-is a good candidate unless you prefer something else. The hostname of your
-current host computer is usually determined when the OS is installed but
-can be changed by editing `/etc/hostname` and making sure `/etc/resolv.conf`
-has a reference like `search netserva.lan`. Once you get results like this...
+The first step, after installing the `SH` scripts, is to make sure the 
+current host has a hostname and a domainname. The domainname needs to be 
+valid if using a publically accessible server and that needs the assistence 
+of a real DNS service. Otherwise, if using a local LAN with private IPs 
+(like 192.168.\*, 10.\* or 172.\*) then you can make up any domainname as 
+long as your are consistent within your local LAN. Using something like 
+`netserva.lan` is a good candidate unless you prefer something else. The 
+hostname of your current host computer is usually determined when the OS is 
+installed but can be changed by editing `/etc/hostname` and making sure 
+`/etc/resolv.conf` has a reference like `search netserva.lan`. Once you get 
+results like this...
 
     ~ hostname
     myhost
