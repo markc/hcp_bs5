@@ -16,6 +16,8 @@ bash build.sh .
 echo "<?php declare(strict_types = 1);
 // netserva.php $(date -u +'%Y-%m-%d %H:%M:%S') UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// This is single script concatenation of all PHP files in lib/php at
+// https://github.com/netserva/hcp
 " > netserva.php
 
 (

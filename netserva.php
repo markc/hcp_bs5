@@ -1,6 +1,8 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-01 01:00:14 UTC
+// netserva.php 2018-05-01 01:05:43 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// This is single script concatenation of all PHP files in lib/php at
+// https://github.com/netserva/hcp
 
 // lib/php/init.php 20150101 - 20180430
 
