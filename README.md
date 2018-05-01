@@ -10,14 +10,13 @@ This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 
 - [NetServa SH/HCP] does not reqire Python or Ruby, just PHP and Bash
 - Fully functional IMAP/SMTP mailserver with personalised Spam filtering
-- LetsEncrypt SSL enabled [nginx] web server with [PHP FPM 7+]
-- Optional PowerDNS installation for real-world or local LAN DNS hosting
+- [LetsEncrypt] SSL enabled [nginx] web server with [PHP FPM 7+]
+- Optional [PowerDNS] installation for local LAN or real-world DNS service
 - Always based and tested on the latest release of [*buntu] server
-- Optional PowerDNS server for local LAN or real-world DNS provisioning
-- It can use either SQLite or MySQL as database backends
+- It can use either [SQLite] or [MySQL] as database backends
 - A fresh SQLite based install uses about 70MB ram (without Wordpress)
-- Built from the ground up using [Bootstrap 4] and [DataTables]
 - The "compiled" single file PHP script is less than 200KB in size
+- Built from the ground up using [Bootstrap 4] and [DataTables]
 
 ## Usage
 
@@ -216,13 +215,17 @@ in to a container or remote server much easier...
 _All scripts and documentation are Copyright (C) 1995-2018 Mark Constable
 and Licensed [AGPL-3.0]_
 
-[NetServa SH]: https://github.com/netserva/sh
-[NetServa SH/HCP]: https://github.com/netserva
+[NetServa SH]: https://github.com/netserva/sh/
+[NetServa SH/HCP]: https://github.com/netserva/
 [AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
-[Bootstrap 4]: https://getbootstrap.com
-[DataTables]: https://datatables.net/examples/styling/bootstrap4
+[Bootstrap 4]: https://getbootstrap.com/
+[DataTables]: https://datatables.net/examples/styling/bootstrap4/
 [index.php]: https://github.com/netserva/www/blob/master/index.php
-[nginx]: http://nginx.org
+[nginx]: http://nginx.org/
 [PHP FPM 7+]: http://www.php.net/manual/en/install.fpm.php
-[*buntu]: https://kubuntu.org
+[*buntu]: https://kubuntu.org/
 [LXD containers]: https://linuxcontainers.org/lxd/introduction/
+[LetsEncrypt]: https://letsencrypt.org/
+[PowerDNS]: https://powerdns.com/
+[SQLite]: https://sqlite.org/features.html
+[MySQL]: https://mariadb.org/
