@@ -12,11 +12,12 @@ This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 - Fully functional IMAP/SMTP mailserver with personalised Spam filtering
 - [LetsEncrypt] SSL enabled [nginx] web server with [PHP FPM 7+]
 - Optional [PowerDNS] installation for local LAN or real-world DNS service
-- Always based and tested on the latest release of [*buntu] server
+- Always based and tested on the latest release of [Ubuntu Server]
 - It can use either [SQLite] or [MySQL] as database backends
 - A fresh SQLite based install uses about 70MB ram (without Wordpress)
 - The "compiled" single file PHP script is less than 200KB in size
 - Built from the ground up using [Bootstrap 4] and [DataTables]
+- Developed and tested using LXD containers on the latest [Plasma Desktop]
 
 ## Usage
 
@@ -223,9 +224,10 @@ and Licensed [AGPL-3.0]_
 [index.php]: https://github.com/netserva/www/blob/master/index.php
 [nginx]: http://nginx.org/
 [PHP FPM 7+]: http://www.php.net/manual/en/install.fpm.php
-[*buntu]: https://kubuntu.org/
+[Plasma Desktop]: https://kubuntu.org/
 [LXD containers]: https://linuxcontainers.org/lxd/introduction/
 [LetsEncrypt]: https://letsencrypt.org/
 [PowerDNS]: https://powerdns.com/
 [SQLite]: https://sqlite.org/features.html
 [MySQL]: https://mariadb.org/
+[Ubuntu Server]: https://ubuntu.com/download/server/
