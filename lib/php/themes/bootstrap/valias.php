@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180323
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180503
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
@@ -47,7 +47,7 @@ error_log(__METHOD__);
               <td>' . $target_buf . ' </td>
               <td>' . $rhs . '</td>
               <td class="text-right" style="width:4rem">' . $active_buf . '
-                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove ALias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
+                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
                   <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
               </td>
             </tr>';
