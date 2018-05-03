@@ -29,7 +29,6 @@ design and some of the new features of PHP7.
       </div>
       <script>
 function ajax(a) {
-alert("a=" + a)
   if (window.XMLHttpRequest)  {
     var x = new XMLHttpRequest();
     x.open("POST", "", true);
