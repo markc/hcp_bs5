@@ -61,7 +61,7 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=accounts class="table table-sm" style="min-width:1000px;table-layout:fixed">
+            <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
                   <th class="w-25">User ID</th>
