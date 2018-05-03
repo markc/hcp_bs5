@@ -46,7 +46,7 @@ error_log(__METHOD__);
               <td class="text-truncate"><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
               <td>' . $target_buf . ' </td>
               <td>' . $rhs . '</td>
-              <td class="text-right">' . $active_buf . '
+              <td class="text-right" style="width:3rem">' . $active_buf . '
                 <a href="?o=valias&m=delete&i=' . $id . '" title="Remove ALias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
                   <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
               </td>
@@ -65,7 +65,7 @@ error_log(__METHOD__);
         </div><!-- END UPPER ROW -->
           <div class="row">
             <div class="table-responsive">
-              <table id=valias class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
                 <thead class="nowrap">
                   <tr>
                     <th>Alias</th>
