@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-01 01:05:43 UTC
+// netserva.php 2018-05-03 05:58:47 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 // This is single script concatenation of all PHP files in lib/php at
 // https://github.com/netserva/hcp
@@ -571,52 +571,13 @@ class Plugins_InfoSys extends Plugin
     }
 }
 
-// lib/php/plugins/home.php 20150101 - 20170317
+// lib/php/plugins/home.php 20150101 - 20180503
 
 class Plugins_Home extends Plugin
 {
     public function list() : string
     {
-        $buf = '
-        <div class="col-12">
-      <h3>
-        <i class="fas fa-server fa-fw"></i> NetServa
-        <small>(Hosting Control Panel)</small>
-      </h3>
-      <p class="columns">
-This is an ultra simple web based Hosting Control Panel for a lightweight Mail,
-Web and DNS server based on Ubuntu Bionic (18.04). It uses PowerDNS for DNS,
-Postfix/Dovecot + Spamprobe for SMTP and spam filtered IMAP email hosting along
-with nginx + PHP7 FPM + LetsEncrypt SSL for efficient and secure websites. It
-can use either SQLite or MySQL as database backends and the SQLite version only
-requires <b>60Mb</b> of ram on a fresh install so it is ideal for lightweight
-256Mb ram LXD containers or KVM/Xen cloud provisioning.
-      </p>
-      <p>
-Some of the features are...
-      </p>
-
-      <ul>
-        <li><b>NetServa HCP</b> does not reqire Python or Ruby, just PHP and Bash</li>
-        <li>Fully functional Mail server with personalised Spam filtering</li>
-        <li>Secure SSL enabled <a href="http://nginx.org/">nginx</a> web server with <a href="http://www.php.net/manual/en/install.fpm.php">PHP FPM 7+</a></li>
-        <li>Always based and tested on the latest release of <a href="https://kubuntu.org">*buntu</a></li>
-        <li>Optional DNS server for local LAN or real-world DNS provisioning</li>
-        <li>Built from the ground up using <a href="https://getbootstrap.com">Bootstrap 4</a> and <a href="https://datatables.net/examples/styling/bootstrap4">DataTables</a></li>
-      </ul>
-
-      <p>
-Comments and pull requests are most welcome via the Issue Tracker link below.
-      </p>
-
-      <p class="text-center">
-        <a class="btn btn-primary" href="https://github.com/netserva/www">Project Page</a>
-        <a class="btn btn-primary" href="https://github.com/netserva/www/issues">Issue Tracker</a>
-      </p>
-
-
-      </div>';
-        return $this->t->list(['buf' => $buf]);
+        return $this->t->list([]);
     }
 }
 
@@ -1428,36 +1389,13 @@ class Plugins_Vhosts extends Plugin
 
 }
 
-// lib/php/plugins/contact.php 20150101 - 20170317
+// lib/php/plugins/contact.php 20150101 - 20180503
 
 class Plugins_Contact extends Plugin
 {
     public function list() : string
     {
-        $buf = '
-      <h2>Email Contact Form</h2>
-      <form id="contact-send" method="post" onsubmit="return mailform(this);">
-        <p><input id="subject" required="" type="text" placeholder="Message Subject"></p>
-        <p><textarea id="message" rows="9" required="" placeholder="Message Content"></textarea></p>
-        <p class="text-right">
-          <small>(Note: Doesn\'t seem to work with Firefox 50.1)</small>
-          <input class="btn" type="submit" id="send" value="Send">
-        </p>
-      </form>';
-
-        $js = '
-      <script>
-function mailform(form) {
-    location.href = "mailto:' . $this->g->cfg['email'] . '"
-        + "?subject=" + encodeURIComponent(form.subject.value)
-        + "&body=" + encodeURIComponent(form.message.value);
-    form.subject.value = "";
-    form.message.value = "";
-    alert("Thank you for your message. We will get back to you as soon as possible.");
-    return false;
-}
-      </script>';
-        return $this->t->list(['buf' => $buf, 'js' => $js]);
+        return $this->t->list([]);
     }
 }
 
@@ -1969,55 +1907,13 @@ class Plugins_News extends Plugin
     }
 }
 
-// lib/php/plugins/about.php 20150101 - 20170317
+// lib/php/plugins/about.php 20150101 - 20180503
 
 class Plugins_About extends Plugin
 {
     public function list() : string
     {
         return $this->t->list([]);
-/*
-        $buf = '
-      <div class="col-12">
-        <h3>About</h3>
-        <p class="columns">
-This is an example of a simple PHP7 "framework" to provide the core
-structure for further experimental development with both the framework
-design and some of the new features of PHP7.
-        </p>
-        <form method="post">
-          <p class="text-center">
-            <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
-            <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'1\')">JSON</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'\')">HTML</a>
-            <a class="btn btn-secondary" href="#" onclick="ajax(\'foot\')">FOOT</a>
-          </p>
-        </form>
-        <pre id="dbg"></pre>
-      </div>
-      <script>
-function ajax(a) {
-alert("a=" + a)
-  if (window.XMLHttpRequest)  {
-    var x = new XMLHttpRequest();
-    x.open("POST", "", true);
-    x.onreadystatechange = function() {
-      if (x.readyState == 4 && x.status == 200) {
-        document.getElementById("dbg").innerHTML = x.responseText
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/\\\n/g,"\n")
-          .replace(/\\\/g,"");
-    }}
-    x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    x.send("o=about&x="+a);
-    return false;
-  }
-}
-      </script>';
-        return $this->t->list(['buf' => $buf]);
-*/
     }
 }
 
@@ -2589,7 +2485,6 @@ design and some of the new features of PHP7.
       </div>
       <script>
 function ajax(a) {
-alert("a=" + a)
   if (window.XMLHttpRequest)  {
     var x = new XMLHttpRequest();
     x.open("POST", "", true);
@@ -2679,13 +2574,54 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/home.php 20150101 - 20170317
+// lib/php/themes/bootstrap/home.php 20150101 - 20180503
 
 class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
-        return $in['buf'];
+        return '
+        <div class="col-12">
+      <h3>
+        <i class="fas fa-server fa-fw"></i> NetServa HCP
+      </h3>
+      <p class="columns">
+This is an ultra simple web based <b>Hosting Control Panel</b> for a 
+lightweight Mail, Web and DNS server based on Ubuntu Bionic (18.04). It 
+uses PowerDNS for DNS, Postfix/Dovecot + Spamprobe for SMTP and spam 
+filtered IMAP email hosting along with nginx + PHP7 FPM + LetsEncrypt SSL 
+for efficient and secure websites. It can use either SQLite or MySQL as 
+database backends and the SQLite version only requires <b>60Mb</b> of ram 
+on a fresh install so it is ideal for lightweight 256Mb ram LXD containers 
+or KVM/Xen cloud provisioning.
+      </p>
+      <p>
+Some of the features are...
+      </p>
+      <ul>
+        <li><b>NetServa HCP</b> does not reqire Python or Ruby, just PHP and Bash</li>
+        <li>Fully functional Mail server with personalised Spam filtering</li>
+        <li>Secure SSL enabled <a href="http://nginx.org/">nginx</a> web server with <a href="http://www.php.net/manual/en/install.fpm.php">PHP FPM 7+</a></li>
+        <li>Always based and tested on the latest release of <a href="https://kubuntu.org">*buntu</a></li>
+        <li>Optional DNS server for local LAN or real-world DNS provisioning</li>
+        <li>Built from the ground up using <a href="https://getbootstrap.com">Bootstrap 4</a> and <a href="https://datatables.net/examples/styling/bootstrap4">DataTables</a></li>
+      </ul>
+      <p class="columns">
+You can change the content of this page by editing where ever this
+<a href="https://github.com/netserva/hcp/blob/master/lib/php/themes/bootstrap/home.php">
+home.php</a> theme file ends up on your system. Modifying the navigation
+menus above can be done by creating a <code>lib/.ht_conf.php</code> file and
+copying the <a href="https://github.com/netserva/hcp/blob/master/index.php#L62">
+$nav1 array</a> from <code>index.php</code> into that optional config override file.
+Comments and pull requests are most welcome via the Issue Tracker link below.
+      </p>
+      <p class="text-center">
+        <a class="btn btn-primary" href="https://github.com/netserva/hcp">
+          <i class="fas fa-code-branch fa-fw"></i> Project Page</a>
+        <a class="btn btn-primary" href="https://github.com/netserva/hcp/issues">
+          <i class="fas fa-ticket-alt fa-fw"></i> Issue Tracker</a>
+      </p>
+      </div>';        
     }
 }
 
@@ -3254,7 +3190,7 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/theme.php 20150101 - 20180429
+// lib/php/themes/bootstrap/theme.php 20150101 - 20180503
 
 class Themes_Bootstrap_Theme extends Theme
 {
@@ -3437,8 +3373,8 @@ table.dataTable{border-collapse: collapse !important;}
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script>
-    <script src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script>';
+    <script src="https://use.fontawesome.com/releases/v5.0.11/js/solid.js" integrity="sha384-Y5YpSlHvzVV0DWYRcgkEu96v/nptti7XYp3D8l+PquwfpOnorjWA+dC7T6wRgZFI" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.11/js/fontawesome.js" integrity="sha384-KPnpIFJjPHLMZMALe0U04jClDmqlLhkBM6ZEkFvs9AiWRYwaDXPhn2D5lr8sypQ+" crossorigin="anonymous"></script>';
     }
 
     protected function pager(array $ary) : string
@@ -3526,7 +3462,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="table-responsive">
-            <table id=accounts class="table table-sm" style="min-width:1000px;table-layout:fixed">
+            <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
               <thead class="nowrap">
                 <tr>
                   <th class="w-25">User ID</th>
@@ -3903,7 +3839,7 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180323
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180503
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 {
@@ -3943,8 +3879,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
               <td class="text-truncate"><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
               <td>' . $target_buf . ' </td>
               <td>' . $rhs . '</td>
-              <td class="text-right">' . $active_buf . '
-                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove ALias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
+              <td class="text-right" style="width:4rem">' . $active_buf . '
+                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
                   <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
               </td>
             </tr>';
@@ -3962,13 +3898,13 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
           <div class="row">
             <div class="table-responsive">
-              <table id=valias class="table table-sm" style="min-width:1000px;table-layout:fixed">
+              <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
                 <thead class="nowrap">
                   <tr>
                     <th>Alias</th>
                     <th>Target Address</th>
                     <th>Domain</th>
-                    <th data-sortable="false" class="text-right" style="width:3rem"></th>
+                    <th data-sortable="false" class="text-right" style="width:4rem"></th>
                   </tr>
                 </thead>
                 <tbody>' . $buf . '
@@ -4752,13 +4688,13 @@ echo new Init(new class
                 ['Mailboxes',   '?o=vmails',    'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias',    'fas fa-envelope-square fa-fw'],
                 ['Domains',     '?o=domains',   'fas fa-server fa-fw'],
-            ], 'fas fa-user-secret fa-fw'],
+            ], 'fas fa-user-cog fa-fw'],
             ['Stats',       [
                 ['Sys Info',    '?o=infosys',   'fas fa-tachometer-alt fa-fw'],
                 ['Processes',   '?o=processes', 'fas fa-code-branch fa-fw'],
                 ['Mail Info',   '?o=infomail',  'fas fa-envelope-square fa-fw'],
                 ['Mail Graph',  '?o=mailgraph', 'fas fa-envelope fa-fw'],
-            ], 'fas fa-server fa-fw'],
+            ], 'fas fa-chart-line fa-fw'],
         ],
     ],
     $nav2 = [
