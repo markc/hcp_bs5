@@ -40,12 +40,12 @@ error_log(__METHOD__);
                 <tr>
                   <th>Email</th>
                   <th>Domain</th>
-                  <th data-sortable="false"></th>
+                  <th></th>
                   <th>Usage&nbsp;</th>
-                  <th data-sortable="false"></th>
+                  <th></th>
                   <th>Quota</th>
-                  <th class="text-left">Msg&nbsp;#&nbsp;</th>
-                  <th data-sortable="false"></th>
+                  <th>Msg&nbsp;#&nbsp;</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -93,15 +93,17 @@ $(document).ready(function() {
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=vmails&m=list",
+    "order": [[ 8, "desc" ]],
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"25%"},
       {"targets":1, "className":"text-truncate", "width":"20%"},
-      {"targets":2, "className":"align-middle"},
+      {"targets":2, "className":"align-middle", "sortable": false},
       {"targets":3, "className":"text-right", "width":"4rem"},
-      {"targets":4, "className":"text-center", "width":"0.5rem"},
+      {"targets":4, "className":"text-center", "width":"0.5rem", "sortable": false},
       {"targets":5, "width":"4rem"},
       {"targets":6, "className":"text-right", "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"4rem"}
+      {"targets":7, "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":8, "visible":false, "sortable": true}
     ]
   });
 });

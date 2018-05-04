@@ -1,5 +1,5 @@
 <?php
-// lib/php/db.php 20150225 - 20180430
+// lib/php/db.php 20150225 - 20180504
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
@@ -177,24 +177,24 @@ error_log(__METHOD__);
 
     // See http://datatables.net/usage/server-side
 
-    public static function simple($request, $table, $primaryKey, $columns, string $sql1 = '', string $sql2 = '')
+    public static function simple($request, $table, $primaryKey, $columns)
     {
 error_log(__METHOD__);
 
-        $bindings = [];
-        $db = self::$dbh;
-        $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
+        $db     = self::$dbh;
+        $cols   = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
+        $bind   = [];
 
-        $limit = self::limit($request, $columns);
-        $order = self::order($request, $columns);
-        $where = self::filter($request, $columns, $bindings);
-        $query = "
+        $limit  = self::limit($request, $columns);
+        $order  = self::order($request, $columns);
+        $where  = self::filter($request, $columns, $bind);
+        $query  = "
  SELECT $cols
    FROM `$table` $where $order $limit";
 
-        $data = self::sql_exec($db, $bindings, $query);
+        $data   = self::sql_exec($db, $bind, $query);
 
-        $recordsFiltered = self::sql_exec($db, $bindings, "
+        $recordsFiltered = self::sql_exec($db, $bind, "
  SELECT COUNT(`$primaryKey`)
    FROM `$table` $where", 'col');
 

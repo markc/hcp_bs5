@@ -50,18 +50,18 @@ error_log(__METHOD__);
                 <tr>
                   <th>Domain</th>
                   <th>Alias&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
+                  <th></th>
+                  <th></th>
                   <th>Mbox&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
+                  <th></th>
+                  <th></th>
                   <th>Mail&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
+                  <th></th>
+                  <th></th>
                   <th>Disk&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
-                  <th data-sortable="false"></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tfoot>
@@ -106,21 +106,24 @@ $(document).ready(function() {
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=vhosts&m=list",
+    "order": [[ 15, "desc" ]],
     "columnDefs": [
-      {"targets":0, "className":"text-truncate", "width":"25%"},
-      {"targets":1, "className":"text-right", "width":"3rem"},
-      {"targets":2, "className":"text-center", "width":"0.5rem"},
-      {"targets":3, "width":"3rem"},
-      {"targets":4, "className":"text-right", "width":"3rem"},
-      {"targets":5, "className":"text-center", "width":"0.5rem"},
-      {"targets":6, "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"4rem"},
-      {"targets":8, "className":"text-center", "width":"0.5rem"},
-      {"targets":9, "width":"4rem"},
-      {"targets":10, "className":"text-right", "width":"4rem"},
-      {"targets":11, "className":"text-center", "width":"0.5rem"},
-      {"targets":12, "width":"4rem"},
-      {"targets":13, "className":"text-right", "width":"4rem"}
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":1,   "className":"text-right", "width":"3rem"},
+      {"targets":2,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":3,   "width":"3rem"},
+      {"targets":4,   "className":"text-right", "width":"3rem"},
+      {"targets":5,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":6,   "width":"3rem"},
+      {"targets":7,   "className":"text-right", "width":"4rem"},
+      {"targets":8,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":9,   "width":"4rem"},
+      {"targets":10,  "className":"text-right", "width":"4rem"},
+      {"targets":11,  "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":12,  "width":"4rem"},
+      {"targets":13,  "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":14,  "visible":false, "sortable": true},
+      {"targets":15,  "visible":false, "sortable": true},
     ]
   });
 });

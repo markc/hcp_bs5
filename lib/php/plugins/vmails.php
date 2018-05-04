@@ -136,9 +136,9 @@ error_log(__METHOD__);
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
-                ['dt' => 0, 'db' => 'user', 'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0, 'db' => 'user',       'formatter' => function($d) { return "<b>$d</b>"; }],
                 ['dt' => 1, 'db' => 'domain'],
-                ['dt' => 2, 'db' => '',  'formatter' => function($d, $row) {
+                ['dt' => 2, 'db' => '',           'formatter' => function($d, $row) {
                     $percent = round(($row['size_mail'] / $row['quota']) * 100);
                     $pbuf    = $percent > 9 ? $percent.'%' : '';
                     $pbar    = $percent >= 90 ? 'bg-danger' : ($percent >= 75 ? 'bg-warning' : '');
@@ -149,11 +149,11 @@ error_log(__METHOD__);
                         </div>
                       </div>';
                 }],
-                ['dt' => 3, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 4, 'db' => null, 'formatter' => function($d) { return '/'; } ],
-                ['dt' => 5, 'db' => 'quota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 6, 'db' => 'num_total'],
-                ['dt' => 7, 'db' => 'active', 'formatter' => function($d, $row) {
+                ['dt' => 3, 'db' => 'size_mail',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 4, 'db' => null,         'formatter' => function($d) { return '/'; }],
+                ['dt' => 5, 'db' => 'quota',      'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 6, 'db' => 'num_total',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 7, 'db' => 'active',     'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
@@ -163,20 +163,8 @@ error_log(__METHOD__);
                     <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
+                ['dt' => 8, 'db' => 'updated'],
             ];
-/*
-            $sql = "
- SELECT m.id,
-        m.user,
-        h.domain,
-        size_mail,
-        quota,
-        num_total,
-        m.active
-   FROM vmails m
-        JOIN vhosts h ON m.hid=h.id
-            LEFT JOIN vmail_log ml ON m.id=ml.mid";
-*/
             return json_encode(db::simple($_GET, 'vmails_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
