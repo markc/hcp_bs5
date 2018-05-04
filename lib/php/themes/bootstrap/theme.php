@@ -110,14 +110,11 @@ error_log(__METHOD__);
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarsDefault">
           <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
           </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item ml-auto">' . $this->g->out['nav3'] . '
-          </li>
-        </ul>
+          <ul class="navbar-nav ml-auto">' . $this->g->out['nav3'] . '
+          </ul>
         </div>
       </div>
     </nav>';
@@ -135,7 +132,7 @@ error_log(__METHOD__);
             $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-          <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
+            <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
         }, $a));
     }
 
@@ -169,16 +166,16 @@ error_log(__METHOD__);
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
         return '
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-              <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
+                <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
         }, $a[1])).'
-            </div>
-          </li>';
+              </div>
+            </li>';
     }
 
     public function main() : string
@@ -204,7 +201,7 @@ error_log(__METHOD__);
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/solid.js" integrity="sha384-Y5YpSlHvzVV0DWYRcgkEu96v/nptti7XYp3D8l+PquwfpOnorjWA+dC7T6wRgZFI" crossorigin="anonymous"></script>
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/fontawesome.js" integrity="sha384-KPnpIFJjPHLMZMALe0U04jClDmqlLhkBM6ZEkFvs9AiWRYwaDXPhn2D5lr8sypQ+" crossorigin="anonymous"></script>';
     }
-
+/*
     protected function pager(array $ary) : string
     {
 error_log(__METHOD__);
@@ -237,6 +234,7 @@ error_log(__METHOD__);
             </ul>
           </nav>';
     }
+*/
 }
 
 ?>

@@ -321,6 +321,33 @@ error_log(__METHOD__);
             return $this->read();
         } else return 'Error updating item';
     }
+    
+    protected function list() : string
+    {
+error_log(__METHOD__);
+
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => 0, 'db' => 'source',     'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 1, 'db' => 'target'],
+                ['dt' => 2, 'db' => 'domain'],
+                ['dt' => 3, 'db' => 'active',     'formatter' => function($d, $row) {
+                    $active_buf = $d
+                        ? '<i class="fas fa-check text-success"></i>'
+                        : '<i class="fas fa-times text-danger"></i>';
+                    return $active_buf . '
+                    <a class="editlink" href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['source'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['source'] . '?\')">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 4, 'db' => 'id'],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+            return json_encode(db::simple($_GET, 'valias_view', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+        return $this->t->list([]);
+    }
 }
 
 ?>

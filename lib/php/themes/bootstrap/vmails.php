@@ -23,71 +23,68 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return '
-          <div class="col-12">
-            <h3>
-              <i class="fas fa-envelope fa-fw"></i> Mailboxes
-              <a href="#" title="Add New Mailbox" data-toggle="modal" data-target="#createmodal">
-              <!-- <a href="?o=vmails&m=create" title="Add Mailbox"> -->
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="table-responsive">
-            <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
-              <thead class="nowrap">
-                <tr>
-                  <th>Email</th>
-                  <th>Domain</th>
-                  <th></th>
-                  <th>Usage&nbsp;</th>
-                  <th></th>
-                  <th>Quota</th>
-                  <th>Msg&nbsp;#&nbsp;</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Mailboxes</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <form method="post" action="' . $this->g->cfg['self'] . '">
-                  <div class="modal-body">
-                    <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                    <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                    <input type="hidden" name="m" value="create">
-                    <div class="form-group">
-                      <label for="user" class="form-control-label">Mailbox</label>
-                      <input type="text" class="form-control" id="user" name="user">
-                    </div>
-                    <div class="form-group">
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
-                        <label class="custom-control-label" for="spamf">Spam Filter</label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add New Mailbox</button>
-                  </div>
-                </form>
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-envelope fa-fw"></i> Mailboxes
+            <a href="#" title="Add New Mailbox" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Email</th>
+                <th>Domain</th>
+                <th></th>
+                <th>Usage&nbsp;</th>
+                <th></th>
+                <th>Quota</th>
+                <th>Msg&nbsp;#&nbsp;</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Mailboxes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <div class="modal-body">
+                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                  <input type="hidden" name="m" value="create">
+                  <div class="form-group">
+                    <label for="user" class="form-control-label">Mailbox</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
+                      <label class="custom-control-label" for="spamf">Spam Filter</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Add New Mailbox</button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <script>
+        </div>
+        <script>
 $(document).ready(function() {
   $("#vmails").DataTable({
     "processing": true,
@@ -107,7 +104,7 @@ $(document).ready(function() {
     ]
   });
 });
-          </script>';
+        </script>';
     }
 
     function editor(array $in) : string

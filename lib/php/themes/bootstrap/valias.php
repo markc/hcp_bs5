@@ -22,64 +22,47 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $buf = '';
-
-        foreach($in as $row) {
-            extract($row);
-            $active = $active ? 1 : 0;
-            list($lhs, $rhs) = explode('@', $source);
-            $target_buf = '';
-            $source_buf = (filter_var($source, FILTER_VALIDATE_EMAIL))
-                ? $source
-                : 'Catch-all ' . $source;
-
-            foreach (explode(',', $target) as $t) {
-                $target_buf .= nl2br(htmlspecialchars($t . PHP_EOL));
-            }
-
-            $active_buf = $active
-                ? '<i class="fas fa-check text-success"></i>'
-                : '<i class="fas fa-times text-danger"></i>';
-
-            $buf .= '
-            <tr>
-              <td class="text-truncate"><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
-              <td>' . $target_buf . ' </td>
-              <td>' . $rhs . '</td>
-              <td class="text-right" style="width:4rem">' . $active_buf . '
-                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
-                  <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
-              </td>
-            </tr>';
-        }
-
         return '
-          <div class="col-12">
+        <div class="col-12">
           <h3>
             <i class="fa fa-globe fa-fw"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
               <small><i class="fas fa-plus-circle fa-fw"></i></small>
             </a>
           </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-          <div class="row">
-            <div class="table-responsive">
-              <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
-                <thead class="nowrap">
-                  <tr>
-                    <th>Alias</th>
-                    <th>Target Address</th>
-                    <th>Domain</th>
-                    <th data-sortable="false" class="text-right" style="width:4rem"></th>
-                  </tr>
-                </thead>
-                <tbody>' . $buf . '
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <script>$(document).ready(function() { $("#valias").DataTable({"order": []}); });</script>';
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Alias</th>
+                <th>Target Address</th>
+                <th>Domain</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#valias").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=valias&m=list",
+    "order": [[ 5, "desc" ]],
+    "columnDefs": [
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":3,   "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":4,   "visible":false},
+      {"targets":5,   "visible":false},
+    ],
+  });
+});
+        </script>';
 
     }
 
