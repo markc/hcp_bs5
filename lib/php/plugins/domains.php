@@ -1,12 +1,12 @@
 <?php
-// lib/php/plugins/domains.php 20150101 - 20180322
+// lib/php/plugins/domains.php 20150101 - 20180510
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
 {
     protected
     $dbh = null,
-    $tbl = 'domains', // dnszones ?
+    $tbl = 'domains',
     $in = [
         'name'        => '',
         'master'      => '',
@@ -112,7 +112,18 @@ error_log(__METHOD__);
                 'created' => $created,
                 'did'     => $did,
                 'disabled'=> $disable,
-                'domain'  => '*.' . $domain,
+                'domain'  => 'cdn.' . $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => 'www.' . $domain,
                 'prio'    => $prio,
                 'ttl'     => $ttl,
                 'type'    => 'A',
@@ -175,7 +186,6 @@ error_log(__METHOD__);
               $retry . ' ' .
               $expire . ' ' .
               $ttl;
-error_log("!!! soa=$soa");
 
             $sql = "
  UPDATE records SET
@@ -240,58 +250,27 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $sql = "
- SELECT D.id,D.name,D.type,count(R.domain_id) AS records
-   FROM domains D
-   LEFT OUTER JOIN records R ON D.id = R.domain_id
-          GROUP BY D.id, D.name, D.type
-         HAVING (D.name LIKE '' OR 1)
-            AND (D.type='' OR 1)
-          ORDER BY D.`updated` DESC";
-
-        $domains = db::qry($sql);
-        $newary = [];
-        foreach($domains as $domain) {
-            $sql = "
- SELECT content as soa
-   FROM records
-  WHERE type='SOA'
-    AND domain_id=:did";
-
-            $soa = db::qry($sql, ['did' => $domain['id']], 'one');
-            $newary[] = array_merge($domain, $soa);
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => 0,   'db' => 'name',       'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 1,   'db' => 'type'],
+                ['dt' => 2,   'db' => 'records'],
+                ['dt' => 3,   'db' => 'soa',        'formatter' => function($d, $row) {
+                    $soa = explode(' ', $row['soa']);
+                    return ($row['type'] === 'MASTER') ? '
+        <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
+                }],
+                ['dt' => 4,   'db' => 'id',         'formatter' => function($d, $row) {
+                    return '
+                    <a class="editlink" href="?o=records&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['name'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Domain" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['name'] . '?\')">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+            return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
-        return $this->t->list($newary);
-    }
-
-    protected function list_ajax() : string
-    {
-error_log(__METHOD__);
-
-        if ($this->g->in['x'] !== 'json')
-          return $this->t->list([]);
-
-        extract($this->t->g->in);
-
-        $search = $search ? "
- HAVING (D.name LIKE '%$search%')
-     OR (D.type LIKE '%$search%')" : '';
-
-        if ($sort === 'name') $orderby = 'D.`name`';
-        elseif ($sort === 'type') $orderby = 'D.`type`';
-        elseif ($sort === 'records') $orderby = '`records`';
-        else $orderby = 'D.`updated`';
-
-        $sql = "
- SELECT D.id,D.name,D.type,count(R.domain_id) AS records
-   FROM domains D
-   LEFT OUTER JOIN records R ON D.id = R.domain_id
-  GROUP BY D.name, D.type $search
-  ORDER BY $orderby $order LIMIT $offset,$limit";
-
-        return json_encode(array_merge(
-            ['total' => db::read('count(id)', '', '', '', 'col')],
-            ['rows' => db::qry($sql)]
-        ));
+        return $this->t->list([]);    
     }
 }
