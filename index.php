@@ -18,6 +18,7 @@ echo new Init(new class
         'email' => 'markc@renta.net',
         'file'  => 'lib' . DS . '.ht_conf.php', // settings override
         'hash'  => 'SHA512-CRYPT',
+        'host'  => '',
         'perp'  => 25,
         'self'  => '',
     ],
