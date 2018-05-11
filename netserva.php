@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-03 05:58:47 UTC
+// netserva.php 2018-05-11 03:13:52 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 // This is single script concatenation of all PHP files in lib/php at
 // https://github.com/netserva/hcp
@@ -417,9 +417,9 @@ class Plugins_Vmails extends Plugin
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
-                ['dt' => 0, 'db' => 'user', 'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0, 'db' => 'user',       'formatter' => function($d) { return "<b>$d</b>"; }],
                 ['dt' => 1, 'db' => 'domain'],
-                ['dt' => 2, 'db' => '',  'formatter' => function($d, $row) {
+                ['dt' => 2, 'db' => '',           'formatter' => function($d, $row) {
                     $percent = round(($row['size_mail'] / $row['quota']) * 100);
                     $pbuf    = $percent > 9 ? $percent.'%' : '';
                     $pbar    = $percent >= 90 ? 'bg-danger' : ($percent >= 75 ? 'bg-warning' : '');
@@ -430,11 +430,11 @@ class Plugins_Vmails extends Plugin
                         </div>
                       </div>';
                 }],
-                ['dt' => 3, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 4, 'db' => null, 'formatter' => function($d) { return '/'; } ],
-                ['dt' => 5, 'db' => 'quota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 6, 'db' => 'num_total'],
-                ['dt' => 7, 'db' => 'active', 'formatter' => function($d, $row) {
+                ['dt' => 3, 'db' => 'size_mail',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 4, 'db' => null,         'formatter' => function($d) { return '/'; }],
+                ['dt' => 5, 'db' => 'quota',      'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 6, 'db' => 'num_total',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 7, 'db' => 'active',     'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
@@ -444,20 +444,8 @@ class Plugins_Vmails extends Plugin
                     <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
+                ['dt' => 8, 'db' => 'updated'],
             ];
-/*
-            $sql = "
- SELECT m.id,
-        m.user,
-        h.domain,
-        size_mail,
-        quota,
-        num_total,
-        m.active
-   FROM vmails m
-        JOIN vhosts h ON m.hid=h.id
-            LEFT JOIN vmail_log ml ON m.id=ml.mid";
-*/
             return json_encode(db::simple($_GET, 'vmails_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
@@ -581,6 +569,12 @@ class Plugins_Home extends Plugin
     }
 }
 
+// lib/php/plugins/dkim.php 20180511 - 20180511
+
+class Plugins_Dkim extends Plugin
+{
+
+}
 // lib/php/plugins/records.php 20150101 - 20170423
 
 class Plugins_Records extends Plugin
@@ -1021,6 +1015,31 @@ class Plugins_Valias extends Plugin
             return $this->read();
         } else return 'Error updating item';
     }
+    
+    protected function list() : string
+    {
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => 0, 'db' => 'source',     'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 1, 'db' => 'target'],
+                ['dt' => 2, 'db' => 'domain'],
+                ['dt' => 3, 'db' => 'active',     'formatter' => function($d, $row) {
+                    $active_buf = $d
+                        ? '<i class="fas fa-check text-success"></i>'
+                        : '<i class="fas fa-times text-danger"></i>';
+                    return $active_buf . '
+                    <a class="editlink" href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['source'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['source'] . '?\')">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 4, 'db' => 'id'],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+            return json_encode(db::simple($_GET, 'valias_view', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+        return $this->t->list([]);
+    }
 }
 
 // lib/php/plugins/mailgraph.php 20170225 - 20170514
@@ -1214,13 +1233,8 @@ class Plugins_Vhosts extends Plugin
     protected function create() : string
     {
         if ($_POST) {
-//            $this->in['diskquota'] *= 1000000;
-//            $this->in['mailquota'] *= 1000000;
             extract($this->in);
             $active = $active ? 1 : 0;
-
-//            if (strpos($domain, '@'))
-//                list($uname, $domain) = explode('@', $domain);
 
             if (file_exists('/home/u/' . $domain)) {
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
@@ -1237,19 +1251,12 @@ class Plugins_Vhosts extends Plugin
 //                $_POST = []; return $this->t->create($this->in);
 //            }
 
-//            $sql = "
-// SELECT COUNT(id)
-//   FROM `vhosts`
-//  WHERE `domain` = :domain";
-
-//            $num_results = db::qry($sql, ['domain' => $domain], 'col');
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
-//error_log("num_results=$num_results, type=".gettype($num_results));
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
-// add plan, default to personal
+
             shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
@@ -1311,7 +1318,6 @@ class Plugins_Vhosts extends Plugin
                 'mailquota' => $mailquota,
                 'updated'   => date('Y-m-d H:i:s'),
             ]);
-            // test $res ?
 
             util::log('Vhost ID ' . $this->g->in['i'] . ' updated', 'success');
             util::ses('p', '', '1');
@@ -1336,19 +1342,20 @@ class Plugins_Vhosts extends Plugin
     {
        if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['dt' => 0,  'db' => 'domain', 'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0,  'db' => 'domain',      'formatter' => function($d) { return "<b>$d</b>"; }],
                 ['dt' => 1,  'db' => 'num_aliases'],
+                ['dt' => 2,  'db' => null,          'formatter' => function($d) { return '/'; } ],
                 ['dt' => 3,  'db' => 'aliases'],
                 ['dt' => 4,  'db' => 'num_mailboxes'],
-                ['dt' => 5,  'db' => null,  'formatter' => function($d) { return '/'; } ],
+                ['dt' => 5,  'db' => null,          'formatter' => function($d) { return '/'; } ],
                 ['dt' => 6,  'db' => 'mailboxes'],
                 ['dt' => 7,  'db' => 'size_mpath',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 8,  'db' => null,  'formatter' => function($d) { return '/'; } ],
-                ['dt' => 9,  'db' => 'mailquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 10, 'db' => 'size_upath', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 11, 'db' => null, 'formatter' => function($d) { return '/'; } ],
-                ['dt' => 12, 'db' => 'diskquota', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 13, 'db' => 'active', 'formatter' => function($d, $row) {
+                ['dt' => 8,  'db' => null,          'formatter' => function($d) { return '/'; } ],
+                ['dt' => 9,  'db' => 'mailquota',   'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 10, 'db' => 'size_upath',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 11, 'db' => null,          'formatter' => function($d) { return '/'; } ],
+                ['dt' => 12, 'db' => 'diskquota',   'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 13, 'db' => 'active',      'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
@@ -1358,35 +1365,13 @@ class Plugins_Vhosts extends Plugin
                     <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
-                ['dt' => 2,  'db' => null, 'formatter' => function($d) { return '/'; } ],
-                ['dt' => null, 'db' => 'id'],
-                ['dt' => null, 'db' => 'updated'],
+                ['dt' => 14, 'db' => 'id'],
+                ['dt' => 15, 'db' => 'updated'],
             ];
-/*
-            $sql1 = "
- SELECT vh.id,
-        vh.domain,
-        vh.aliases,
-        vh.mailboxes,
-        vh.mailquota,
-        vh.diskquota,
-        vh.active,
-        vh.updated,
-        vl.size_mpath,
-        vl.size_upath,
-        count(distinct vm.id) num_mailboxes,
-        count(distinct va.id) num_aliases
-   FROM vhosts vh
-        LEFT JOIN vhost_log vl ON vh.id=vl.hid
-            LEFT JOIN vmails vm ON vh.id=vm.hid
-                LEFT JOIN valias va ON vh.id=va.hid
-  GROUP BY vh.id, vl.size_mpath, vl.size_upath";
-*/
             return json_encode(db::simple($_GET, 'vhosts_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
     }
-
 }
 
 // lib/php/plugins/contact.php 20150101 - 20180503
@@ -1555,13 +1540,13 @@ If you did not request this action then please ignore this message.
     }
 }
 
-// lib/php/plugins/domains.php 20150101 - 20180322
+// lib/php/plugins/domains.php 20150101 - 20180510
 
 class Plugins_Domains extends Plugin
 {
     protected
     $dbh = null,
-    $tbl = 'domains', // dnszones ?
+    $tbl = 'domains',
     $in = [
         'name'        => '',
         'master'      => '',
@@ -1663,7 +1648,18 @@ class Plugins_Domains extends Plugin
                 'created' => $created,
                 'did'     => $did,
                 'disabled'=> $disable,
-                'domain'  => '*.' . $domain,
+                'domain'  => 'cdn.' . $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => 'www.' . $domain,
                 'prio'    => $prio,
                 'ttl'     => $ttl,
                 'type'    => 'A',
@@ -1724,6 +1720,7 @@ class Plugins_Domains extends Plugin
               $retry . ' ' .
               $expire . ' ' .
               $ttl;
+
             $sql = "
  UPDATE records SET
         ttl     = :ttl,
@@ -1783,57 +1780,28 @@ class Plugins_Domains extends Plugin
 
     protected function list() : string
     {
-        $sql = "
- SELECT D.id,D.name,D.type,count(R.domain_id) AS records
-   FROM domains D
-   LEFT OUTER JOIN records R ON D.id = R.domain_id
-          GROUP BY D.id, D.name, D.type
-         HAVING (D.name LIKE '' OR 1)
-            AND (D.type='' OR 1)
-          ORDER BY D.`updated` DESC";
-
-        $domains = db::qry($sql);
-        $newary = [];
-        foreach($domains as $domain) {
-            $sql = "
- SELECT content as soa
-   FROM records
-  WHERE type='SOA'
-    AND domain_id=:did";
-
-            $soa = db::qry($sql, ['did' => $domain['id']], 'one');
-            $newary[] = array_merge($domain, $soa);
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => 0,   'db' => 'name',       'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 1,   'db' => 'type'],
+                ['dt' => 2,   'db' => 'records'],
+                ['dt' => 3,   'db' => 'soa',        'formatter' => function($d, $row) {
+                    $soa = explode(' ', $row['soa']);
+                    return ($row['type'] === 'MASTER') ? '
+        <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
+                }],
+                ['dt' => 4,   'db' => 'id',         'formatter' => function($d, $row) {
+                    return '
+                    <a class="editlink" href="?o=records&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['name'] . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Domain" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['name'] . '?\')">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+            return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
-        return $this->t->list($newary);
-    }
-
-    protected function list_ajax() : string
-    {
-        if ($this->g->in['x'] !== 'json')
-          return $this->t->list([]);
-
-        extract($this->t->g->in);
-
-        $search = $search ? "
- HAVING (D.name LIKE '%$search%')
-     OR (D.type LIKE '%$search%')" : '';
-
-        if ($sort === 'name') $orderby = 'D.`name`';
-        elseif ($sort === 'type') $orderby = 'D.`type`';
-        elseif ($sort === 'records') $orderby = '`records`';
-        else $orderby = 'D.`updated`';
-
-        $sql = "
- SELECT D.id,D.name,D.type,count(R.domain_id) AS records
-   FROM domains D
-   LEFT OUTER JOIN records R ON D.id = R.domain_id
-  GROUP BY D.name, D.type $search
-  ORDER BY $orderby $order LIMIT $offset,$limit";
-
-        return json_encode(array_merge(
-            ['total' => db::read('count(id)', '', '', '', 'col')],
-            ['rows' => db::qry($sql)]
-        ));
+        return $this->t->list([]);    
     }
 }
 // lib/php/plugins/news.php 20150101 - 20170317
@@ -1960,93 +1928,94 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
         $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
         return '
-          <div class="col-12">
-            <h3>
-              <i class="fa fa-globe fa-fw"></i> Vhosts
-              <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="table-responsive">
-            <table id=vhosts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-              <thead class="nowrap">
-                <tr>
-                  <th>Domain</th>
-                  <th>Alias&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
-                  <th>Mbox&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
-                  <th>Mail&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
-                  <th>Disk&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th class="text-left"></th>
-                  <th data-sortable="false"></th>
-                </tr>
-              </thead>
-              <tfoot>
-              </tfoot>
-            </table>
-          </div>
-
-          <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Vhosts</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <form method="post" action="' . $this->g->cfg['self'] . '">
-                  <div class="modal-body">
-                      <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                      <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                      <input type="hidden" name="m" value="create">
-                      <div class="form-group">
-                        <label for="domain" class="form-control-label">Vhost</label>
-                        <input type="text" class="form-control" id="domain" name="domain">
-                      </div>
-                      <div class="form-group">
-                        <label for="plan class="form-control-label">Plan</label>' . $plans_buf . '
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add New Vhost</button>
-                  </div>
-                </form>
+        <div class="col-12">
+          <h3>
+            <i class="fa fa-globe fa-fw"></i> Vhosts
+            <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=vhosts class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Domain</th>
+                <th>Alias&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Mbox&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Mail&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Disk&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tfoot>
+            </tfoot>
+          </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Vhosts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <div class="modal-body">
+                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                  <input type="hidden" name="m" value="create">
+                  <div class="form-group">
+                    <label for="domain" class="form-control-label">Vhost</label>
+                    <input type="text" class="form-control" id="domain" name="domain">
+                  </div>
+                  <div class="form-group">
+                    <label for="plan" class="form-control-label">Plan</label>' . $plans_buf . '
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Add New Vhost</button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <script>
+        </div>
+        <script>
 $(document).ready(function() {
   $("#vhosts").DataTable({
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=vhosts&m=list",
+    "order": [[ 15, "desc" ]],
     "columnDefs": [
-      {"targets":0, "className":"text-truncate", "width":"25%"},
-      {"targets":1, "className":"text-right", "width":"3rem"},
-      {"targets":2, "className":"text-center", "width":"0.5rem"},
-      {"targets":3, "width":"3rem"},
-      {"targets":4, "className":"text-right", "width":"3rem"},
-      {"targets":5, "className":"text-center", "width":"0.5rem"},
-      {"targets":6, "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"4rem"},
-      {"targets":8, "className":"text-center", "width":"0.5rem"},
-      {"targets":9, "width":"4rem"},
-      {"targets":10, "className":"text-right", "width":"4rem"},
-      {"targets":11, "className":"text-center", "width":"0.5rem"},
-      {"targets":12, "width":"4rem"},
-      {"targets":13, "className":"text-right", "width":"4rem"}
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":1,   "className":"text-right", "width":"3rem"},
+      {"targets":2,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":3,   "width":"3rem"},
+      {"targets":4,   "className":"text-right", "width":"3rem"},
+      {"targets":5,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":6,   "width":"3rem"},
+      {"targets":7,   "className":"text-right", "width":"4rem"},
+      {"targets":8,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":9,   "width":"4rem"},
+      {"targets":10,  "className":"text-right", "width":"4rem"},
+      {"targets":11,  "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":12,  "width":"4rem"},
+      {"targets":13,  "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":14,  "visible":false, "sortable": true},
+      {"targets":15,  "visible":false, "sortable": true},
     ]
   });
 });
@@ -2122,7 +2091,7 @@ $(document).ready(function() {
     }
 }
 
-// lib/php/themes/bootstrap/domains.php 20170225 - 20180323
+// lib/php/themes/bootstrap/domains.php 20170225 - 20180510
 
 class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 {
@@ -2138,95 +2107,73 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     public function list(array $in) : string
     {
-        $buf = '';
-        $adm = util::is_adm();
-
-        foreach ($in as $row) {
-            extract($row);
-            $soa_ary = explode(' ', $soa);
-            $buf .= '
-                <tr>
-                  <td class="text-truncate">
-                    <a href="?o=records&m=update&i=' . $id . '" title="Show item ' . $id . '">
-                      <strong>' . $name . '</strong>
-                    </a>
-                  </td>
-                  <td>' . $type . '
-                  </td>
-                  <td class=text-right>' . $records . '
-                  </td>
-                  <td class=text-right><a class=serial href="?o=domains&m=update&i=' . $id . '" title="Click to increment">' . $soa_ary[2] . '</a>
-                  </td>
-                  <td class="text-right" data-sortable="false">
-                    <a href="?o=domains&m=update&i=' . $id . '" title="Edit SOA: ' . $id . '">
-                      <i class="fas fa-edit fa-fw cursor-pointer text-success"></i></a>
-                    <a href="?o=domains&m=delete&i=' . $id . '" title="Remove DNS record" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $name . '?\')">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
-                  </td>
-                </tr>';
-        }
-        if (empty($buf)) $buf .= '
-                <tr><td colspan="4" class="text-center">No Domains</td></tr>';
-
         return '
-          <div class="col-12">
-            <h3>
-              <i class="fas fa-globe fa-fw"></i> Domains
-              <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="table-responsive">
-            <table id=domains class="table table-sm" style="min-width:1000px;table-layout:fixed">
-              <thead>
-                <tr>
-                  <th class="w-25">Name</th>
-                  <th>Type</th>
-                  <th>Records</th>
-                  <th>Serial</th>
-                  <th data-sortable="false" class="text-right" style="width:3rem"></th>
-                </tr>
-              </thead>
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
-          </div>
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-globe fa-fw"></i> Domains
+            <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
         </div>
-
-        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Domain</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-                <form method="post" action="' . $this->g->cfg['self'] . '">
-              <div class="modal-body">
-                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                  <input type="hidden" name="m" value="create">
-                  <div class="form-group">
-                    <label for="domain" class="form-control-label">Name</label>
-                    <input type="text" class="form-control" id="domain" name="domain">
-                  </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Add New Domain</button>
-              </div>
-                </form>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=domains class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Records</th>
+                <th>Serial</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Domain</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+            <div class="modal-body">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+              <input type="hidden" name="m" value="create">
+              <div class="form-group">
+                <label for="domain" class="form-control-label">Name</label>
+                <input type="text" class="form-control" id="domain" name="domain">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Add New Domain</button>
+            </div>
+              </form>
           </div>
         </div>
         <script>
 $(document).ready(function() {
-  $("#domains").DataTable();
-  $(document).on("click", ".serial", {}, (function(id, serial){
+  $("#domains").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=domains&m=list",
+    "order": [[ 5, "desc" ]],
+    "columnDefs": [
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":4,   "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":5,   "visible":false},
+    ],
+  });
+  $(document).on("click", ".serial", {}, (function() {
     var a = $(this)
     $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
       $(a).text(data);
@@ -2574,6 +2521,13 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
     }
 }
 
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20180511
+
+class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
+{
+
+
+}
 // lib/php/themes/bootstrap/home.php 20150101 - 20180503
 
 class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
@@ -3294,14 +3248,11 @@ table.dataTable{border-collapse: collapse !important;}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="navbarsDefault">
           <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
           </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item ml-auto">' . $this->g->out['nav3'] . '
-          </li>
-        </ul>
+          <ul class="navbar-nav ml-auto">' . $this->g->out['nav3'] . '
+          </ul>
         </div>
       </div>
     </nav>';
@@ -3317,7 +3268,7 @@ table.dataTable{border-collapse: collapse !important;}
             $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-          <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
+            <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
         }, $a));
     }
 
@@ -3345,16 +3296,16 @@ table.dataTable{border-collapse: collapse !important;}
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
         return '
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-              <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
+                <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
         }, $a[1])).'
-            </div>
-          </li>';
+              </div>
+            </li>';
     }
 
     public function main() : string
@@ -3376,7 +3327,7 @@ table.dataTable{border-collapse: collapse !important;}
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/solid.js" integrity="sha384-Y5YpSlHvzVV0DWYRcgkEu96v/nptti7XYp3D8l+PquwfpOnorjWA+dC7T6wRgZFI" crossorigin="anonymous"></script>
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/fontawesome.js" integrity="sha384-KPnpIFJjPHLMZMALe0U04jClDmqlLhkBM6ZEkFvs9AiWRYwaDXPhn2D5lr8sypQ+" crossorigin="anonymous"></script>';
     }
-
+/*
     protected function pager(array $ary) : string
     {
         extract($ary);
@@ -3407,6 +3358,7 @@ table.dataTable{border-collapse: collapse !important;}
             </ul>
           </nav>';
     }
+*/
 }
 
 // lib/php/themes/bootstrap/accounts.php 20170225 - 20180430
@@ -3588,89 +3540,88 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
     public function list(array $in) : string
     {
         return '
-          <div class="col-12">
-            <h3>
-              <i class="fas fa-envelope fa-fw"></i> Mailboxes
-              <a href="#" title="Add New Mailbox" data-toggle="modal" data-target="#createmodal">
-              <!-- <a href="?o=vmails&m=create" title="Add Mailbox"> -->
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="table-responsive">
-            <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
-              <thead class="nowrap">
-                <tr>
-                  <th>Email</th>
-                  <th>Domain</th>
-                  <th data-sortable="false"></th>
-                  <th>Usage&nbsp;</th>
-                  <th data-sortable="false"></th>
-                  <th>Quota</th>
-                  <th class="text-left">Msg&nbsp;#&nbsp;</th>
-                  <th data-sortable="false"></th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Mailboxes</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <form method="post" action="' . $this->g->cfg['self'] . '">
-                  <div class="modal-body">
-                    <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                    <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                    <input type="hidden" name="m" value="create">
-                    <div class="form-group">
-                      <label for="user" class="form-control-label">Mailbox</label>
-                      <input type="text" class="form-control" id="user" name="user">
-                    </div>
-                    <div class="form-group">
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
-                        <label class="custom-control-label" for="spamf">Spam Filter</label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add New Mailbox</button>
-                  </div>
-                </form>
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-envelope fa-fw"></i> Mailboxes
+            <a href="#" title="Add New Mailbox" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Email</th>
+                <th>Domain</th>
+                <th></th>
+                <th>Usage&nbsp;</th>
+                <th></th>
+                <th>Quota</th>
+                <th>Msg&nbsp;#&nbsp;</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Mailboxes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
               </div>
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <div class="modal-body">
+                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                  <input type="hidden" name="m" value="create">
+                  <div class="form-group">
+                    <label for="user" class="form-control-label">Mailbox</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
+                      <label class="custom-control-label" for="spamf">Spam Filter</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Add New Mailbox</button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <script>
+        </div>
+        <script>
 $(document).ready(function() {
   $("#vmails").DataTable({
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=vmails&m=list",
+    "order": [[ 8, "desc" ]],
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"25%"},
       {"targets":1, "className":"text-truncate", "width":"20%"},
-      {"targets":2, "className":"align-middle"},
+      {"targets":2, "className":"align-middle", "sortable": false},
       {"targets":3, "className":"text-right", "width":"4rem"},
-      {"targets":4, "className":"text-center", "width":"0.5rem"},
+      {"targets":4, "className":"text-center", "width":"0.5rem", "sortable": false},
       {"targets":5, "width":"4rem"},
       {"targets":6, "className":"text-right", "width":"3rem"},
-      {"targets":7, "className":"text-right", "width":"4rem"}
+      {"targets":7, "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":8, "visible":false, "sortable": true}
     ]
   });
 });
-          </script>';
+        </script>';
     }
 
     function editor(array $in) : string
@@ -3855,64 +3806,47 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     public function list(array $in) : string
     {
-        $buf = '';
-
-        foreach($in as $row) {
-            extract($row);
-            $active = $active ? 1 : 0;
-            list($lhs, $rhs) = explode('@', $source);
-            $target_buf = '';
-            $source_buf = (filter_var($source, FILTER_VALIDATE_EMAIL))
-                ? $source
-                : 'Catch-all ' . $source;
-
-            foreach (explode(',', $target) as $t) {
-                $target_buf .= nl2br(htmlspecialchars($t . PHP_EOL));
-            }
-
-            $active_buf = $active
-                ? '<i class="fas fa-check text-success"></i>'
-                : '<i class="fas fa-times text-danger"></i>';
-
-            $buf .= '
-            <tr>
-              <td class="text-truncate"><a href="?o=valias&m=update&i=' . $id . '"><strong>' . $source_buf . '<strong></a></td>
-              <td>' . $target_buf . ' </td>
-              <td>' . $rhs . '</td>
-              <td class="text-right" style="width:4rem">' . $active_buf . '
-                <a href="?o=valias&m=delete&i=' . $id . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $source . '?\')">
-                  <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>
-              </td>
-            </tr>';
-        }
-
         return '
-          <div class="col-12">
+        <div class="col-12">
           <h3>
             <i class="fa fa-globe fa-fw"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
               <small><i class="fas fa-plus-circle fa-fw"></i></small>
             </a>
           </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-          <div class="row">
-            <div class="table-responsive">
-              <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
-                <thead class="nowrap">
-                  <tr>
-                    <th>Alias</th>
-                    <th>Target Address</th>
-                    <th>Domain</th>
-                    <th data-sortable="false" class="text-right" style="width:4rem"></th>
-                  </tr>
-                </thead>
-                <tbody>' . $buf . '
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <script>$(document).ready(function() { $("#valias").DataTable({"order": []}); });</script>';
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Alias</th>
+                <th>Target Address</th>
+                <th>Domain</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#valias").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=valias&m=list",
+    "order": [[ 5, "desc" ]],
+    "columnDefs": [
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":3,   "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":4,   "visible":false},
+      {"targets":5,   "visible":false},
+    ],
+  });
+});
+        </script>';
 
     }
 
@@ -4231,7 +4165,7 @@ class Util
     }
 }
 
-// lib/php/db.php 20150225 - 20180430
+// lib/php/db.php 20150225 - 20180504
 
 class Db extends \PDO
 {
@@ -4394,22 +4328,22 @@ class Db extends \PDO
 
     // See http://datatables.net/usage/server-side
 
-    public static function simple($request, $table, $primaryKey, $columns, string $sql1 = '', string $sql2 = '')
+    public static function simple($request, $table, $primaryKey, $columns)
     {
-        $bindings = [];
-        $db = self::$dbh;
-        $cols  = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
+        $db     = self::$dbh;
+        $cols   = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
+        $bind   = [];
 
-        $limit = self::limit($request, $columns);
-        $order = self::order($request, $columns);
-        $where = self::filter($request, $columns, $bindings);
-        $query = "
+        $limit  = self::limit($request, $columns);
+        $order  = self::order($request, $columns);
+        $where  = self::filter($request, $columns, $bind);
+        $query  = "
  SELECT $cols
    FROM `$table` $where $order $limit";
 
-        $data = self::sql_exec($db, $bindings, $query);
+        $data   = self::sql_exec($db, $bind, $query);
 
-        $recordsFiltered = self::sql_exec($db, $bindings, "
+        $recordsFiltered = self::sql_exec($db, $bind, "
  SELECT COUNT(`$primaryKey`)
    FROM `$table` $where", 'col');
 
