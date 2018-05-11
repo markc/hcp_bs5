@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20170329
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/auth.php 20150101 - 20180511
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
 {
@@ -151,11 +151,11 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
-            . $_SERVER['HTTP_HOST']
+            . $this->g->cfg['host']
             . $this->g->cfg['self'];
         return mail(
             "$email",
-            'Reset password for ' . $_SERVER['HTTP_HOST'],
+            'Reset password for ' . $this->g->cfg['host'],
 'Here is your new OTP (one time password) key that is valid for one hour.
 
 Please click on the link below and continue with reseting your password.
