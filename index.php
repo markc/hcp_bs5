@@ -1,8 +1,8 @@
 <?php
-// index.php 20150101 - 20180325
+// index.php 20150101 - 20180511
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-const DS  = DIRECTORY_SEPARATOR;
+const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 spl_autoload_register(function ($c) {
@@ -16,7 +16,6 @@ echo new Init(new class
     public
     $cfg = [
         'email' => 'markc@renta.net',
-        'host'  => $_SERVER['HTTP_HOST'],
         'file'  => 'lib' . DS . '.ht_conf.php', // settings override
         'hash'  => 'SHA512-CRYPT',
         'perp'  => 25,

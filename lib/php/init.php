@@ -10,6 +10,7 @@ class Init
     {
 error_log(__METHOD__);
 
+        $g->cfg['host'] = $_SERVER['HTTP_HOST'];
         session_start();
         //$_SESSION = []; // to reset session for testing
 error_log('GET=' . var_export($_GET, true));
