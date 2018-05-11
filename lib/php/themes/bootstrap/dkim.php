@@ -4,6 +4,20 @@
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
-
-
+        return '
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-gear fa-fw"></i> DKIM
+            <a href="#" title="Add New DKIM" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <p>DKIM records will appear here.</p>
+      </div>
+    </div>';
 }
+
+?>

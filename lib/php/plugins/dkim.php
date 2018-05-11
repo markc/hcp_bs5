@@ -4,5 +4,13 @@
 
 class Plugins_Dkim extends Plugin
 {
+    public function list() : string
+    {
+error_log(__METHOD__);
+
+        return $this->t->list([]);
+    }
 
 }
+
+?>

@@ -82,6 +82,7 @@ echo new Init(new class
                 ['Vhosts',      '?o=vhosts',    'fas fa-globe fa-fw'],
                 ['Mailboxes',   '?o=vmails',    'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias',    'fas fa-envelope-square fa-fw'],
+                ['DKIM',        '?o=dkim',      'fas fa-gear fa-fw'],
                 ['Domains',     '?o=domains',   'fas fa-server fa-fw'],
             ], 'fas fa-user-cog fa-fw'],
             ['Stats',       [
