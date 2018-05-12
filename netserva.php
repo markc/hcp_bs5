@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-12 04:30:37 UTC
+// netserva.php 2018-05-12 04:58:32 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 // This is single script concatenation of all PHP files in lib/php at
 // https://github.com/netserva/hcp
@@ -10,7 +10,7 @@ class Init
 {
     private $t = null;
 
-    public function __construct($g)
+    public function __construct(object $g)
     {
         $g->cfg['host'] = $g->cfg['host']
             ? $g->cfg['host']
@@ -21,9 +21,7 @@ class Init
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-        util::ses('l');
-        util::ses('o');
-        util::ses('m');
+        util::ses('o'); util::ses('m'); util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
@@ -78,7 +76,7 @@ function dbg($var = null)
     error_log($ob);
 }
 
-// lib/php/theme.php 20150101 - 20170411
+// lib/php/theme.php 20150101 - 20180512
 
 class Theme
 {
@@ -86,7 +84,7 @@ class Theme
     $buf = '',
     $in  = [];
 
-    public function __construct($g)
+    public function __construct(object $g)
     {
         $this->g = $g;
     }
@@ -193,7 +191,7 @@ class Theme
     }
 }
 
-// lib/php/plugin.php 20150101 - 20180319
+// lib/php/plugin.php 20150101 - 20180512
 
 class Plugin
 {
@@ -274,21 +272,7 @@ class Plugin
 
     protected function list() : string
     {
-// Remove util::pager(), changeover to relying on bootstrap4 tables
-
-//        $pager = util::pager(
-//            (int) util::ses('p'),
-//            (int) $this->g->cfg['perp'],
-//            (int) db::read('count(id)', '', '', '', 'col')
-//        );
-
-        // this may still need to be LIMIT'd
         return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
-
-//        return $this->t->list(array_merge(
-//            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
-//            ['pager' => $pager]
-//        ));
     }
 
     public function __call(string $name, array $args) : string
@@ -323,7 +307,7 @@ class Plugins_Vmails extends Plugin
         if (util::is_post()) {
             extract($this->in);
             $spamf  = $spamf ? 1 : 0;
-            $user_esc = escapeshellarg($user);
+            $user_esc = trim(escapeshellarg($user), "'");
             $spamf_str = $spamf === 1 ? '' : 'nospam';
             exec("sudo addvmail $user_esc $spamf_str 2>&1", $retArr, $retVal);
             util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
@@ -387,7 +371,7 @@ class Plugins_Vmails extends Plugin
 
             $spamf_buf = '';
             if ($spamf_old !== $spamf) {
-                $user_esc = escapeshellarg($user);
+                $user_esc = trim(escapeshellarg($user), "'");
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
                 exec("sudo spamf $user_esc $spamf_str 2>&1", $retArr, $retVal);
                 $spamf_buf = trim(implode("\n", $retArr));
@@ -407,7 +391,7 @@ class Plugins_Vmails extends Plugin
             $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
             if ($user) {
                 $retArr = []; $retVal = null;
-                $user_esc = escapeshellarg($user);
+                $user_esc = trim(escapeshellarg($user), "'");
                 exec("sudo delvmail $user_esc 2>&1", $retArr, $retVal);
                 util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             } else {
@@ -1266,14 +1250,14 @@ class Plugins_Vhosts extends Plugin
 //            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
-            
+
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            $plan_esc = escapeshellarg($plan);
-            $domain_esc = escapeshellarg($domain);
+            $plan_esc = trim(escapeshellarg($plan), "'");
+            $domain_esc = trim(escapeshellarg($domain), "'");
             shell_exec("nohup sh -c 'sudo addvhost $domain_esc $plan_esc' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
@@ -1348,7 +1332,7 @@ class Plugins_Vhosts extends Plugin
     {
         if ($this->g->in['i']) {
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            $vhost_esc = escapeshellarg($vhost);
+            $vhost_esc = trim(escapeshellarg($vhost), "'");
             shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');

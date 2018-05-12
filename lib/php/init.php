@@ -6,7 +6,7 @@ class Init
 {
     private $t = null;
 
-    public function __construct($g)
+    public function __construct(object $g)
     {
 error_log(__METHOD__);
 
@@ -25,9 +25,7 @@ error_log('SESSION=' . var_export($_SESSION, true));
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-        util::ses('l');
-        util::ses('o');
-        util::ses('m');
+        util::ses('o'); util::ses('m'); util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';

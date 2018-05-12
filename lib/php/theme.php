@@ -1,5 +1,5 @@
 <?php
-// lib/php/theme.php 20150101 - 20170411
+// lib/php/theme.php 20150101 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
@@ -8,7 +8,7 @@ class Theme
     $buf = '',
     $in  = [];
 
-    public function __construct($g)
+    public function __construct(object $g)
     {
 error_log(__METHOD__);
 
