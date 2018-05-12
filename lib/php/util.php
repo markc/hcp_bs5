@@ -292,7 +292,6 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if ($_POST) {
-            if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 util::log('Possible CSRF attack');
                 util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);

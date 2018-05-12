@@ -25,8 +25,11 @@ error_log('SESSION=' . var_export($_SESSION, true));
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+
+        if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
         util::ses('o'); util::ses('m'); util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
+
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
 
