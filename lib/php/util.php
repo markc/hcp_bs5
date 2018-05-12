@@ -45,7 +45,7 @@ error_log(__METHOD__."($k, $v, $x)");
                 : ($_SESSION[$k] ?? $v));
     }
 
-    public static function cfg($g) : void
+    public static function cfg(object $g) : void
     {
 error_log(__METHOD__);
 
@@ -56,7 +56,7 @@ error_log(__METHOD__);
         }
     }
 
-    public static function now($date1, $date2 = null)
+    public static function now(string $date1, string $date2 = null) : string
     {
 error_log(__METHOD__);
 
@@ -144,7 +144,7 @@ error_log(__METHOD__);
 
     // 09-Auth
 
-    public static function genpw()
+    public static function genpw() : string
     {
 error_log(__METHOD__);
 
@@ -183,7 +183,7 @@ error_log(__METHOD__);
         return self::put_cookie($name, '', time() - 1);
     }
 
-    public static function chkpw($pw, $pw2)
+    public static function chkpw(string $pw, string $pw2) : bool
     {
 error_log(__METHOD__);
 
@@ -258,7 +258,7 @@ error_log(__METHOD__);
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
-    public static function is_valid_domain_name($domainname) : string
+    public static function is_valid_domain_name(string $domainname) : string
     {
 error_log(__METHOD__);
 
