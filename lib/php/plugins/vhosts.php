@@ -44,14 +44,14 @@ error_log(__METHOD__);
 //            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
-            
+
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            $plan_esc = escapeshellarg($plan);
-            $domain_esc = escapeshellarg($domain);
+            $plan_esc = trim(escapeshellarg($plan), "'");
+            $domain_esc = trim(escapeshellarg($domain), "'");
             shell_exec("nohup sh -c 'sudo addvhost $domain_esc $plan_esc' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
@@ -132,7 +132,7 @@ error_log(__METHOD__);
 
         if ($this->g->in['i']) {
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            $vhost_esc = escapeshellarg($vhost);
+            $vhost_esc = trim(escapeshellarg($vhost), "'");
             shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');

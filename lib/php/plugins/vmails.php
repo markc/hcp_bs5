@@ -28,7 +28,7 @@ error_log(__METHOD__);
         if (util::is_post()) {
             extract($this->in);
             $spamf  = $spamf ? 1 : 0;
-            $user_esc = escapeshellarg($user);
+            $user_esc = trim(escapeshellarg($user), "'");
             $spamf_str = $spamf === 1 ? '' : 'nospam';
             exec("sudo addvmail $user_esc $spamf_str 2>&1", $retArr, $retVal);
             util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
@@ -96,7 +96,7 @@ error_log(__METHOD__);
 
             $spamf_buf = '';
             if ($spamf_old !== $spamf) {
-                $user_esc = escapeshellarg($user);
+                $user_esc = trim(escapeshellarg($user), "'");
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
                 exec("sudo spamf $user_esc $spamf_str 2>&1", $retArr, $retVal);
                 $spamf_buf = trim(implode("\n", $retArr));
@@ -118,7 +118,7 @@ error_log(__METHOD__);
             $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
             if ($user) {
                 $retArr = []; $retVal = null;
-                $user_esc = escapeshellarg($user);
+                $user_esc = trim(escapeshellarg($user), "'");
                 exec("sudo delvmail $user_esc 2>&1", $retArr, $retVal);
                 util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             } else {

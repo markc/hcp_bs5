@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-11 03:13:52 UTC
+// netserva.php 2018-05-12 04:30:37 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 // This is single script concatenation of all PHP files in lib/php at
 // https://github.com/netserva/hcp
 
-// lib/php/init.php 20150101 - 20180430
+// lib/php/init.php 20150101 - 20180512
 
 class Init
 {
@@ -12,12 +12,18 @@ class Init
 
     public function __construct($g)
     {
+        $g->cfg['host'] = $g->cfg['host']
+            ? $g->cfg['host']
+            : getenv('HOSTNAME');
+
         session_start();
         //$_SESSION = []; // to reset session for testing
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
         util::ses('l');
+        util::ses('o');
+        util::ses('m');
         $t = util::ses('t', '', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
@@ -314,14 +320,12 @@ class Plugins_Vmails extends Plugin
 
     function create() : string
     {
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
-            $quota *= 1000000;
-//            $active = $active ? 1 : 0;
             $spamf  = $spamf ? 1 : 0;
+            $user_esc = escapeshellarg($user);
             $spamf_str = $spamf === 1 ? '' : 'nospam';
-            $retArr = []; $retVal = null;
-            exec("sudo addvmail $user $spamf_str 2>&1", $retArr, $retVal);
+            exec("sudo addvmail $user_esc $spamf_str 2>&1", $retArr, $retVal);
             util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             util::ses('p', '', '1');
             return $this->list();
@@ -336,7 +340,7 @@ class Plugins_Vmails extends Plugin
 
     function update() : string
     {
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $quota *= 1000000;
             $active = $active ? 1 : 0;
@@ -383,8 +387,9 @@ class Plugins_Vmails extends Plugin
 
             $spamf_buf = '';
             if ($spamf_old !== $spamf) {
+                $user_esc = escapeshellarg($user);
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
-                exec("sudo spamf $user $spamf_str 2>&1", $retArr, $retVal);
+                exec("sudo spamf $user_esc $spamf_str 2>&1", $retArr, $retVal);
                 $spamf_buf = trim(implode("\n", $retArr));
                 $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
             }
@@ -402,7 +407,8 @@ class Plugins_Vmails extends Plugin
             $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
             if ($user) {
                 $retArr = []; $retVal = null;
-                exec("sudo delvmail $user 2>&1", $retArr, $retVal);
+                $user_esc = escapeshellarg($user);
+                exec("sudo delvmail $user_esc 2>&1", $retArr, $retVal);
                 util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
             } else {
                 util::log('ERROR: user does not exist');
@@ -573,8 +579,16 @@ class Plugins_Home extends Plugin
 
 class Plugins_Dkim extends Plugin
 {
+    public function list() : string
+    {
+        $retArr = []; $retVal = null;
+        exec("sudo dkim show 2>&1", $retArr, $retVal);
+//        util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
+        return $this->t->list(['buf' =>  trim(implode("\n", $retArr))]);
+    }
 
 }
+
 // lib/php/plugins/records.php 20150101 - 20170423
 
 class Plugins_Records extends Plugin
@@ -700,7 +714,7 @@ class Plugins_InfoMail extends Plugin
     }
 }
 
-// lib/php/plugins/valias.php 20170225 - 20180420
+// lib/php/plugins/valias.php 20170225 - 20180512
 
 class Plugins_Valias extends Plugin
 {
@@ -1210,7 +1224,7 @@ class Plugins_Accounts extends Plugin
     }
 }
 
-// lib/php/plugins/vhosts.php 20170225
+// lib/php/plugins/vhosts.php 20180512
 
 class Plugins_Vhosts extends Plugin
 {
@@ -1252,12 +1266,15 @@ class Plugins_Vhosts extends Plugin
 //            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
+            
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
+            $plan_esc = escapeshellarg($plan);
+            $domain_esc = escapeshellarg($domain);
+            shell_exec("nohup sh -c 'sudo addvhost $domain_esc $plan_esc' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
@@ -1331,7 +1348,8 @@ class Plugins_Vhosts extends Plugin
     {
         if ($this->g->in['i']) {
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            shell_exec("nohup sh -c 'sudo delvhost $vhost' > /tmp/delvhost.log 2>&1 &");
+            $vhost_esc = escapeshellarg($vhost);
+            shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
@@ -1384,7 +1402,7 @@ class Plugins_Contact extends Plugin
     }
 }
 
-// lib/php/plugins/auth.php 20150101 - 20170329
+// lib/php/plugins/auth.php 20150101 - 20180511
 
 class Plugins_Auth extends Plugin
 {
@@ -1523,11 +1541,11 @@ class Plugins_Auth extends Plugin
     private function mail_forgotpw(string $email, string $newpass, string $headers = '') : bool
     {
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
-            . $_SERVER['HTTP_HOST']
+            . $this->g->cfg['host']
             . $this->g->cfg['self'];
         return mail(
             "$email",
-            'Reset password for ' . $_SERVER['HTTP_HOST'],
+            'Reset password for ' . $this->g->cfg['host'],
 'Here is your new OTP (one time password) key that is valid for one hour.
 
 Please click on the link below and continue with reseting your password.
@@ -1900,7 +1918,7 @@ class Themes_Bootstrap_MailGraph extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180430
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180512
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
 {
@@ -1973,6 +1991,7 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
               </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
                 <div class="modal-body">
+                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
                   <input type="hidden" name="m" value="create">
@@ -2049,6 +2068,7 @@ $(document).ready(function() {
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
@@ -2091,7 +2111,7 @@ $(document).ready(function() {
     }
 }
 
-// lib/php/themes/bootstrap/domains.php 20170225 - 20180510
+// lib/php/themes/bootstrap/domains.php 20170225 - 20180512
 
 class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 {
@@ -2145,6 +2165,7 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
             </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
             <div class="modal-body">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <input type="hidden" name="m" value="create">
@@ -2215,6 +2236,7 @@ $(document).ready(function() {
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
               <div class="row">
@@ -2405,12 +2427,13 @@ class Themes_Bootstrap_Mail_DomainAlias extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/about.php 20150101 - 20170317
+// lib/php/themes/bootstrap/about.php 20150101 - 20180512
 
 class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
+        // TODO change the a class btn links to form input submits
         return '
       <div class="col-12">
         <h3>About</h3>
@@ -2420,6 +2443,7 @@ structure for further experimental development with both the framework
 design and some of the new features of PHP7.
         </p>
         <form method="post">
+          <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
           <p class="text-center">
             <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
             <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
@@ -2452,7 +2476,7 @@ function ajax(a) {
     }
 }
 
-// lib/php/themes/bootstrap/infomail.php 20170225 - 20170513
+// lib/php/themes/bootstrap/infomail.php 20170225 - 20180512
 
 class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
 {
@@ -2466,8 +2490,9 @@ class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
           </div>
           <div class="col-6">
             <form method="post" class="form-inline">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="m" value="pflog_renew">
               <div class="form-group ml-auto">
-                <input type="hidden" id="m" name="m" value="pflog_renew">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refreshed ' . $pflog_time . ' ago</button>
               </div>
             </form>
@@ -2525,9 +2550,28 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
-
-
+     public function list(array $in) : string
+    {
+       return '
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-address-card fa-fw"></i> DKIM
+            <a href="#" title="Add New DKIM" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="col-12">
+          <p>DKIM records will appear here... </p>
+          <pre>' . $in['buf'] . '</pre>
+        </div>
+      </div>
+    </div>';
+    }
 }
+
 // lib/php/themes/bootstrap/home.php 20150101 - 20180503
 
 class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
@@ -2579,7 +2623,7 @@ Comments and pull requests are most welcome via the Issue Tracker link below.
     }
 }
 
-// lib/php/themes/bootstrap/processes.php 20170225 - 20180405
+// lib/php/themes/bootstrap/processes.php 20170225 - 20180512
 
 class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
 {
@@ -2591,6 +2635,7 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
           </div>
           <div class="col-12 col-sm-6">
             <form method="post" class="form-inline">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" id="o" name="o" value="processes">
               <div class="form-group ml-auto">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refresh</button>
@@ -2608,7 +2653,7 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/news.php 20170225 - 20170317
+// lib/php/themes/bootstrap/news.php 20170225 - 20180512
 
 class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
 {
@@ -2756,6 +2801,7 @@ class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
             </h2>
           </div>
             <form class="col-12" method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
               <input type="hidden" name="author" value="' . $uid . '">
@@ -2968,10 +3014,11 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
       </div>
       <br>
       <form method="post" action="' . $this->g->cfg['self'] . '">
+        <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+        <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+        <input type="hidden" name="i" value="0">
+        <input type="hidden" name="domain_id" value="' . $this->g->in['i'] . '">
         <div class="row">
-          <input type="hidden" id="o" name="o" value="' . $this->g->in['o'] . '">
-          <input type="hidden" id="i" name="i" value="0">
-          <input type="hidden" id="domain_id" name="domain_id" value="' . $this->g->in['i'] . '">
           <div class="col-3">
             <div class="form-group">
             <input type="text" class="form-control" id="name" name="name" data-regex="^([^.]+\.)*[^.]*$" value="">
@@ -3030,7 +3077,7 @@ $(".editlink").on("click", function() {
     }
 }
 
-// lib/php/themes/bootstrap/auth.php 20150101
+// lib/php/themes/bootstrap/auth.php 20150101 - 20180512
 
 class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
 {
@@ -3043,8 +3090,8 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Forgot password</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-
             <div class="input-group mb-2 mr-sm-2">
             <div class="input-group-prepend">
               <div class="input-group-text"><i class="fas fa-envelope fa-fw"></i></div>
@@ -3075,6 +3122,7 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-sign-in-alt fa-fw"></i> Sign in</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <label class="sr-only" for="login">Username</label>
             <div class="input-group mb-2 mr-sm-2">
@@ -3116,6 +3164,7 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Update Password</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <input type="hidden" name="id" value="' . $id . '">
             <input type="hidden" name="login" value="' . $login . '">
@@ -3361,7 +3410,7 @@ table.dataTable{border-collapse: collapse !important;}
 */
 }
 
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20180430
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20180512
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 {
@@ -3484,6 +3533,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $id . '">
               <div class="row">
@@ -3523,7 +3573,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180430
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180512
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
@@ -3578,10 +3628,11 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
                 </button>
               </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
+                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                <input type="hidden" name="m" value="create">
                 <div class="modal-body">
-                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                  <input type="hidden" name="m" value="create">
                   <div class="form-group">
                     <label for="user" class="form-control-label">Mailbox</label>
                     <input type="text" class="form-control" id="user" name="user">
@@ -3654,6 +3705,7 @@ $(document).ready(function() {
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
@@ -3704,7 +3756,7 @@ $(document).ready(function() {
     }
 }
 
-// lib/php/themes/bootstrap/infosys.php 20170225 - 20170513
+// lib/php/themes/bootstrap/infosys.php 20170225 - 20180512
 
 class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
 {
@@ -3718,7 +3770,8 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
           </div>
           <div class="col-6">
             <form method="post" class="form-inline">
-              <input type="hidden" id="o" name="o" value="infosys">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="infosys">
               <div class="form-group ml-auto">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refresh</button>
               </div>
@@ -3790,7 +3843,7 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180503
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180512
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 {
@@ -3874,6 +3927,7 @@ $(document).ready(function() {
           <div class="col-12">
             <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
@@ -3907,7 +3961,7 @@ $(document).ready(function() {
     }
 }
 
-// lib/php/util.php 20150225 - 20180430
+// lib/php/util.php 20150225 - 20180512
 
 class Util
 {
@@ -3934,6 +3988,7 @@ class Util
         return $in;
     }
 
+    // TODO please document what $k, $v and $x are for?
     public static function ses(string $k, string $v = '', string $x = null) : string
     {
         return $_SESSION[$k] =
@@ -3945,8 +4000,7 @@ class Util
                 : ($_SESSION[$k] ?? $v));
     }
 
-//    public static function cfg($g) : void  // php7.1+ only
-    public static function cfg($g)
+    public static function cfg(object $g) : void
     {
         if (file_exists($g->cfg['file'])) {
             foreach(include $g->cfg['file'] as $k => $v) {
@@ -3955,7 +4009,7 @@ class Util
         }
     }
 
-    public static function now($date1, $date2 = null)
+    public static function now(string $date1, string $date2 = null) : string
     {
         if (!is_numeric($date1)) $date1 = strtotime($date1);
         if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
@@ -3991,8 +4045,8 @@ class Util
         return implode(' ', $result) . ' ago';
     }
 
-
-    //Not needed with Bootstrap4 DataTables, 20180303
+/*
+    // Not needed with Bootstrap4 DataTables, 20180303
 
     public static function pager(int $curr, int $perp, int $total) : array
     {
@@ -4013,7 +4067,7 @@ class Util
             'total' => $total
         ];
     }
-
+*/
     public static function is_adm() : bool
     {
         return isset($_SESSION['adm']);
@@ -4033,7 +4087,7 @@ class Util
 
     // 09-Auth
 
-    public static function genpw()
+    public static function genpw() : string
     {
         return str_replace('.', '_',
             substr(password_hash((string)time(), PASSWORD_DEFAULT),
@@ -4062,7 +4116,7 @@ class Util
         return self::put_cookie($name, '', time() - 1);
     }
 
-    public static function chkpw($pw, $pw2)
+    public static function chkpw(string $pw, string $pw2) : bool
     {
         if (strlen($pw) > 9) {
             if (preg_match('/[0-9]+/', $pw)) {
@@ -4078,7 +4132,7 @@ class Util
         return false;
     }
 
-    public static function remember($g)
+    public static function remember(object $g) : void
     {
         if (!self::is_usr()) {
             if ($c = self::get_cookie('remember')) {
@@ -4098,28 +4152,14 @@ class Util
 
     // shell utilities
 
-    public static function redirect(string $url, int $ttl = 5, string $msg = '')
+    public static function redirect(string $url, int $ttl = 5, string $msg = '') : void
     {
         header('refresh:' . $ttl . '; url=' . $url);
-        echo '<!DOCTYPE html>
+        if ($ttl) echo '<!DOCTYPE html>
 <title>Redirect...</title>
 <h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
         exit;
-    }
-
-    // not used 20180319
-    public static function getcfg()
-    {
-        $ary = $cfg = [];
-        $str = shell_exec("sudo rootcat ~/.vhosts/$(hostname -f)");
-        $ary = explode("\n", $str);
-        foreach($ary as $line) {
-            if (empty($line)) continue;
-            list($k, $v) = explode('=', $line);
-            $cfg[$k] = trim($v, "'");
-        }
-        return $cfg;
     }
 
     public static function numfmt(float $size, int $precision = null) : string
@@ -4141,7 +4181,7 @@ class Util
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
-    public static function is_valid_domain_name($domainname) : string
+    public static function is_valid_domain_name(string $domainname) : string
     {
         $domainname = idn_to_ascii($domainname);
         return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domainname)
@@ -4149,7 +4189,7 @@ class Util
               && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domainname));
     }
 
-    public static function mail_password($pw, $hash = 'SHA512-CRYPT')
+    public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT') : string
     {
         $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
         return $hash === 'SHA512-CRYPT'
@@ -4162,6 +4202,19 @@ class Util
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@$seconds");
         return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
+    }
+
+    public static function is_post() : bool
+    {
+        if ($_POST) {
+            if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
+            if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
+                util::log('Possible CSRF attack');
+                util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
+            }
+            return true;
+        }
+        return false;
     }
 }
 
@@ -4539,9 +4592,9 @@ class Db extends \PDO
     }
 }
 
-// index.php 20150101 - 20180325
+// index.php 20150101 - 20180511
 
-const DS  = DIRECTORY_SEPARATOR;
+const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 spl_autoload_register(function ($c) {
@@ -4557,6 +4610,7 @@ echo new Init(new class
         'email' => 'markc@renta.net',
         'file'  => 'lib' . DS . '.ht_conf.php', // settings override
         'hash'  => 'SHA512-CRYPT',
+        'host'  => '',
         'perp'  => 25,
         'self'  => '',
     ],
@@ -4621,6 +4675,7 @@ echo new Init(new class
                 ['Vhosts',      '?o=vhosts',    'fas fa-globe fa-fw'],
                 ['Mailboxes',   '?o=vmails',    'fas fa-envelope fa-fw'],
                 ['Aliases',     '?o=valias',    'fas fa-envelope-square fa-fw'],
+                ['DKIM',        '?o=dkim',      'fas fa-address-card fa-fw'],
                 ['Domains',     '?o=domains',   'fas fa-server fa-fw'],
             ], 'fas fa-user-cog fa-fw'],
             ['Stats',       [
