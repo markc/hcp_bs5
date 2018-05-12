@@ -73,56 +73,44 @@ error_log('bootstrap news update ='.var_export($in , true));
     {
 error_log(__METHOD__);
 
-        $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pager']; unset($in['pager']);
-
-        if ($pgr['last'] > 1) {
-            $pgr_top = $this->pager($pgr);
-            $pgr_end = '
-          <div class="col-12">' . $this->pager($pgr) . '
-          </div>';
-        }
-
-        foreach($in as $row) {
-            extract($row);
-            $author_buf = $fname && $lname
-                ? $fname . ' ' . $lname
-                : ($fname && empty($lname) ? $fname : $login);
-
-            $media = $media ? '
-              <img src="' . $media . '" alt="' . $title . ' Image">' : '
-              <div class="media-blank"></div>';
-
-            $content = strlen($content) > 400 ? mb_strimwidth($content, 0, 396, '...') : $content;
-
-            $buf .= '
-            <div class="media">' . $media . '
-              <div class="media-body text-muted">
-                <div class="media-title">
-                  <h4 class="mb-0">
-                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">' . $title . '</a>
-                  </h4>
-                  <small>
-                    <i>by <a href="?o=accounts&m=update&i=' . $uid . '">' . $author_buf . '</a>
-                    - ' . util::now($updated) . '
-                    </i>
-                  </small>
-                </div>' . nl2br($content) . '
-              </div>
-            </div>
-            <hr>';
-        }
-
         return '
-          <div class="col-12">
-            <h2 class="my-0"><i class="fas fa-newspaper"></i> News
-              <a href="?o=news&m=create" title="Add news item">
-                <i class="fas fa-plus-circle fa-xs"></i>
-              </a>
-            </h2>
-          </div>
-          <div class="col-12">' . $buf . '
-          </div>' . $pgr_end;
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-newspaper fa-fw"></i> News
+            <a href="?o=news&m=create" title="Add new post">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class="table-responsive">
+          <table id=news class="table table-sm" style="min-width:1100px;">
+             <tbody>
+            </tbody>
+         </table>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#news").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=news&m=list",
+//    "order": [[ 0, "desc" ]],
+    "columnDefs": [
+      {"targets":0, "visible":false},
+      {"targets":1, "width":"25%"},
+      {"targets":2, "width":"75%"},
+      {"targets":3, "visible":false},
+      {"targets":4, "visible":false},
+      {"targets":5, "visible":false},
+    ],
+    fnDrawCallback: function() {
+      $("#news thead").remove();
+    }
+  });
+});
+        </script>';
     }
 
     private function editor(array $in) : string
