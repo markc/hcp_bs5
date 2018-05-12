@@ -1,5 +1,5 @@
 <?php declare(strict_types = 1);
-// netserva.php 2018-05-12 04:58:32 UTC
+// netserva.php 2018-05-12 05:15:39 UTC
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 // This is single script concatenation of all PHP files in lib/php at
 // https://github.com/netserva/hcp
@@ -21,8 +21,11 @@ class Init
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+
+        if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
         util::ses('o'); util::ses('m'); util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
+
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
 
@@ -4191,7 +4194,6 @@ class Util
     public static function is_post() : bool
     {
         if ($_POST) {
-            if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 util::log('Possible CSRF attack');
                 util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
@@ -4202,7 +4204,7 @@ class Util
     }
 }
 
-// lib/php/db.php 20150225 - 20180504
+// lib/php/db.php 20150225 - 20180512
 
 class Db extends \PDO
 {
