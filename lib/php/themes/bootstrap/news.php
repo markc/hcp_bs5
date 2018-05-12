@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/news.php 20170225 - 20170317
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/news.php 20170225 - 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
 {
@@ -160,6 +160,7 @@ error_log(__METHOD__);
             </h2>
           </div>
             <form class="col-12" method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
               <input type="hidden" name="author" value="' . $uid . '">

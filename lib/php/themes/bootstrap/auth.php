@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/auth.php 20150101
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/auth.php 20150101 - 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
 {
@@ -15,8 +15,8 @@ error_log(__METHOD__);
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Forgot password</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-
             <div class="input-group mb-2 mr-sm-2">
             <div class="input-group-prepend">
               <div class="input-group-text"><i class="fas fa-envelope fa-fw"></i></div>
@@ -49,6 +49,7 @@ error_log(var_export($in,true));
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-sign-in-alt fa-fw"></i> Sign in</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <label class="sr-only" for="login">Username</label>
             <div class="input-group mb-2 mr-sm-2">
@@ -92,6 +93,7 @@ error_log(var_export($in,true));
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Update Password</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <input type="hidden" name="id" value="' . $id . '">
             <input type="hidden" name="login" value="' . $login . '">

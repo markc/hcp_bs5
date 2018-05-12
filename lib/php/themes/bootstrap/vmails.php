@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180430
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
@@ -61,11 +61,11 @@ error_log(__METHOD__);
                 </button>
               </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
+                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                <input type="hidden" name="m" value="create">
                 <div class="modal-body">
-                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                  <input type="hidden" name="m" value="create">
                   <div class="form-group">
                     <label for="user" class="form-control-label">Mailbox</label>
                     <input type="text" class="form-control" id="user" name="user">

@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/infomail.php 20170225 - 20170513
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/infomail.php 20170225 - 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
 {
@@ -16,8 +16,9 @@ error_log(__METHOD__);
           </div>
           <div class="col-6">
             <form method="post" class="form-inline">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="m" value="pflog_renew">
               <div class="form-group ml-auto">
-                <input type="hidden" id="m" name="m" value="pflog_renew">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refreshed ' . $pflog_time . ' ago</button>
               </div>
             </form>

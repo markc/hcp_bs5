@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/infosys.php 20170225 - 20170513
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/infosys.php 20170225 - 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
 {
@@ -18,7 +18,8 @@ error_log(var_export($in,true));
           </div>
           <div class="col-6">
             <form method="post" class="form-inline">
-              <input type="hidden" id="o" name="o" value="infosys">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="infosys">
               <div class="form-group ml-auto">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refresh</button>
               </div>

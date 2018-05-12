@@ -188,10 +188,11 @@ error_log('records::editor = '.var_export($in,true));
       </div>
       <br>
       <form method="post" action="' . $this->g->cfg['self'] . '">
+        <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+        <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+        <input type="hidden" name="i" value="0">
+        <input type="hidden" name="domain_id" value="' . $this->g->in['i'] . '">
         <div class="row">
-          <input type="hidden" id="o" name="o" value="' . $this->g->in['o'] . '">
-          <input type="hidden" id="i" name="i" value="0">
-          <input type="hidden" id="domain_id" name="domain_id" value="' . $this->g->in['i'] . '">
           <div class="col-3">
             <div class="form-group">
             <input type="text" class="form-control" id="name" name="name" data-regex="^([^.]+\.)*[^.]*$" value="">

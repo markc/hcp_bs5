@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20180430
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
@@ -133,6 +133,7 @@ error_log(__METHOD__);
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $id . '">
               <div class="row">

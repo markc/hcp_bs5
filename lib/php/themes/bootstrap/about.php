@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/about.php 20150101 - 20170317
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/about.php 20150101 - 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
 {
@@ -8,6 +8,7 @@ class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
     {
 error_log(__METHOD__);
 
+        // TODO change the a class btn links to form input submits
         return '
       <div class="col-12">
         <h3>About</h3>
@@ -17,6 +18,7 @@ structure for further experimental development with both the framework
 design and some of the new features of PHP7.
         </p>
         <form method="post">
+          <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
           <p class="text-center">
             <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
             <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
