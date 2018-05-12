@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/valias.php 20170225 - 20180420
+// lib/php/plugins/valias.php 20170225 - 20180512
 // Copyright (C) 1995-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin

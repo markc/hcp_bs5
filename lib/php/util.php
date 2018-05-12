@@ -45,8 +45,7 @@ error_log(__METHOD__."($k, $v, $x)");
                 : ($_SESSION[$k] ?? $v));
     }
 
-//    public static function cfg($g) : void  // php7.1+ only
-    public static function cfg($g)
+    public static function cfg($g) : void
     {
 error_log(__METHOD__);
 
@@ -95,8 +94,8 @@ error_log(__METHOD__);
         return implode(' ', $result) . ' ago';
     }
 
-
-    //Not needed with Bootstrap4 DataTables, 20180303
+/*
+    // Not needed with Bootstrap4 DataTables, 20180303
 
     public static function pager(int $curr, int $perp, int $total) : array
     {
@@ -119,7 +118,7 @@ error_log(__METHOD__);
             'total' => $total
         ];
     }
-
+*/
     public static function is_adm() : bool
     {
 error_log(__METHOD__);
@@ -202,7 +201,7 @@ error_log(__METHOD__);
         return false;
     }
 
-    public static function remember($g)
+    public static function remember(object $g) : void
     {
 error_log(__METHOD__);
 
@@ -224,7 +223,7 @@ error_log(__METHOD__);
 
     // shell utilities
 
-    public static function redirect(string $url, int $ttl = 5, string $msg = '')
+    public static function redirect(string $url, int $ttl = 5, string $msg = '') : void
     {
 error_log(__METHOD__);
 
@@ -234,22 +233,6 @@ error_log(__METHOD__);
 <h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
         exit;
-    }
-
-    // not used 20180319
-    public static function getcfg()
-    {
-error_log(__METHOD__);
-
-        $ary = $cfg = [];
-        $str = shell_exec("sudo rootcat ~/.vhosts/$(hostname -f)");
-        $ary = explode("\n", $str);
-        foreach($ary as $line) {
-            if (empty($line)) continue;
-            list($k, $v) = explode('=', $line);
-            $cfg[$k] = trim($v, "'");
-        }
-        return $cfg;
     }
 
     public static function numfmt(float $size, int $precision = null) : string
@@ -303,8 +286,7 @@ error_log(__METHOD__);
         $dtT = new \DateTime("@$seconds");
         return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
     }
-    
-    
+
     public static function is_post() : bool
     {
 error_log(__METHOD__);

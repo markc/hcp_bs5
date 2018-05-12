@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/vhosts.php 20170225
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/vhosts.php 20180512
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
 {
@@ -44,12 +44,15 @@ error_log(__METHOD__);
 //            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
+            
             if ($num_results != 0) {
                 util::log('Domain already exists');
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
+            $plan_esc = escapeshellarg($plan);
+            $domain_esc = escapeshellarg($domain);
+            shell_exec("nohup sh -c 'sudo addvhost $domain_esc $plan_esc' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
@@ -129,7 +132,8 @@ error_log(__METHOD__);
 
         if ($this->g->in['i']) {
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            shell_exec("nohup sh -c 'sudo delvhost $vhost' > /tmp/delvhost.log 2>&1 &");
+            $vhost_esc = escapeshellarg($vhost);
+            shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
             util::log('Removed ' . $vhost, 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
