@@ -1,5 +1,5 @@
 <?php
-// lib/php/init.php 20150101 - 20180511
+// lib/php/init.php 20150101 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
@@ -22,10 +22,13 @@ error_log('POST=' . var_export($_POST, true));
 
 error_log('SESSION=' . var_export($_SESSION, true));
 
+        if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
         util::ses('l');
+        util::ses('o');
+        util::ses('m');
         $t = util::ses('t', '', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';

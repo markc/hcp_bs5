@@ -1,5 +1,5 @@
 <?php
-// lib/php/util.php 20150225 - 20180430
+// lib/php/util.php 20150225 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -31,6 +31,7 @@ error_log(__METHOD__);
         return $in;
     }
 
+    // TODO please document what $k, $v and $x are for?
     public static function ses(string $k, string $v = '', string $x = null) : string
     {
 error_log(__METHOD__."($k, $v, $x)");
@@ -228,7 +229,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         header('refresh:' . $ttl . '; url=' . $url);
-        echo '<!DOCTYPE html>
+        if ($ttl) echo '<!DOCTYPE html>
 <title>Redirect...</title>
 <h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
@@ -284,7 +285,7 @@ error_log(__METHOD__);
               && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domainname));
     }
 
-    public static function mail_password($pw, $hash = 'SHA512-CRYPT')
+    public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT') : string
     {
 error_log(__METHOD__);
 
@@ -301,6 +302,21 @@ error_log(__METHOD__);
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@$seconds");
         return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
+    }
+    
+    
+    public static function is_post() : bool
+    {
+error_log(__METHOD__);
+
+        if ($_POST) {
+            if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
+                util::log('Possible CSRF attack');
+                util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
+            }
+            return true;
+        }
+        return false;
     }
 }
 

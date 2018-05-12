@@ -62,6 +62,7 @@ error_log(__METHOD__);
               </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
                 <div class="modal-body">
+                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
                   <input type="hidden" name="m" value="create">

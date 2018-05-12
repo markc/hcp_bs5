@@ -19,7 +19,10 @@ error_log(__METHOD__);
         </div>
       </div><!-- END UPPER ROW -->
       <div class="row">
-        <p>DKIM records will appear here.</p>
+        <div class="col-12">
+          <p>DKIM records will appear here... </p>
+          <pre>' . $in['buf'] . '</pre>
+        </div>
       </div>
     </div>';
     }

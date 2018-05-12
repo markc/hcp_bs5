@@ -25,7 +25,7 @@ class Plugins_Vmails extends Plugin
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $quota *= 1000000;
 //            $active = $active ? 1 : 0;
@@ -51,7 +51,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $quota *= 1000000;
             $active = $active ? 1 : 0;

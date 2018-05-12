@@ -8,7 +8,10 @@ class Plugins_Dkim extends Plugin
     {
 error_log(__METHOD__);
 
-        return $this->t->list([]);
+        $retArr = []; $retVal = null;
+        exec("sudo dkim show 2>&1", $retArr, $retVal);
+//        util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
+        return $this->t->list(['buf' =>  trim(implode("\n", $retArr))]);
     }
 
 }
