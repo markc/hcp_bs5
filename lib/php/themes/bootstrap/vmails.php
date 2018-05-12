@@ -140,6 +140,7 @@ error_log(__METHOD__);
         <div class="row">
           <div class="col-12">
             <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">

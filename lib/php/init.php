@@ -22,7 +22,6 @@ error_log('POST=' . var_export($_POST, true));
 
 error_log('SESSION=' . var_export($_SESSION, true));
 
-        if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
