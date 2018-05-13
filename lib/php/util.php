@@ -21,13 +21,19 @@ error_log(__METHOD__);
         return ['', ''];
     }
 
+    private static function _esc(string $v) : string
+    {
+error_log(__METHOD__);
+        return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
+    }
+
     public static function esc(array $in) : array
     {
 error_log(__METHOD__);
 
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
-                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
+                ?  self::_esc($_REQUEST[$k]): $v;
         return $in;
     }
 
@@ -41,7 +47,7 @@ error_log(__METHOD__."($k, $v, $x)");
                 (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
                     || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
                     && ($_REQUEST[$k] != $_SESSION[$k])))
-                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                ? self::_esc($_REQUEST[$k])
                 : ($_SESSION[$k] ?? $v));
     }
 
