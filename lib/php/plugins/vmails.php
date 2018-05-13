@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vmails.php 20180321
+// lib/php/plugins/vmails.php 20180513
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vmails extends Plugin
@@ -152,7 +152,7 @@ error_log(__METHOD__);
                 ['dt' => 3, 'db' => 'size_mail',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 4, 'db' => null,         'formatter' => function($d) { return '/'; }],
                 ['dt' => 5, 'db' => 'quota',      'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 6, 'db' => 'num_total',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
+                ['dt' => 6, 'db' => 'num_total',  'formatter' => function($d) { return number_format(intval($d)); }],
                 ['dt' => 7, 'db' => 'active',     'formatter' => function($d, $row) {
                     $active_buf = $d
                         ? '<i class="fas fa-check text-success"></i>'
