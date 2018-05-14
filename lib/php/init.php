@@ -26,7 +26,7 @@ error_log('SESSION=' . var_export($_SESSION, true));
         $g->in = util::esc($g->in);
         $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
 
-        if (!isset($_SESSION['c'])) $_SESSION['c'] = sha1(microtime());
+        if (!isset($_SESSION['c'])) $_SESSION['c'] = Util::random_token(32);
         util::ses('o'); util::ses('m'); util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
 
