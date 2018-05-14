@@ -30,7 +30,7 @@ error_log(__METHOD__);
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if ($usr['acl'] != 9) {
-                        $newpass = util::genpw(slef::OTP_LENGTH);
+                        $newpass = util::genpw(self::OTP_LENGTH);
                         if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
                             db::update([
                                 'otp' => $newpass,
