@@ -1,9 +1,11 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20180511
+// lib/php/plugins/auth.php 20150101 - 20180514
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
 {
+    const OTP_LENGTH = 10;
+
     protected
     $tbl = 'accounts',
     $in = [
@@ -18,8 +20,6 @@ class Plugins_Auth extends Plugin
         'passwd2'   => '',
     ];
 
-    const OTP_LENGTH = 10;
-
     public function create() : string
     {
 error_log(__METHOD__);
@@ -30,7 +30,7 @@ error_log(__METHOD__);
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if ($usr['acl'] != 9) {
-                        $newpass = util::genpw(slef::OTP_LENGTH);
+                        $newpass = util::genpw(self::OTP_LENGTH);
                         if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
                             db::update([
                                 'otp' => $newpass,
