@@ -62,7 +62,7 @@ error_log(__METHOD__);
                         $uniq = Util::random_token(32);
                         if ($this->in['remember']) {
                             db::update(['cookie' => $uniq], [['id', '=', $id]]);
-                            self::setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
+                            $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
                         }
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
@@ -131,7 +131,7 @@ error_log(__METHOD__);
             unset($_SESSION['usr']);
             if(isset($_COOKIE['remember'])){
                 db::update(['cookie' => ''], [['id', '=', $id]]);
-                self::setcookie('remember', '', strtotime('-1 hour', 0));
+                $this->setcookie('remember', '', strtotime('-1 hour', 0));
              }
             util::log($u . ' is now logged out', 'success');
         }
