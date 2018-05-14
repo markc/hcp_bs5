@@ -14,7 +14,7 @@ error_log(__METHOD__);
             ? $g->cfg['host']
             : getenv('HOSTNAME');
 
-        session_start();
+        Util::session_start($g->sess_cookie);
         //$_SESSION = []; // to reset session for testing
 error_log('GET=' . var_export($_GET, true));
 
