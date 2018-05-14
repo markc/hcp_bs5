@@ -21,9 +21,10 @@ error_log(__METHOD__);
         return ['', ''];
     }
 
-    private static function _esc(string $v) : string
+    private static function enc(string $v) : string
     {
 error_log(__METHOD__);
+
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
 
@@ -33,7 +34,7 @@ error_log(__METHOD__);
 
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
-                ?  self::_esc($_REQUEST[$k]): $v;
+                ?  self::enc($_REQUEST[$k]): $v;
         return $in;
     }
 
@@ -47,7 +48,7 @@ error_log(__METHOD__."($k, $v, $x)");
                 (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
                     || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
                     && ($_REQUEST[$k] != $_SESSION[$k])))
-                ? self::_esc($_REQUEST[$k])
+                ? self::enc($_REQUEST[$k])
                 : ($_SESSION[$k] ?? $v));
     }
 
@@ -310,14 +311,14 @@ error_log(__METHOD__);
     public static function random_token(int $length = 32) : string
     {
 error_log(__METHOD__);
-        
+
         $random_base64 = base64_encode(random_bytes($length));
         $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
 
         if (strlen($random_base64)<$length) {
             /**
              * It happens sometimes that there are many +=\, so if
-             * the length of $random_base64 after suppressing thoses 
+             * the length of $random_base64 after suppressing thoses
              * characters, is less than the $length, then start over again.
              */
             return self::random_token($length);
