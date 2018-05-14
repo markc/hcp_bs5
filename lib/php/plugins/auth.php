@@ -18,17 +18,19 @@ class Plugins_Auth extends Plugin
         'passwd2'   => '',
     ];
 
+    const OTP_LENGTH = 10;
+
     public function create() : string
     {
 error_log(__METHOD__);
 
         $u = $this->in['login'];
 
-        if ($_POST) {
+        if (Util::is_post()) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if ($usr['acl'] != 9) {
-                        $newpass = util::genpw();
+                        $newpass = util::genpw(slef::OTP_LENGTH);
                         if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
                             db::update([
                                 'otp' => $newpass,
@@ -50,29 +52,26 @@ error_log(__METHOD__);
 
         $u = $this->in['login'];
         $p = $this->in['webpw'];
-        $c = $this->in['remember'];
 
         if ($u) {
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
                 extract($usr);
                 if ($acl !== 9) {
-//                    if ($p == 'changeme') { // for testing a clear text password
-                    if (password_verify(html_entity_decode($p), $webpw)) {
-                        $uniq = md5(uniqid());
-                        if ($c) {
-                            db::update(['cookie' => $uniq], [['login', '=', $u]]);
-                            util::put_cookie('remember', $uniq, 60*60*24*7);
-                            $tmp = $uniq;
-                        } else $tmp = '';
+                    if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
+                        $uniq = Util::random_token(32);
+                        if ($this->in['remember']) {
+                            db::update(['cookie' => $uniq], [['id', '=', $id]]);
+                            util::put_cookie('remember', $uniq, strtotime('7 days', 0), $this->g->cfg['host'], $this->g->cfg['self'], true, true);
+                        }
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
                         if ((int) $acl === 0) $_SESSION['adm'] = $id;
                         $_SESSION['m'] = 'list';
                         header('Location: ' . $this->g->cfg['self']);
                         exit();
-                    } else util::log('Incorrect password');
+                    } else util::log('Invalid Email Or Password');
                 } else util::log('Account is disabled, contact your System Administrator');
-            } else util::log('Username does not exist');
+            } else util::log('Invalid Email Or Password');
         }
         return $this->t->list(['login' => $u]);
     }
@@ -81,13 +80,18 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $i = !is_null($this->in['id']) ? $this->in['id'] : $_SESSION['usr']['id'];
-        $u = !empty($this->in['login']) ? $this->in['login'] : $_SESSION['usr']['login'];
+        if (!( util::is_usr() || isset($_SESSION['resetpw']) )){
+            util::log('Session expired! Please try again.');
+            return $this->t->list(['login' => '']);
+        }
 
-        if ($_POST) {
+        $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
+        $u = (util::is_usr()) ? $_SESSION['usr']['login'] : $_SESSION['resetpw']['usr']['login'];
+
+        if (Util::is_post()) {
             if ($usr = db::read('login,acl,otpttl', 'id', $i, '', 'one')) {
-                $p1 = html_entity_decode($this->in['passwd1']);
-                $p2 = html_entity_decode($this->in['passwd2']);
+                $p1 = html_entity_decode($this->in['passwd1'], ENT_QUOTES, 'UTF-8');
+                $p2 = html_entity_decode($this->in['passwd2'], ENT_QUOTES, 'UTF-8');
                 if (util::chkpw($p1, $p2)) {
                     if (util::is_usr() or ($usr['otpttl'] && (($usr['otpttl'] + 3600) > time()))) {
                         if (!is_null($usr['acl'])) {
@@ -101,7 +105,10 @@ error_log(__METHOD__);
                                 if (util::is_usr()) {
                                     header('Location: ' . $this->g->cfg['self']);
                                     exit();
-                                } else return $this->t->list(['login' => $usr['login']]);
+                                } else {
+                                    unset($_SESSION['resetpw']);
+                                    return $this->t->list(['login' => $usr['login']]);
+                                }
                             } else util::log('Problem updating database');
                         } else util::log($usr['login'] . ' is not allowed access');
                     } else util::log('Your one time password key has expired');
@@ -132,11 +139,12 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $otp = html_entity_decode($this->in['otp']);
-        if (strlen($otp) === 10) {
+        if (strlen($otp) === self::OTP_LENGTH) {
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
                 extract($usr);
                 if ($otpttl && (($otpttl + 3600) > time())) {
                     if ($acl != 3) { // suspended
+                        $_SESSION['resetpw'] = [ 'usr'=> $usr ];
                         return $this->t->update(['id' => $id, 'login' => $login]);
                     } else util::log($login . ' is not allowed access');
                 } else util::log('Your one time password key has expired');

@@ -150,13 +150,13 @@ error_log(__METHOD__);
 
     // 09-Auth
 
-    public static function genpw() : string
+    public static function genpw(int $length = 10) : string
     {
 error_log(__METHOD__);
 
         return str_replace('.', '_',
             substr(password_hash((string)time(), PASSWORD_DEFAULT),
-                rand(10, 50), 10));
+                rand(10, 50), $length));
     }
 
     public static function get_nav(array $nav = []) : array
@@ -175,11 +175,11 @@ error_log(__METHOD__);
         return $_COOKIE[$name] ?? $default;
     }
 
-    public static function put_cookie(string $name, string $value, int $expiry=604800) : string
+    public static function put_cookie(string $name, string $value, int $expiry=604800, $path = '/', string $domain = '', bool $secure=false, bool $httponly=false) : string
     {
 error_log(__METHOD__);
 
-        return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
+        return setcookie($name, $value, time() + $expiry, $path, $domain, $secure, $httponly) ? $value : '';
     }
 
     public static function del_cookie(string $name) : string
@@ -264,7 +264,7 @@ error_log(__METHOD__);
         return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
-    public static function is_valid_domain_name(string $domainname) : string
+    public static function is_valid_domain_name(string $domainname) : bool
     {
 error_log(__METHOD__);
 
@@ -297,7 +297,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 util::log('Possible CSRF attack');
                 util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
@@ -305,6 +305,25 @@ error_log(__METHOD__);
             return true;
         }
         return false;
+    }
+
+    public static function random_token(int $length = 32) : string
+    {
+error_log(__METHOD__);
+        
+        $random_base64 = base64_encode(random_bytes($length));
+        $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
+
+        if (strlen($random_base64)<$length) {
+            /**
+             * It happens sometimes that there are many +=\, so if
+             * the length of $random_base64 after suppressing thoses 
+             * characters, is less than the $length, then start over again.
+             */
+            return self::random_token($length);
+        }
+
+        return substr($random_base64, 0, $length);
     }
 }
 
