@@ -176,11 +176,11 @@ error_log(__METHOD__);
         return $_COOKIE[$name] ?? $default;
     }
 
-    public static function put_cookie(string $name, string $value, int $expiry=604800, $path = '/', string $domain = '', bool $secure=false, bool $httponly=false) : string
+    public static function put_cookie(string $name, string $value, int $expiry=604800) : string
     {
 error_log(__METHOD__);
 
-        return setcookie($name, $value, time() + $expiry, $path, $domain, $secure, $httponly) ? $value : '';
+        return setcookie($name, $value, time() + $expiry) ? $value : '';
     }
 
     public static function del_cookie(string $name) : string
