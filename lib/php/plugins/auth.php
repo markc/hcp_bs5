@@ -189,7 +189,8 @@ error_log(__METHOD__);
          * secure HTTPS connection from the client, and
          * must be accessible only through the HTTP protocol.
          */
-        return setcookie($name, $value, time() + $expire, $this->g->cfg['self'], '', true, true);
+        $expire = $expire ? time() + $expire : 0;
+        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', true, true);
     }
 }
 
