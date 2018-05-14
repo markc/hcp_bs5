@@ -1,9 +1,11 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20180511
+// lib/php/plugins/auth.php 20150101 - 20180514
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
 {
+    const OTP_LENGTH = 10;
+
     protected
     $tbl = 'accounts',
     $in = [
@@ -17,8 +19,6 @@ class Plugins_Auth extends Plugin
         'passwd1'   => '',
         'passwd2'   => '',
     ];
-
-    const OTP_LENGTH = 10;
 
     public function create() : string
     {
