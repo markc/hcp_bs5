@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20180511
+// index.php 20150101 - 20180515
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -22,14 +22,6 @@ echo new Init(new class
         'perp'  => 25,
         'self'  => '',
     ],
-    $sess_cookie = [
-        'name' => 'HCPSESS',
-        'lifetime' => 0,
-        'path' => '',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true
-    ],
     $in = [
         'd'     => '',          // Domain (current)
         'g'     => null,        // Group/Category
@@ -39,11 +31,6 @@ echo new Init(new class
         'o'     => 'home',      // Object (content)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
-        'search'=> '',
-        'sort'  => '',
-        'order' => 'desc',
-        'offset'=> '0',
-        'limit' => '10',
     ],
     $out = [
         'doc'   => 'NetServa',
@@ -129,6 +116,14 @@ echo new Init(new class
             'type'  => '',          // mysql | sqlite | '' to disable
             'user'  => 'pdns',      // Alt DNS DB user
         ],
+    ],
+    $sess_cookie = [
+        'name'      => 'HCPSESS',
+        'lifetime'  => 0,
+        'path'      => '',
+        'domain'    => '',
+        'secure'    => false,
+        'httponly'  => true
     ],
     $acl = [
         0 => 'SuperAdmin',
