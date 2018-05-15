@@ -32,20 +32,20 @@ error_log(__METHOD__);
             $wval = $_SESSION['usr']['id'];
          }
 
-//        return $this->t->list(db::read('*')),
-        return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
-/*
-        $pager = util::pager(
-            (int) util::ses('p'),
-            (int) $this->g->cfg['perp'],
-            (int) db::read('count(id)', $where, $wval, '', 'col')
-        );
+        //return $this->t->list(db::read('*')),
+        return $this->t->list(db::read('*', $where, $wval, 'ORDER BY `updated` DESC'));
 
-        return $this->t->list(array_merge(
-            db::read('*', $where, $wval, 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
-            ['pager' => $pager]
-        ));
-*/
+        // $pager = util::pager(
+        //     (int) util::ses('p'),
+        //     (int) $this->g->cfg['perp'],
+        //     (int) db::read('count(id)', $where, $wval, '', 'col')
+        // );
+
+        // return $this->t->list(array_merge(
+        //     db::read('*', $where, $wval, 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+        //     ['pager' => $pager]
+        // ));
+
     }
 
     protected function switch_user()

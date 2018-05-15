@@ -5,6 +5,7 @@
 class Plugins_Auth extends Plugin
 {
     const OTP_LENGTH = 10;
+    const REMEMBER_ME_EXP = 604800; // 7 days;
 
     protected
     $tbl = 'accounts',
@@ -61,7 +62,7 @@ error_log(__METHOD__);
                         $uniq = Util::random_token(32);
                         if ($this->in['remember']) {
                             db::update(['cookie' => $uniq], [['id', '=', $id]]);
-                            util::put_cookie('remember', $uniq, strtotime('7 days', 0), $this->g->cfg['host'], $this->g->cfg['self'], true, true);
+                            $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
                         }
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
@@ -122,12 +123,18 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $u = $_SESSION['usr']['login'];
-        if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
-            unset($_SESSION['adm']);
-        unset($_SESSION['usr']);
-        util::del_cookie('remember');
-        util::log($u . ' is now logged out', 'success');
+        if(Util::is_usr()){
+            $u = $_SESSION['usr']['login'];
+            $id = $_SESSION['usr']['id'];
+            if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
+                unset($_SESSION['adm']);
+            unset($_SESSION['usr']);
+            if(isset($_COOKIE['remember'])){
+                db::update(['cookie' => ''], [['id', '=', $id]]);
+                $this->setcookie('remember', '', strtotime('-1 hour', 0));
+             }
+            util::log($u . ' is now logged out', 'success');
+        }
         header('Location: ' . $this->g->cfg['self']);
         exit();
     }
@@ -173,6 +180,20 @@ If you did not request this action then please ignore this message.
 ' . $host . '?o=auth&m=resetpw&otp=' . $newpass,
             $headers
         );
+    }
+
+    public function setcookie(string $name, string $value, int $expire) : bool
+    {
+error_log(__METHOD__);
+        if((empty($value) || $expire<0) && isset($_COOKIE[$name])) unset($_COOKIE[$name]);
+
+        /**
+         * Auth Cookies must be transmitted only over a
+         * secure HTTPS connection from the client, and
+         * must be accessible only through the HTTP protocol.
+         */
+        $expire = $expire ? time() + $expire : 0;
+        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', true, true);
     }
 }
 

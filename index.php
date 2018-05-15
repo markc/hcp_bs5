@@ -22,6 +22,14 @@ echo new Init(new class
         'perp'  => 25,
         'self'  => '',
     ],
+    $sess_cookie = [
+        'name' => 'HCPSESS',
+        'lifetime' => 0,
+        'path' => '',
+        'domain' => '',
+        'secure' => false,
+        'httponly' => true
+    ],
     $in = [
         'd'     => '',          // Domain (current)
         'g'     => null,        // Group/Category

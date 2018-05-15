@@ -176,11 +176,11 @@ error_log(__METHOD__);
         return $_COOKIE[$name] ?? $default;
     }
 
-    public static function put_cookie(string $name, string $value, int $expiry=604800, $path = '/', string $domain = '', bool $secure=false, bool $httponly=false) : string
+    public static function put_cookie(string $name, string $value, int $expiry=604800) : string
     {
 error_log(__METHOD__);
 
-        return setcookie($name, $value, time() + $expiry, $path, $domain, $secure, $httponly) ? $value : '';
+        return setcookie($name, $value, time() + $expiry) ? $value : '';
     }
 
     public static function del_cookie(string $name) : string
@@ -325,6 +325,28 @@ error_log(__METHOD__);
         }
 
         return substr($random_base64, 0, $length);
+    }
+
+    public static function session_start(array $cfg) : bool
+    {
+error_log(__METHOD__);
+
+        /**
+         * Default session cookie paramters
+         * http://php.net/manual/en/session.configuration.php
+         */
+        $_sess_cookie_params = session_get_cookie_params();
+
+        $name     = $cfg['name'] ?? session_name();
+        $lifetime = $cfg['lifetime'] ?? $_sess_cookie_params['lifetime'];
+        $path     = $cfg['path'] ?? $_sess_cookie_params['path'];
+        $domain   = $cfg['domain'] ?? $_sess_cookie_params['domain'];
+        $secure   = $cfg['secure'] ?? $_sess_cookie_params['secure'];
+        $httponly = $cfg['httponly'] ?? $_sess_cookie_params['httponly'];
+
+        session_name($name);
+        session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
+        return session_start();
     }
 }
 
