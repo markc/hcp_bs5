@@ -201,40 +201,39 @@ error_log(__METHOD__);
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/solid.js" integrity="sha384-Y5YpSlHvzVV0DWYRcgkEu96v/nptti7XYp3D8l+PquwfpOnorjWA+dC7T6wRgZFI" crossorigin="anonymous"></script>
     <script src="https://use.fontawesome.com/releases/v5.0.11/js/fontawesome.js" integrity="sha384-KPnpIFJjPHLMZMALe0U04jClDmqlLhkBM6ZEkFvs9AiWRYwaDXPhn2D5lr8sypQ+" crossorigin="anonymous"></script>';
     }
-/*
-    protected function pager(array $ary) : string
+
+    protected function modal(array $ary) : string
     {
 error_log(__METHOD__);
 
         extract($ary);
-
-        $b = '';
-        $o = util::ses('o');
-
-        for($i = 1; $i <= $last; $i++) $b .= '
-              <li class="page-item' . ($i === $curr ? ' active' : '') . '">
-                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>
-              </li>';
-
+        $hidden = isset($hidden) && $hidden ? $hidden : '';
         return '
-          <nav aria-label="Page navigation">
-            <ul class="pagination pagination-sm pull-right">
-              <li class="page-item' . ($curr === 1 ? ' disabled' : '') . '">
-                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $prev . '" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-              </li>' . $b . '
-              <li class="page-item' . ($curr === $last ? ' disabled' : '') . '">
-                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $next . '" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-              </li>
-            </ul>
-          </nav>';
+        <div class="modal fade" id="' . $id . '" tabindex="-1" role="dialog" aria-labelledby="' . $id . '" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">' . $title . '</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                <input type="hidden" name="m" value="' . $action . '">' . $hidden . '
+                <div class="modal-body">' . $body . '
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">' . $footer . '</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>';
     }
-*/
+
 }
 
 ?>

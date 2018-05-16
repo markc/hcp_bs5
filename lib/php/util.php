@@ -63,6 +63,15 @@ error_log(__METHOD__);
         }
     }
 
+    public static function exe(string $cmd) : bool
+    {
+error_log(__METHOD__."(cmd=$cmd)");
+
+        exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
+        util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
+        return $retVal;
+    }
+
     public static function now(string $date1, string $date2 = null) : string
     {
 error_log(__METHOD__);
@@ -101,31 +110,6 @@ error_log(__METHOD__);
         return implode(' ', $result) . ' ago';
     }
 
-/*
-    // Not needed with Bootstrap4 DataTables, 20180303
-
-    public static function pager(int $curr, int $perp, int $total) : array
-    {
-error_log(__METHOD__);
-
-        $start = ($curr - 1) * $perp;
-        $start = $start < 0 ? 0 : $start;
-        $last  = intval(ceil($total / $perp));
-        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
-        $prev  = $curr < 2 ? 1 : $curr - 1;
-        $next  = $curr > ($last - 1) ? $last : $curr + 1;
-
-        return [
-            'start' => $start,
-            'prev'  => $prev,
-            'curr'  => $curr,
-            'next'  => $next,
-            'last'  => $last,
-            'perp'  => $perp,
-            'total' => $total
-        ];
-    }
-*/
     public static function is_adm() : bool
     {
 error_log(__METHOD__);
