@@ -55,18 +55,10 @@ error_log(__METHOD__);
 
         $buf = '<p style="columns:350px 3;column-rule: 1px dotted #ddd;text-align:center;">';
         exec("sudo dkim list 2>&1", $retArr, $retVal);
-        sort($retArr);
         foreach($retArr as $line) $buf .= '
             <a href="?o=dkim&m=read&dnstxt=' . $line . '"><b>' . $line . '</b></a>';
         return $this->t->list(['buf' => $buf . '</p>']);
     }
-
-//        exec("sudo dkim show 2>&1", $retArr, $retVal);
-//        $cnt = count($retArr);
-//         for($i = 0; $i < $cnt; $i++) $buf .= ($i % 2 == 0) ? '
-//        <a href="?o=dkim&m=read&dnstxt=' . $retArr[$i] . '"><b>' . $retArr[$i] . '</b></a><br>' : '
-//        <div style="word-break:break-all;font-family:monospace;width:100%;">' . $retArr[$i] . '</div><hr>';
-
 }
 
 ?>
