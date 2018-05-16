@@ -29,6 +29,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+/*
         $buf = '';
         $num = count($in);
 
@@ -48,7 +49,7 @@ error_log(__METHOD__);
           <td>' . $grp . '</td>
         </tr>';
         }
-
+*/
         return '
           <div class="col-12">
             <h3>
@@ -72,11 +73,24 @@ error_log(__METHOD__);
                   <th>Grp</th>
                 </tr>
               </thead>
-              <tbody>' . $buf . '
+              <tbody>
               </tbody>
             </table>
           </div>
-          <script>$(document).ready(function() { $("#accounts").DataTable({"order": []}); });</script>';
+          <script>
+$(document).ready(function() {
+  $("#accounts").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=accounts&m=list",
+//    "order": [[ 8, "desc" ]],
+    "columnDefs": [
+      {"targets":0, "className":"text-truncate"},
+      {"targets":3, "className":"text-truncate"},
+    ]
+  });
+});
+          </script>';
     }
 
     private function editor(array $in) : string

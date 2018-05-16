@@ -69,6 +69,25 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => null, 'db' => 'id'],
+                ['dt' => 0, 'db' => 'login'],
+                ['dt' => 1, 'db' => 'fname'],
+                ['dt' => 2, 'db' => 'lname'],
+                ['dt' => 3, 'db' => 'altemail'],
+                ['dt' => 4, 'db' => 'acl'],
+                ['dt' => 5, 'db' => 'grp'],
+            ];
+            return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+        return $this->t->list([]);
+    }
+
+    protected function list2() : string
+    {
+error_log(__METHOD__);
+
         // TODO this needs to be generalised and added to util::
         if (util::is_acl(0)) { // superadmin
             $where = '';
