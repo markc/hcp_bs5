@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20180514
+// lib/php/plugins/auth.php 20150101 - 20180516
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
@@ -27,7 +27,7 @@ error_log(__METHOD__);
 
         $u = $this->in['login'];
 
-        if (Util::is_post()) {
+        if (util::is_post()) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if ($usr['acl'] != 9) {
@@ -59,8 +59,8 @@ error_log(__METHOD__);
                 extract($usr);
                 if ($acl !== 9) {
                     if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
-                        $uniq = Util::random_token(32);
                         if ($this->in['remember']) {
+                            $uniq = util::random_token(32);
                             db::update(['cookie' => $uniq], [['id', '=', $id]]);
                             $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
                         }
@@ -81,7 +81,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if (!( util::is_usr() || isset($_SESSION['resetpw']) )){
+        if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please try again.');
             return $this->t->list(['login' => '']);
         }
@@ -89,7 +89,7 @@ error_log(__METHOD__);
         $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
         $u = (util::is_usr()) ? $_SESSION['usr']['login'] : $_SESSION['resetpw']['usr']['login'];
 
-        if (Util::is_post()) {
+        if (util::is_post()) {
             if ($usr = db::read('login,acl,otpttl', 'id', $i, '', 'one')) {
                 $p1 = html_entity_decode($this->in['passwd1'], ENT_QUOTES, 'UTF-8');
                 $p2 = html_entity_decode($this->in['passwd2'], ENT_QUOTES, 'UTF-8');
@@ -123,7 +123,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if(Util::is_usr()){
+        if(util::is_usr()){
             $u = $_SESSION['usr']['login'];
             $id = $_SESSION['usr']['id'];
             if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
@@ -185,7 +185,8 @@ If you did not request this action then please ignore this message.
     public function setcookie(string $name, string $value, int $expire) : bool
     {
 error_log(__METHOD__);
-        if((empty($value) || $expire<0) && isset($_COOKIE[$name])) unset($_COOKIE[$name]);
+
+        if ((empty($value) || $expire < 0) && isset($_COOKIE[$name])) unset($_COOKIE[$name]);
 
         /**
          * Auth Cookies must be transmitted only over a

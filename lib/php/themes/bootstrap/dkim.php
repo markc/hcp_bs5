@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20180514
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20180515
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
@@ -40,8 +40,6 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
-
-//error_log('in='.var_export($in,true));
 
         $keylen_buf = $this->dropdown([
             ['1024', '1024'],

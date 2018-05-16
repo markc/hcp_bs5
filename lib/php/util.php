@@ -284,8 +284,8 @@ error_log(__METHOD__);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
-                util::log('Possible CSRF attack');
-                util::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
+                self::log('Possible CSRF attack');
+                self::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
             }
             return true;
         }
@@ -299,7 +299,7 @@ error_log(__METHOD__);
         $random_base64 = base64_encode(random_bytes($length));
         $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
 
-        if (strlen($random_base64)<$length) {
+        if (strlen($random_base64) < $length) {
             /**
              * It happens sometimes that there are many +=\, so if
              * the length of $random_base64 after suppressing thoses
