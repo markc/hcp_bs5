@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20180516
+// lib/php/plugins/auth.php 20150101 - 20180517
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
@@ -24,6 +24,11 @@ class Plugins_Auth extends Plugin
     public function create() : string
     {
 error_log(__METHOD__);
+
+        // Logged-in users cannot perfom this action.
+        if(util::is_usr()){
+            util::redirect($this->g->cfg['self'], 0);
+        }
 
         $u = $this->in['login'];
 
@@ -50,6 +55,11 @@ error_log(__METHOD__);
     public function list() : string
     {
 error_log(__METHOD__);
+
+        // Logged-in users cannot perform this action
+        if(util::is_usr()){
+            util::redirect($this->g->cfg['self'], 0);
+        }
 
         $u = $this->in['login'];
         $p = $this->in['webpw'];
@@ -82,7 +92,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
-            util::log('Session expired! Please try again.');
+            util::log('Session expired! Please login and try again.');
             return $this->t->list(['login' => '']);
         }
 
@@ -145,6 +155,11 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        // Logged-in users cannot perfom this action.
+        if(util::is_usr()){
+            util::redirect($this->g->cfg['self'], 0);
+        }
+
         $otp = html_entity_decode($this->in['otp']);
         if (strlen($otp) === self::OTP_LENGTH) {
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
@@ -194,7 +209,7 @@ error_log(__METHOD__);
          * must be accessible only through the HTTP protocol.
          */
         $expire = $expire ? time() + $expire : 0;
-        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', true, true);
+        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', $this->g->sess_cookie['secure'], $this->g->sess_cookie['httponly']);
     }
 }
 
