@@ -22,17 +22,15 @@ error_log(__METHOD__);
             : ($fname && empty($lname) ? $fname : $login);
 
         $media = $media ?
-              '<img src="' . $media . '" alt="' . $title . ' Image">' :
+              '<img class="mb-3" src="' . $media . '" alt="' . $title . ' Image">' :
               '<div class="media-blank"></div>';
 
         return '
           <div class="col-12">
-
             <h2 class=my-0><a href="?o=news&m=list" title="Go back to list">&laquo;</a> ' . $title . '
             </h2>
           </div>
           <div class="col-12">
-
             <div class="media text-muted">
                 <div class="media-img">' . $media . '
                   <small class="text-center">
@@ -44,7 +42,6 @@ error_log(__METHOD__);
               <div class="media-body">' . nl2br($content) . '
               </div>
             </div>
-
           </div>
           <div class="col-12 text-right mt-4">
             <div class="btn-group">
@@ -58,8 +55,6 @@ error_log(__METHOD__);
     public function update(array $in) : string
     {
 error_log(__METHOD__);
-
-error_log('bootstrap news update ='.var_export($in , true));
 
         if (!util::is_adm() && ($_SESSION['usr']['id'] !== $in['author'])) {
             util::log('You do not have permissions to update this post');
@@ -99,8 +94,8 @@ $(document).ready(function() {
 //    "order": [[ 0, "desc" ]],
     "columnDefs": [
       {"targets":0, "visible":false},
-      {"targets":1, "width":"25%"},
-      {"targets":2, "width":"75%"},
+      {"targets":1, "width":"25%", "className":"pt-4"},
+      {"targets":2, "width":"75%", "className":"pl-4 pt-4"},
       {"targets":3, "visible":false},
       {"targets":4, "visible":false},
       {"targets":5, "visible":false},
@@ -173,8 +168,10 @@ error_log(__METHOD__);
                   </div>
                 </div>
               </div>
-              <div class="col-12 text-right">
-                <div class="btn-group">' . $submit . '
+              <div class="row">
+                <div class="col-12 text-right">
+                  <div class="btn-group">' . $submit . '
+                  </div>
                 </div>
               </div>
             </form>';
