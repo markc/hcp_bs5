@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/users.php 20150101 - 20180516
+// lib/php/plugins/users.php 20150101 - 20180517
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Accounts extends Plugin
@@ -72,7 +72,10 @@ error_log(__METHOD__);
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
-                ['dt' => 0, 'db' => 'login'],
+                ['dt' => 0, 'db' => 'login',     'formatter' => function($d, $row) {
+                    return '
+                    <b><a href="?o=accounts&m=update&i=' . $row['id'] . '">' . $d . '</a></b>';
+                }],
                 ['dt' => 1, 'db' => 'fname'],
                 ['dt' => 2, 'db' => 'lname'],
                 ['dt' => 3, 'db' => 'altemail'],
@@ -82,24 +85,6 @@ error_log(__METHOD__);
             return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
-    }
-
-    protected function list2() : string
-    {
-error_log(__METHOD__);
-
-        // TODO this needs to be generalised and added to util::
-        if (util::is_acl(0)) { // superadmin
-            $where = '';
-            $wval = '';
-        } elseif (util::is_acl(1)) { // normal admin
-            $where = 'grp';
-            $wval = $_SESSION['usr']['id'];
-        } else {
-            $where = 'id';
-            $wval = $_SESSION['usr']['id'];
-        }
-        return $this->t->list(db::read('*', $where, $wval, 'ORDER BY `updated` DESC'));
     }
 
     protected function switch_user()

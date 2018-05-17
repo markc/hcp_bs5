@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20180512
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20180517
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
@@ -29,55 +29,88 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-/*
-        $buf = '';
-        $num = count($in);
+        extract($in);
+        $aclgrp_buf = '';
 
-        foreach ($in as $a) {
-            extract($a);
-            $buf .= '
-        <tr>
-          <td class="text-truncate">
-            <a href="?o=accounts&m=read&i=' . $id . '" title="Show account: ' . $id . '">
-              <strong>' . $login . '</strong>
-            </a>
-          </td>
-          <td>' . $fname . '</td>
-          <td>' . $lname . '</td>
-          <td class="text-truncate">' . $altemail . '</td>
-          <td>' . $this->g->acl[$acl] . '</td>
-          <td>' . $grp . '</td>
-        </tr>';
+        if (util::is_adm()) {
+            $acl_ary = $grp_ary = [];
+            foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
+            $acl_buf = $this->dropdown($acl_ary, 'acl', "$acl", '', 'custom-select');
+            $res = db::qry("
+ SELECT login,id
+   FROM `accounts`
+  WHERE acl = :0 OR acl = :1", ['0' => 0, '1' => 1]);
+
+            foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
+            $grp_buf = $this->dropdown($grp_ary, 'grp', "$grp", '', 'custom-select');
+
+            $aclgrp_buf = '
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label for="acl" class="form-control-label">ACL</label>' . $acl_buf . '
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label for="grp" class="form-control-label">Group</label>' . $grp_buf . '
+                      </div>
+                    </div>
+                  </div>';
         }
-*/
+
+        $createmodal = $this->modal([
+            'id'      => 'createmodal',
+            'title'   => 'Create New Account',
+            'action'  => 'create',
+            'footer'  => 'Create',
+            'body'    => '
+                  <div class="form-group">
+                    <label for="login" class="form-control-label">Email ID</label>
+                    <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="fname" class="form-control-label">First Name</label>
+                    <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="lname" class="form-control-label">Last Name</label>
+                    <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="altemail" class="form-control-label">Alt Email</label>
+                    <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
+                  </div>' . $aclgrp_buf,
+        ]);
+
         return '
-          <div class="col-12">
-            <h3>
-              <i class="fas fa-users fa-fw"></i> Accounts
-              <a href="?o=accounts&m=create" title="Add new account">
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="table-responsive">
-            <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-              <thead class="nowrap">
-                <tr>
-                  <th class="w-25">User ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th class="w-25">Alt Email</th>
-                  <th>ACL</th>
-                  <th>Grp</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-          <script>
+            <div class="col-12">
+              <h3>
+                <i class="fas fa-users fa-fw"></i> Accounts
+                <a href="" title="Add new account" data-toggle="modal" data-target="#createmodal">
+                  <small><i class="fas fa-plus-circle fa-fw"></i></small>
+                </a>
+              </h3>
+            </div>
+          </div><!-- END UPPER ROW -->
+          <div class="row">
+            <div class="table-responsive">
+              <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
+                <thead class="nowrap">
+                  <tr>
+                    <th class="w-25">User ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th class="w-25">Alt Email</th>
+                    <th>ACL</th>
+                    <th>Grp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>' . $createmodal . '
+            <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
     "processing": true,
@@ -99,6 +132,17 @@ error_log(__METHOD__);
 
         extract($in);
 
+        $removemodal = $this->modal([
+            'id'      => 'removemodal',
+            'title'   => 'Remove User',
+            'action'  => 'delete',
+            'footer'  => 'Remove',
+            'hidden'  => '
+                <input type="hidden" name="i" value="' . $in['id'] . '">',
+            'body'    => '
+                  <p class="text-center">Are you sure you want to remove this user?:<br><b>' . $in['login'] . '</b></p>',
+        ]);
+
         if ($this->g->in['m'] === 'create') {
             $header = 'Add Account';
             $switch = '';
@@ -107,12 +151,10 @@ error_log(__METHOD__);
                 <button type="submit" name="m" value="create" class="btn btn-primary">Add This Account</button>';
         } else {
             $header = 'Update Account';
-//            $switch = util::is_adm() && (!util::is_usr(0) && !util::is_usr(1)) ? '
             $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
-                  <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
+                <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
             $submit = '
                 <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=accounts&m=delete&i=' . $id . '" title="Remove this account" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
                 <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
         }
 
@@ -141,7 +183,12 @@ error_log(__METHOD__);
 
         return '
           <div class="col-12">
-            <h3><a href="?o=accounts&m=list">&laquo;</a> ' . $header . '</h3>
+            <h3>
+              <a href="?o=accounts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Accounts
+              <a href="#" title="Remove this user" data-toggle="modal" data-target="#removemodal">
+                <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
+              </a>
+            </h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
@@ -183,7 +230,7 @@ error_log(__METHOD__);
                 </div>
               </div>
             </form>
-          </div>';
+          </div>' . $removemodal;
     }
 }
 
