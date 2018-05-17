@@ -52,7 +52,6 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-//            util::ses('p', '', '1');
             return $this->list();
         } else return $this->t->create($this->in);
     }
@@ -72,11 +71,9 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-//            util::ses('p', '', '1');
             return $this->list();
-//??        } elseif ($this->g->in['i']) {
-//??            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
-        } else return 'Error updating item';
+        }
+        return 'Error updating item';
     }
 
     protected function delete() : string
@@ -87,7 +84,6 @@ error_log(__METHOD__);
             if ($this->g->in['i']) {
                 $res = db::delete([['id', '=', $this->g->in['i']]]);
                 util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-//                util::ses('p', '', '1');
                 return $this->list();
             }
         }

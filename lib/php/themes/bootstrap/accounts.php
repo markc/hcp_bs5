@@ -140,7 +140,7 @@ error_log(__METHOD__);
             'hidden'  => '
                 <input type="hidden" name="i" value="' . $in['id'] . '">',
             'body'    => '
-                  <p class="text-center">Are you sure you want to remove this user?:<br><b>' . $in['login'] . '</b></p>',
+                <p class="text-center">Are you sure you want to remove this user?<br><b>' . $in['login'] . '</b></p>',
         ]);
 
         if ($this->g->in['m'] === 'create') {
@@ -185,9 +185,8 @@ error_log(__METHOD__);
           <div class="col-12">
             <h3>
               <a href="?o=accounts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Accounts
-              <a href="#" title="Remove this user" data-toggle="modal" data-target="#removemodal">
-                <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
-              </a>
+              <a href="" title="Remove this user" data-toggle="modal" data-target="#removemodal">
+                <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>
             </h3>
           </div>
         </div><!-- END UPPER ROW -->
