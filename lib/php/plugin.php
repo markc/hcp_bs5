@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugin.php 20150101 - 20180512
+// lib/php/plugin.php 20150101 - 20180517
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
@@ -47,12 +47,12 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            util::ses('p', '', '1');
+//            util::ses('p', '', '1');
             return $this->list();
         } else return $this->t->create($this->in);
     }
@@ -68,14 +68,14 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            util::ses('p', '', '1');
+//            util::ses('p', '', '1');
             return $this->list();
-        } elseif ($this->g->in['i']) {
-            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+//??        } elseif ($this->g->in['i']) {
+//??            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
         } else return 'Error updating item';
     }
 
@@ -83,12 +83,15 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['i']) {
-            $res = db::delete([['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            util::ses('p', '', '1');
-            return $this->list();
-        } else return 'Error deleting item';
+        if (util::is_post()) {
+            if ($this->g->in['i']) {
+                $res = db::delete([['id', '=', $this->g->in['i']]]);
+                util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+//                util::ses('p', '', '1');
+                return $this->list();
+            }
+        }
+        return 'Error deleting item';
     }
 
     protected function list() : string
