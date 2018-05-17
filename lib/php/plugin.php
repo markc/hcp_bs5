@@ -69,11 +69,14 @@ error_log(__METHOD__);
 
         if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
-            db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            return $this->list();
+            if(db::update($this->in, [['id', '=', $this->g->in['i']]])){
+                util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+                return $this->list();
+            }else{
+                util::log('Error updating item.');
+            }
         }
-        return 'Error updating item';
+        return $this->read();
     }
 
     protected function delete() : string
