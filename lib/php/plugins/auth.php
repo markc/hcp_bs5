@@ -209,7 +209,7 @@ error_log(__METHOD__);
          * must be accessible only through the HTTP protocol.
          */
         $expire = $expire ? time() + $expire : 0;
-        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', true, true);
+        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', $this->g->sess_cookie['secure'], $this->g->sess_cookie['httponly']);
     }
 }
 
