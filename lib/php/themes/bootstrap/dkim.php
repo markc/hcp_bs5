@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20180515
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20180517
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
@@ -23,7 +23,7 @@ error_log(__METHOD__);
             <div class="col-12">
               <h3>
                 <a href="?o=dkim&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> DKIM
-                <a href="#" title="Remove this DKIM record" data-toggle="modal" data-target="#removemodal">
+                <a href="" title="Remove this DKIM record" data-toggle="modal" data-target="#removemodal">
                   <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
                 </a>
               </h3>

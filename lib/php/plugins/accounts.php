@@ -72,14 +72,14 @@ error_log(__METHOD__);
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
-                ['dt' => 0, 'db' => 'login',     'formatter' => function($d, $row) {
+                ['dt' => 0, 'db' => 'login', 'formatter' => function($d, $row) {
                     return '
                     <b><a href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
                 }],
                 ['dt' => 1, 'db' => 'fname'],
                 ['dt' => 2, 'db' => 'lname'],
                 ['dt' => 3, 'db' => 'altemail'],
-                ['dt' => 4, 'db' => 'acl'],
+                ['dt' => 4, 'db' => 'acl', 'formatter' => function($d) { return $this->g->acl[$d]; }],
                 ['dt' => 5, 'db' => 'grp'],
             ];
             return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
