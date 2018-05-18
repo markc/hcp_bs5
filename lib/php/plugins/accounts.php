@@ -14,7 +14,7 @@ class Plugins_Accounts extends Plugin
         'fname'     => '',
         'lname'     => '',
         'altemail'  => '',
-        'webpw'     => '',
+        //'webpw'     => '',
     ];
 
     public function __construct(Theme $t)
