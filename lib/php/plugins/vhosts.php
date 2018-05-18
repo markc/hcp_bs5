@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vhosts.php 20180512
+// lib/php/plugins/vhosts.php 20180518
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
@@ -24,7 +24,7 @@ class Plugins_Vhosts extends Plugin
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
 
@@ -70,7 +70,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $diskquota *= 1000000;
             $mailquota *= 1000000;
@@ -130,7 +130,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['i']) {
+        if (util::is_post() && $this->g->in['i']) {
             $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
             $vhost_esc = trim(escapeshellarg($vhost), "'");
             shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
