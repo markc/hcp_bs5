@@ -33,6 +33,21 @@ error_log(__METHOD__);
 
         $plans_buf = $this->dropdown($plans, 'plan', '', '', 'custom-select');
 
+        $createmodal = $this->modal([
+            'id'      => 'createmodal',
+            'title'   => 'Create New Vhost',
+            'action'  => 'create',
+            'footer'  => 'Create',
+            'body'    => '
+                  <div class="form-group">
+                    <label for="domain" class="form-control-label">Vhost</label>
+                    <input type="text" class="form-control" id="domain" name="domain">
+                  </div>
+                  <div class="form-group">
+                    <label for="plan" class="form-control-label">Plan</label>' . $plans_buf . '
+                  </div>',
+        ]);
+
         return '
         <div class="col-12">
           <h3>
@@ -67,38 +82,7 @@ error_log(__METHOD__);
             <tfoot>
             </tfoot>
           </table>
-        </div>
-        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Vhosts</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form method="post" action="' . $this->g->cfg['self'] . '">
-                <div class="modal-body">
-                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                  <input type="hidden" name="m" value="create">
-                  <div class="form-group">
-                    <label for="domain" class="form-control-label">Vhost</label>
-                    <input type="text" class="form-control" id="domain" name="domain">
-                  </div>
-                  <div class="form-group">
-                    <label for="plan" class="form-control-label">Plan</label>' . $plans_buf . '
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Add New Vhost</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        </div>' . $createmodal . '
         <script>
 $(document).ready(function() {
   $("#vhosts").DataTable({

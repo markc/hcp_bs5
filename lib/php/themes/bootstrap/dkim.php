@@ -16,7 +16,7 @@ error_log(__METHOD__);
             'hidden'  => '
                 <input type="hidden" name="domain" value="' . $in['domain'] . '">',
             'body'    => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for:<br><b>' . $in['domain'] . '</b></p>',
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
         ]);
 
         return '
@@ -44,7 +44,7 @@ error_log(__METHOD__);
         $keylen_buf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],
-        ], 'bits', '', '', 'custom-select');
+        ], 'keylen', '', '', 'custom-select');
 
         $createmodal = $this->modal([
             'id'      => 'createmodal',
@@ -60,12 +60,12 @@ error_log(__METHOD__);
                     <div class="col-6">
                       <div class="form-group">
                         <label for="selector" class="form-control-label">Selector</label>
-                        <input type="text" class="form-control" id="selector" name="selector" value="dkim">
+                        <input type="text" class="form-control" id="select" name="select" value="dkim">
                       </div>
                     </div>
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="bits" class="form-control-label">Key Length</label>' . $keylen_buf . '
+                        <label for="keylen" class="form-control-label">Key Length</label>' . $keylen_buf . '
                       </div>
                     </div>
                   </div>',

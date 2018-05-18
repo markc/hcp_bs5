@@ -22,6 +22,24 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        $createmodal = $this->modal([
+            'id'      => 'createmodal',
+            'title'   => 'Create New Mailbox',
+            'action'  => 'create',
+            'footer'  => 'Create',
+            'body'    => '
+                  <div class="form-group">
+                    <label for="user" class="form-control-label">Mailbox</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
+                      <label class="custom-control-label" for="spamf">Spam Filter</label>
+                    </div>
+                  </div>',
+        ]);
+
         return '
         <div class="col-12">
           <h3>
@@ -50,41 +68,7 @@ error_log(__METHOD__);
             <tbody>
             </tbody>
           </table>
-        </div>
-        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Mailboxes</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form method="post" action="' . $this->g->cfg['self'] . '">
-                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                <input type="hidden" name="m" value="create">
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="user" class="form-control-label">Mailbox</label>
-                    <input type="text" class="form-control" id="user" name="user">
-                  </div>
-                  <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
-                      <label class="custom-control-label" for="spamf">Spam Filter</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Add New Mailbox</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        </div>' . $createmodal . '
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({

@@ -25,7 +25,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $domain = trim(escapeshellarg(explode('._domainkey.', $this->in['dnstxt'])[1]), "'");
+        $domain = trim(escapeshellarg(explode('._domainkey.', $this->in['dnstxt'])[1]), "'"); // too fragile?
         exec("sudo dkim show $domain 2>&1", $retArr, $retVal);
         $buf = '
         <b>' . $retArr[0] . '</b><br>
