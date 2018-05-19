@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/valias.php 20170225 - 20180512
+// lib/php/plugins/valias.php 20170225 - 20180518
 // Copyright (C) 1995-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
@@ -332,10 +332,10 @@ error_log(__METHOD__);
                     <a href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $d . '">
                       <b>' . $d . ' </b></a>';
                 }],
-                ['dt' => 1, 'db' => 'target'],
+                ['dt' => 1, 'db' => 'target', 'formatter' => function($d) { return str_replace(',', '<br>', $d); }],
                 ['dt' => 2, 'db' => 'domain'],
                 ['dt' => 3, 'db' => 'active', 'formatter' => function($d) {
-                    return = $d
+                    return $d
                         ? '<i class="fas fa-check text-success"></i>'
                         : '<i class="fas fa-times text-danger"></i>';
                 }],
@@ -347,10 +347,5 @@ error_log(__METHOD__);
         return $this->t->list([]);
     }
 }
-
-//                    return $active_buf . '
-//                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-//                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Alias" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['source'] . '?\')">
-//                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
 
 ?>

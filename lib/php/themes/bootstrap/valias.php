@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180512
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180518
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
@@ -63,7 +63,6 @@ $(document).ready(function() {
   });
 });
         </script>';
-
     }
 
     private function editor(array $in) : string
@@ -74,10 +73,9 @@ error_log(__METHOD__);
 
         $active = $active ? 1 : 0;
         $actbuf = $active ? ' checked' : '';
-        $header = $this->g->in['m'] === 'create' ? 'Add new Alias' : 'Update Alias
+        $header = $this->g->in['m'] === 'create' ? 'Add new Alias' : 'Aliases
                 <a href="" title="Remove this Alias" data-toggle="modal" data-target="#removemodal">
-                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
-                </a>';
+                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>';
         $tolist = '
                 <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>';
         $submit = $this->g->in['m'] === 'create' ? $tolist . '

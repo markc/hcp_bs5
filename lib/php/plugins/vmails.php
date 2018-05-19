@@ -21,21 +21,13 @@ class Plugins_Vmails extends Plugin
         'user'      => '',
     ];
 
-    function create() : string
+    protected function create() : string
     {
 error_log(__METHOD__);
 
-        if (util::is_post()) {
-            extract($this->in);
-            $spamf  = $spamf ? 1 : 0;
-            $user_esc = trim(escapeshellarg($user), "'");
-            $spamf_str = $spamf === 1 ? '' : 'nospam';
-            exec("sudo addvmail $user_esc $spamf_str 2>&1", $retArr, $retVal);
-            util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
-            util::ses('p', '', '1');
-            return $this->list();
-        }
-        return $this->t->create($this->in);
+        if (util::is_post())
+            util::exe('addvmail ' . $this->in['user'] . ($this->in['spamf'] ? '' : ' nospam'));
+        return $this->list();
     }
 
     protected function read() : string
@@ -45,7 +37,7 @@ error_log(__METHOD__);
         return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
-    function update() : string
+    protected function update() : string
     {
 error_log(__METHOD__);
 
@@ -110,11 +102,24 @@ error_log(__METHOD__);
         } else return 'Error updating item';
     }
 
-    function delete() : string
+    protected function delete() : string
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['i']) {
+        if (util::is_post() && $this->g->in['i']) {
+            $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
+            if ($user) util::exe("delvmail $user");
+            else util::log('ERROR: user does not exist');
+        }
+        return $this->list();
+    }
+
+
+    protected function delete2() : string
+    {
+error_log(__METHOD__);
+
+        if (util::is_post() && $this->g->in['i']) {
             $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
             if ($user) {
                 $retArr = []; $retVal = null;
@@ -136,7 +141,11 @@ error_log(__METHOD__);
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
-                ['dt' => 0, 'db' => 'user',       'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0, 'db' => 'user',       'formatter' => function($d, $row) {
+                    return '
+                    <a href="?o=vmails&m=read&i=' . $row['id'] . '" title="Update entry for ' . $d . '">
+                      <b>' . $d . ' </b></a>';
+                }],
                 ['dt' => 1, 'db' => 'domain'],
                 ['dt' => 2, 'db' => '',           'formatter' => function($d, $row) {
                     $percent = round(($row['size_mail'] / $row['quota']) * 100);
@@ -153,15 +162,8 @@ error_log(__METHOD__);
                 ['dt' => 4, 'db' => null,         'formatter' => function($d) { return '/'; }],
                 ['dt' => 5, 'db' => 'quota',      'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 6, 'db' => 'num_total',  'formatter' => function($d) { return number_format(intval($d)); }],
-                ['dt' => 7, 'db' => 'active',     'formatter' => function($d, $row) {
-                    $active_buf = $d
-                        ? '<i class="fas fa-check text-success"></i>'
-                        : '<i class="fas fa-times text-danger"></i>';
-                    return $active_buf . '
-                    <a class="editlink" href="?o=vmails&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['user'] . '">
-                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-                    <a href="?o=vmails&m=delete&i=' . $row['id'] . '" title="Remove Mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['user'] . '?\')">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                ['dt' => 7, 'db' => 'active',     'formatter' => function($d) {
+                    return '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>';
                 }],
                 ['dt' => 8, 'db' => 'updated'],
             ];

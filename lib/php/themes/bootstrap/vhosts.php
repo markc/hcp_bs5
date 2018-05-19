@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180512
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180518
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
@@ -53,8 +53,7 @@ error_log(__METHOD__);
           <h3>
             <i class="fa fa-globe fa-fw"></i> Vhosts
             <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
-              <small><i class="fas fa-plus-circle fa-fw"></i></small>
-            </a>
+              <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
           </h3>
         </div>
       </div><!-- END UPPER ROW -->

@@ -1,5 +1,5 @@
 <?php
-// lib/php/util.php 20150225 - 20180512
+// lib/php/util.php 20150225 - 20180519
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -10,7 +10,7 @@ error_log(__METHOD__);
 
         if ($msg) {
             if (isset($_SESSION['l']) and $_SESSION['l']) {
-                list(, $m) = explode(':', $_SESSION['l'], 2);
+                [, $m] = explode(':', $_SESSION['l'], 2);
                 $msg = $m . '<br>' . $msg;
             }
             $_SESSION['l'] = $lvl . ':' . $msg;
@@ -23,7 +23,7 @@ error_log(__METHOD__);
 
     private static function enc(string $v) : string
     {
-error_log(__METHOD__);
+error_log(__METHOD__."($v)");
 
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
@@ -65,7 +65,7 @@ error_log(__METHOD__);
 
     public static function exe(string $cmd) : bool
     {
-error_log(__METHOD__."(cmd=$cmd)");
+error_log(__METHOD__."($cmd)");
 
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
         util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
@@ -132,8 +132,6 @@ error_log(__METHOD__);
 
         return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
-
-    // 09-Auth
 
     public static function genpw(int $length = 10) : string
     {
@@ -211,8 +209,6 @@ error_log(__METHOD__);
             }
         }
     }
-
-    // shell utilities
 
     public static function redirect(string $url, int $ttl = 5, string $msg = '') : void
     {
