@@ -16,7 +16,7 @@ echo new Init(new class
     public
     $cfg = [
         'email' => 'markc@renta.net',
-        'file'  => 'lib' . DS . '.ht_conf.php', // settings override
+        'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // settings override
         'hash'  => 'SHA512-CRYPT',
         'host'  => '',
         'perp'  => 25,
