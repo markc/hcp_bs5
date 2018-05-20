@@ -25,7 +25,7 @@ error_log(__METHOD__);
         return '
         <div class="col-12">
           <h3>
-            <i class="fa fa-globe fa-fw"></i> Aliases
+            <i class="fa fa-globe"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
               <small><i class="fas fa-plus-circle fa-fw"></i></small>
             </a>
@@ -55,8 +55,8 @@ $(document).ready(function() {
     "ajax": "?x=json&o=valias&m=list",
     "order": [[ 5, "desc" ]],
     "columnDefs": [
-      {"targets":0,   "className":"text-truncate", "width":"25%"},
-      {"targets":3,   "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":0,   "className":"text-truncate", "width":"30%"},
+      {"targets":3,   "className":"text-right", "width":"1rem", "sortable": false},
       {"targets":4,   "visible":false},
       {"targets":5,   "visible":false},
     ],
