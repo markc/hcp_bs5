@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vhosts.php 20180518
+// lib/php/plugins/vhosts.php 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
@@ -134,9 +134,11 @@ error_log(__METHOD__);
 
         if (util::is_post() && $this->g->in['i']) {
             $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            shell_exec("nohup sh -c 'sudo delvhost $domain' > /tmp/delvhost.log 2>&1 &");
-            util::log('Removed ' . $domain, 'success');
-            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            if ($domain) {
+                shell_exec("nohup sh -c 'sudo delvhost $domain' > /tmp/delvhost.log 2>&1 &");
+                util::log('Removed ' . $domain, 'success');
+                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            } else util::log('ERROR: domain does not exist');
         }
         return 'Error deleting item';
     }
