@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vmails.php 20180513
+// lib/php/plugins/vmails.php 20180530
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vmails extends Plugin
@@ -47,10 +47,10 @@ error_log(__METHOD__);
             $active = $active ? 1 : 0;
             $spamf  = $spamf ? 1 : 0;
 
-            if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
-                util::log('Email address is invalid');
-                $_POST = []; return $this->read();
-            }
+//            if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
+//                util::log('Email address is invalid');
+//                $_POST = []; return $this->read();
+//            }
 
             if ($passwd1 && $passwd2) {
                 if (!util::chkpw($passwd1, $passwd2)) {
@@ -70,8 +70,6 @@ error_log(__METHOD__);
                 ]);
             }
 
-            $spamf_old = db::read('spamf', 'id', $this->g->in['i'], '', 'col');
-
             $sql = "
  UPDATE `vmails` SET
         `active`    = :active,
@@ -86,7 +84,9 @@ error_log(__METHOD__);
                 'updated' => date('Y-m-d H:i:s'),
             ]);
 
+            $spamf_old = db::read('spamf', 'id', $this->g->in['i'], '', 'col');
             $spamf_buf = '';
+
             if ($spamf_old !== $spamf) {
                 $user_esc = trim(escapeshellarg($user), "'");
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
@@ -95,11 +95,11 @@ error_log(__METHOD__);
                 $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
             }
             util::log($spamf_buf . 'Mailbox details for ' . $user . ' have been saved', 'success');
-            util::ses('p', '', '1');
             return $this->list();
-        } elseif ($this->g->in['i']) {
-            return $this->read();
-        } else return 'Error updating item';
+//        } elseif ($this->g->in['i']) {
+//            return $this->read();
+        }
+        return 'Error updating item';
     }
 
     protected function delete() : string
@@ -111,26 +111,6 @@ error_log(__METHOD__);
             if ($user) util::exe("delvmail $user");
             else util::log('ERROR: user does not exist');
         }
-        return $this->list();
-    }
-
-
-    protected function delete2() : string
-    {
-error_log(__METHOD__);
-
-        if (util::is_post() && $this->g->in['i']) {
-            $user = db::read('user', 'id', $this->g->in['i'], '', 'col');
-            if ($user) {
-                $retArr = []; $retVal = null;
-                $user_esc = trim(escapeshellarg($user), "'");
-                exec("sudo delvmail $user_esc 2>&1", $retArr, $retVal);
-                util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
-            } else {
-                util::log('ERROR: user does not exist');
-            }
-        }
-        util::ses('p', '', '1');
         return $this->list();
     }
 
@@ -148,12 +128,12 @@ error_log(__METHOD__);
                 }],
                 ['dt' => 1, 'db' => 'domain'],
                 ['dt' => 2, 'db' => '',           'formatter' => function($d, $row) {
-                    $percent = round(($row['size_mail'] / $row['quota']) * 100);
-                    $pbuf    = $percent > 9 ? $percent.'%' : '';
-                    $pbar    = $percent >= 90 ? 'bg-danger' : ($percent >= 75 ? 'bg-warning' : '');
+                    $pcnt = round(($row['size_mail'] / $row['quota']) * 100);
+                    $pbuf = $pcnt > 9 ? $pcnt.'%' : '';
+                    $pbar = $pcnt >= 90 ? 'bg-danger' : ($pcnt >= 75 ? 'bg-warning' : '');
                     return '
                       <div class="progress">
-                        <div class="progress-bar ' . $pbar . '" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $percent . '%;">
+                        <div class="progress-bar ' . $pbar . '" role="progressbar" aria-valuenow="' . $pcnt . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $pcnt . '%;">
                           ' . $pbuf . '
                         </div>
                       </div>';
