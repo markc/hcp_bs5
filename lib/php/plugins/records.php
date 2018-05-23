@@ -1,19 +1,14 @@
 <?php
-// lib/php/plugins/records.php 20150101 - 20170423
-// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/records.php 20150101 - 20180523
+// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Records extends Plugin
 {
     protected
     $tbl = 'records',
     $in = [
-        'auth'        => 1, // ?
-        'change_date' => '', // ?
         'content'     => '',
-        'disabled'    => 0, // ?
-        'domain_id'   => null,
         'name'        => '',
-        'ordername'   => '', // ?
         'prio'        => 0,
         'ttl'         => 300,
         'type'        => '',
@@ -32,37 +27,53 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
-            $sql = "
- SELECT name FROM domains
-  WHERE id = :did";
+        if (util::is_post()) {
+            if (empty($this->in['content'])) {
+                util::log('Content must not be empty');
+            } elseif ($this->in['name'] && !preg_match('/^[a-zA-Z0-9_-]/', $this->in['name'])) {
+                util::log('Record name must only contain lower case letters, numbers, _ and -');
+            } else {
+                $this->in['ttl'] = intval($this->in['ttl']);
+                $this->in['prio'] = intval($this->in['prio']);
+                $domain = util::enc($_POST['domain']);
+                $did = intval(util::enc($_POST['did']));
+                $now = date('Y-m-d H:i:s');
 
-            $domain = db::qry($sql, ['did' => $this->in['domain_id']], 'col');
-            $this->in['updated'] = date('Y-m-d H:i:s');
-            $this->in['created'] = date('Y-m-d H:i:s');
-            $this->in['name'] = $this->in['name']
-                ? $this->in['name'] . '.' . $domain
-                : $domain;
-            $lid = db::create($this->in);
-            util::log('Created DNS record ID: ' . $lid, 'success');
-            $this->g->in['i'] = $this->in['domain_id'];
+                if ($this->in['type'] === 'TXT') {
+                    $this->in['content'] = '"' . trim($this->in['content'], '"') . '"';
+                }
+                $this->in['updated'] = $now;
+                $this->in['created'] = $now;
+                $this->in['name'] = $this->in['name']
+                    ? strtolower($this->in['name'] . '.' . $domain)
+                    : $domain;
+                $this->in['domain_id'] = $did;
+                $lid = db::create($this->in);
+                $this->update_domains($did, $now);
+                util::log('Created DNS record ID: ' . $lid . ' for ' . $domain, 'success');
+            }
+            $this->g->in['i'] = $did;
             return $this->list();
         }
-        return $this->t->create($this->in);
+        return 'Error creating DNS record';
     }
 
     protected function update() : string
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
-            $this->in['disabled'] = isset($_POST['active']) && $_POST['active'] ? 0 : 1;
-            $res = db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            // TODO check $res ???
-            util::log('Updated DNS record ID: ' . $this->g->in['i'], 'success');
-            $this->g->in['i'] = $this->in['domain_id'];
-            return $this->list();
-        } elseif ($this->g->in['i']) {
+        if (util::is_post()) {
+            $this->in['ttl'] = intval($this->in['ttl']);
+            $this->in['prio'] = intval($this->in['prio']);
+            $dom = util::enc($_POST['domain']);
+            $did = intval(util::enc($_POST['did']));
+            $now = date('Y-m-d H:i:s');
+
+            $this->in['updated'] = $now;
+            db::update($this->in, [['id', '=', $this->g->in['i']]]);
+            $this->update_domains($did, $now);
+            util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
+            $this->g->in['i'] = $did;
             return $this->list();
         }
         return 'Error updating DNS record';
@@ -72,40 +83,76 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['i']) {
-            $res = db::delete([['id', '=', $this->g->in['i']]]);
-            // TODO check $res ???
-            util::log('Deleted DNS record ID: ' . $this->g->in['i'], 'success');
-            util::ses('p', '', '1');
-            $this->g->in['i'] = $this->in['domain_id'];
+        if (util::is_post()) {
+            $dom = util::enc($_POST['domain']);
+            $did = intval(util::enc($_POST['did']));
+            $now = date('Y-m-d H:i:s');
+
+            db::delete([['id', '=', $this->g->in['i']]]);
+            $this->update_domains($did, $now);
+            util::log('Deleted DNS record ID: ' . $this->g->in['i'] . ' from ' . $dom, 'success');
+            $this->g->in['i'] = $did;
             return $this->list();
         }
-        return 'Error deleting item';
+        return 'Error deleting DNS record';
     }
 
     protected function list() : string
     {
 error_log(__METHOD__);
 
-          $sql = "
+        if ($this->g->in['x'] === 'json') {
+            $columns = [
+                ['dt' => 0,  'db' => 'name'],
+                ['dt' => 1,  'db' => 'content'],
+                ['dt' => 2,  'db' => 'type'],
+                ['dt' => 3,  'db' => 'prio'],
+                ['dt' => 4,  'db' => 'ttl'],
+                ['dt' => 5,  'db' => 'id', 'formatter' => function($d) {
+                    return '
+                    <a class="update" href="" title="Update DNS record ID: ' . $d . '" data-rowid="' . $d . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a class="delete" href="" title="Delete DNS record ID: ' . $d . '" data-rowid="' . $d . '">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 6,  'db' => 'active'],
+                ['dt' => 7,  'db' => 'did'],
+                ['dt' => 8,  'db' => 'domain'],
+                ['dt' => 9,  'db' => 'updated'],
+            ];
+            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, 'did=' . $_GET['did']), JSON_PRETTY_PRINT);
+        }
+
+        $domain = db::qry("
  SELECT name FROM domains
-  WHERE id = :did";
+  WHERE id = :did", ['did' => $this->g->in['i']], 'col'); // i = domain id at this point
 
-        $domain = db::qry($sql, ['did' => $this->g->in['i']], 'col');
+        return $this->t->list(['domain' => $domain, 'did' => $this->g->in['i']]);
+    }
 
-        $sql = "
- SELECT id,name,type,content,ttl,disabled,prio AS priority
+    private function update_domains(int $did, string $now) : bool
+    {
+error_log(__METHOD__);
+
+        if ($did && $now) {
+            $sql = "
+ SELECT content
    FROM records
-  WHERE (name LIKE '' OR 1) AND
-        (content LIKE '' OR 1) AND
-        (domain_id = :did) AND
-        (type != 'SOA')";
+  WHERE type='SOA'
+    AND domain_id=:did";
 
-        return $this->t->update(array_merge(
-            ['domain' => $domain],
-            ['domain_id' => $this->g->in['i']],
-            db::qry($sql, ['did' => $this->g->in['i']])
-        ));
+            $soa = util::inc_soa(db::qry($sql, ['did' => $did], 'col'));
+            $sql = "
+ UPDATE records
+    SET content=:content
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            db::qry($sql, ['did' => $did, 'content' => $soa]);
+            db::$tbl = 'domains';
+            return db::update(['updated' => $now], [['id', '=', $did]]);
+        }
+        return false;
     }
 }
 

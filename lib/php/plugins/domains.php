@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/domains.php 20150101 - 20180510
+// lib/php/plugins/domains.php 20150101 - 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
@@ -240,7 +240,6 @@ error_log(__METHOD__);
             $res2 = db::delete([['id', '=', $this->g->in['i']]]);
             // TODO check $res1 and $res2 ???
             util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
-            util::ses('p', '', '1');
             return $this->list();
         }
         return 'Error deleting item';
@@ -252,7 +251,11 @@ error_log(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['dt' => 0,   'db' => 'name',       'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0,   'db' => 'name',       'formatter' => function($d, $row) {
+                    return ($row['type'] === 'MASTER') ? '
+                    <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
+                      <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
+                }],
                 ['dt' => 1,   'db' => 'type'],
                 ['dt' => 2,   'db' => 'records'],
                 ['dt' => 3,   'db' => 'soa',        'formatter' => function($d, $row) {
@@ -260,17 +263,11 @@ error_log(__METHOD__);
                     return ($row['type'] === 'MASTER') ? '
         <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
                 }],
-                ['dt' => 4,   'db' => 'id',         'formatter' => function($d, $row) {
-                    return '
-                    <a class="editlink" href="?o=records&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['name'] . '">
-                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-                    <a href="?o=valias&m=delete&i=' . $row['id'] . '" title="Remove Domain" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['name'] . '?\')">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
-                }],
-                ['dt' => 5, 'db' => 'updated'],
+                ['dt' => 4,   'db' => 'updated'],
+                ['dt' => 5,   'db' => 'id'],
             ];
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
-        return $this->t->list([]);    
+        return $this->t->list([]);
     }
 }

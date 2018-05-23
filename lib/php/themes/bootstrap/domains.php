@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/domains.php 20170225 - 20180512
+// lib/php/themes/bootstrap/domains.php 20170225 - 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
@@ -22,71 +22,55 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return '
-        <div class="col-12">
-          <h3>
-            <i class="fas fa-globe fa-fw"></i> Domains
-            <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
-              <small><i class="fas fa-plus-circle fa-fw"></i></small>
-            </a>
-          </h3>
-        </div>
-      </div><!-- END UPPER ROW -->
-      <div class="row">
-        <div class="table-responsive">
-          <table id=domains class="table table-sm" style="min-width:1100px;table-layout:fixed">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Records</th>
-                <th>Serial</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Domain</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-              <form method="post" action="' . $this->g->cfg['self'] . '">
-            <div class="modal-body">
-              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-              <input type="hidden" name="m" value="create">
-              <div class="form-group">
-                <label for="domain" class="form-control-label">Name</label>
+        $create = $this->modal([
+            'id'      => 'createmodal',
+            'title'   => 'Create DNS Zone',
+            'action'  => 'create',
+            'footer'  => 'Create',
+            'body'    => '
+            <div class="form-group">
+                <label for="domain" class="form-control-label">Domain</label>
                 <input type="text" class="form-control" id="domain" name="domain">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Add New Domain</button>
-            </div>
-              </form>
+              </div>',
+        ]);
+
+        return '
+          <div class="col-12">
+            <h3>
+              <i class="fas fa-globe fa-fw"></i> Domains
+              <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
+                <small><i class="fas fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h3>
           </div>
-        </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <div class="table-responsive">
+            <table id="domains" class="table table-sm" style="min-width:1100px;table-layout:fixed">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Serial</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>' . $create . '
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=domains&m=list",
-    "order": [[ 5, "desc" ]],
+    "order": [[ 4, "desc" ]],
     "columnDefs": [
-      {"targets":0,   "className":"text-truncate", "width":"25%"},
-      {"targets":4,   "className":"text-right", "width":"4rem", "sortable": false},
-      {"targets":5,   "visible":false},
+      {"targets":0, "className":"text-truncate", "width":"40%"},
+      {"targets":4, "visible":false},
+      {"targets":5, "visible":false},
     ],
   });
   $(document).on("click", ".serial", {}, (function() {
@@ -127,7 +111,11 @@ error_log(__METHOD__);
 
         return '
           <div class="col-12">
-            <h3><a href="?o=domains&m=list">&laquo;</a> ' . $header . $serial . '</h3>
+          <h3>
+            <i class="fa fa-globe fa-fw"></i>  ' . $header . $serial . '
+            <a href="" title="Add new domain" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
+          </h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">

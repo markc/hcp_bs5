@@ -335,9 +335,7 @@ error_log(__METHOD__);
                 ['dt' => 1, 'db' => 'target', 'formatter' => function($d) { return str_replace(',', '<br>', $d); }],
                 ['dt' => 2, 'db' => 'domain'],
                 ['dt' => 3, 'db' => 'active', 'formatter' => function($d) {
-                    return $d
-                        ? '<i class="fas fa-check text-success"></i>'
-                        : '<i class="fas fa-times text-danger"></i>';
+                    return '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>';
                 }],
                 ['dt' => 4, 'db' => 'id'],
                 ['dt' => 5, 'db' => 'updated'],

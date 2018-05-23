@@ -21,7 +21,7 @@ error_log(__METHOD__);
         return ['', ''];
     }
 
-    private static function enc(string $v) : string
+    public static function enc(string $v) : string
     {
 error_log(__METHOD__."($v)");
 
@@ -327,6 +327,20 @@ error_log(__METHOD__);
         session_name($name);
         session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
         return session_start();
+    }
+
+    public static function inc_soa(string $soa) : string
+    {
+error_log(__METHOD__);
+
+        $ary = explode(' ', $soa);
+        $ymd = date('Ymd');
+        $day = substr($ary[2], 0, 8);
+        $rev = substr($ary[2], -2);
+        $ary[2] = ($day == $ymd)
+            ? "$ymd" . sprintf("%02d", $rev + 1)
+            : "$ymd" . "00";
+        return implode(' ', $ary);
     }
 }
 

@@ -167,9 +167,7 @@ error_log(__METHOD__);
                 ['dt' => 11, 'db' => null,          'formatter' => function($d) { return '/'; } ],
                 ['dt' => 12, 'db' => 'diskquota',   'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 13, 'db' => 'active',      'formatter' => function($d) {
-                    return $d
-                        ? '<i class="fas fa-check text-success"></i>'
-                        : '<i class="fas fa-times text-danger"></i>';
+                    return '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>';
                 }],
                 ['dt' => 14, 'db' => 'id'],
                 ['dt' => 15, 'db' => 'updated'],

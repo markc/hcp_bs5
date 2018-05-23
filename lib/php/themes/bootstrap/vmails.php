@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180518
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
@@ -8,21 +8,13 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
     {
 error_log(__METHOD__);
 
-        extract($in);
-
-        $actbuf = ($active ? 1 : 0) ? ' checked' : '';
-        $spmbuf = ($spamf  ? 1 : 0) ? ' checked' : '';
-        $pword1 = $passwd1 ?? '';
-        $pword2 = $passwd2 ?? '';
-        $remove = $this->g->in['m'] === 'create' ? '' : $this->modal([
+        $remove = $this->modal([
             'id'      => 'removemodal',
             'title'   => 'Remove Mailbox',
             'action'  => 'delete',
             'footer'  => 'Remove',
-            'hidden'  => '
-                <input type="hidden" name="i" value="' . $id . '">',
             'body'    => '
-                  <p class="text-center">Are you sure you want to remove this mailbox?<br><b>' . $user . '</b></p>',
+                  <p class="text-center">Are you sure you want to remove this mailbox?<br><b>' . $in['user'] . '</b></p>',
         ]);
 
         return '
@@ -44,22 +36,22 @@ error_log(__METHOD__);
                   <div class="row">
                     <div class="form-group col-4">
                       <label for="domain">Email Address</label>
-                      <input type="text" class="form-control" value="' . $user . '" disabled>
+                      <input type="text" class="form-control" value="' . $in['user'] . '" disabled>
                     </div>
                     <div class="form-group col-2">
                       <label for="quota">Mailbox Quota</label>
-                      <input type="number" class="form-control" name="quota" id="quota" value="' . intval($quota / 1000000) . '">
+                      <input type="number" class="form-control" name="quota" id="quota" value="' . intval($in['quota'] / 1000000) . '">
                     </div>
                     <div class="col-3">
                       <div class="form-group">
                         <label for="passwd1">Password</label>
-                        <input type="password" class="form-control" name="passwd1" id="passwd1" value="' . $pword1 . '">
+                        <input type="password" class="form-control" name="passwd1" id="passwd1" value="' . $in['password1'] . '">
                       </div>
                     </div>
                     <div class="col-3">
                       <div class="form-group">
                         <label for="passwd2">Confirm Password</label>
-                        <input type="password" class="form-control" name="passwd2" id="passwd2" value="' . $pword2 . '">
+                        <input type="password" class="form-control" name="passwd2" id="passwd2" value="' . $in['password2'] . '">
                       </div>
                     </div>
                   </div>
@@ -67,7 +59,7 @@ error_log(__METHOD__);
                     <div class="col-4">
                       <div class="form-group">
                         <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . $spmbuf . '>
+                          <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . ($in['spamf'] ? ' checked' : '') . '>
                           <label class="custom-control-label" for="spamf">Spam Filter</label>
                         </div>
                       </div>
@@ -75,7 +67,7 @@ error_log(__METHOD__);
                     <div class="col-4">
                       <div class="form-group">
                         <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" name="active" id="active"' . $actbuf . '>
+                          <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in['active'] ? ' checked' : '') . '>
                           <label class="custom-control-label" for="active">Active</label>
                         </div>
                       </div>
@@ -95,7 +87,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $createmodal = $this->modal([
+        $create = $this->modal([
             'id'      => 'createmodal',
             'title'   => 'Create New Mailbox',
             'action'  => 'create',
@@ -141,7 +133,7 @@ error_log(__METHOD__);
             <tbody>
             </tbody>
           </table>
-        </div>' . $createmodal . '
+        </div>' . $create . '
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({
