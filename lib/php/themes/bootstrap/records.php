@@ -137,26 +137,27 @@ $(document).ready(function() {
     $("#m").val("Create");
     $("#m").attr("class", "btn btn-success");
     $("#m").removeAttr("disabled");
+    $("#name").val("");
+    $("#content").val("");
     return false;
   });
 
-   $(document).on("click", ".delete", {}, function() {
+  $(document).on("click", ".delete", {}, function() {
     $("#m").val("Delete");
     $("#m").attr("class", "btn btn-danger");
     $("#m").removeAttr("disabled");
     return false;
   });
 
-   $(document).on("click", ".update", {}, function() {
+  $(document).on("click", ".update", {}, function() {
     $("#m").val("Update");
     $("#m").attr("class", "btn btn-primary");
     $("#m").removeAttr("disabled");
     return false;
   });
 
- $(document).on("click", ".update,.delete", {}, function() {
+  $(document).on("click", ".update,.delete", {}, function() {
     var row = $(this).closest("tr");
-//    $("#i").val(row.attr("data-rowid"));
     $("#i").val($(this).attr("data-rowid"));
     $("#name").val(row.find("td:eq(0)").text());
     $("#content").val(row.find("td:eq(1)").text());

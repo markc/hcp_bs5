@@ -1,4 +1,4 @@
-# NetServa HCP (BETA 1)
+# NetServa HCP (BETA 2)
 
 This is an ultra simple PHP based **Hosting Control Panel** for a lightweight
 Mail, Web and DNS server on an uptodate Ubuntu Server. It depends on the
@@ -34,16 +34,16 @@ the [NetServa SH] repo for more information about how to use these aliases
 and scripts directly. This `HCP` project is just a web based frontend for
 the `SH` system which does all the real provisioning and management work.
 
-The first step, after installing the `SH` scripts, is to make sure the 
-current host has a hostname and a domainname. The domainname needs to be 
-valid if using a publically accessible server and that needs the assistence 
-of a real DNS service. Otherwise, if using a local LAN with private IPs 
-(like 192.168.\*, 10.\* or 172.\*) then you can make up any domainname as 
-long as your are consistent within your local LAN. Using something like 
-`netserva.lan` is a good candidate unless you prefer something else. The 
-hostname of your current host computer is usually determined when the OS is 
-installed but can be changed by editing `/etc/hostname` and making sure 
-`/etc/resolv.conf` has a reference like `search netserva.lan`. Once you get 
+The first step, after installing the `SH` scripts, is to make sure the
+current host has a hostname and a domainname. The domainname needs to be
+valid if using a publically accessible server and that needs the assistence
+of a real DNS service. Otherwise, if using a local LAN with private IPs
+(like 192.168.\*, 10.\* or 172.\*) then you can make up any domainname as
+long as your are consistent within your local LAN. Using something like
+`netserva.lan` is a good candidate unless you prefer something else. The
+hostname of your current host computer is usually determined when the OS is
+installed but can be changed by editing `/etc/hostname` and making sure
+`/etc/resolv.conf` has a reference like `search netserva.lan`. Once you get
 results like this...
 
     ~ hostname
@@ -98,9 +98,9 @@ local LXD container) and...
     curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
     setup-all
 
-This may take 5 or 15 mintes to complete depending on the bandwidth
+This may take 5 to 15 mintes to complete depending on the bandwidth
 available to the target server. Once finished you should be able to go to
-`https://real.netserva.lan/adm` and login to the HCP web interface using the
+`https://c1.netserva.lan/hcp` and login to the HCP web interface using the
 simple sitewide HTTP `sysadm/1234` authentication first then the real admin
 username and password available with `cat ~/.vhosts/$(hostname -f).conf`.
 

@@ -28,31 +28,14 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if (util::is_post()) {
-            if (empty($this->in['content'])) {
-                util::log('Content must not be empty');
-            } elseif ($this->in['name'] && !preg_match('/^[a-zA-Z0-9_-]/', $this->in['name'])) {
-                util::log('Record name must only contain lower case letters, numbers, _ and -');
-            } else {
-                $this->in['ttl'] = intval($this->in['ttl']);
-                $this->in['prio'] = intval($this->in['prio']);
-                $domain = util::enc($_POST['domain']);
-                $did = intval(util::enc($_POST['did']));
-                $now = date('Y-m-d H:i:s');
-
-                if ($this->in['type'] === 'TXT') {
-                    $this->in['content'] = '"' . trim($this->in['content'], '"') . '"';
-                }
-                $this->in['updated'] = $now;
-                $this->in['created'] = $now;
-                $this->in['name'] = $this->in['name']
-                    ? strtolower($this->in['name'] . '.' . $domain)
-                    : $domain;
-                $this->in['domain_id'] = $did;
-                $lid = db::create($this->in);
-                $this->update_domains($did, $now);
-                util::log('Created DNS record ID: ' . $lid . ' for ' . $domain, 'success');
+            $in = $this->validate($this->in);
+            if (!empty($in)) {
+                $in['created'] = $in['updated'];
+                $lid = db::create($in);
+                $this->update_domains($in['domain_id'], $in['updated'] );
+                util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
             }
-            $this->g->in['i'] = $did;
+            $this->g->in['i'] = intval(util::enc($_POST['did']));
             return $this->list();
         }
         return 'Error creating DNS record';
@@ -63,17 +46,14 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         if (util::is_post()) {
-            $this->in['ttl'] = intval($this->in['ttl']);
-            $this->in['prio'] = intval($this->in['prio']);
-            $dom = util::enc($_POST['domain']);
-            $did = intval(util::enc($_POST['did']));
-            $now = date('Y-m-d H:i:s');
-
-            $this->in['updated'] = $now;
-            db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            $this->update_domains($did, $now);
-            util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
-            $this->g->in['i'] = $did;
+            $in = $this->validate($this->in);
+            if (!empty($in)) {
+                $in['created'] = $in['updated'];
+                db::update($this->in, [['id', '=', $this->g->in['i']]]);
+                $this->update_domains($in['domain_id'], $in['updated'] );
+                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
+            }
+            $this->g->in['i'] = intval(util::enc($_POST['did']));
             return $this->list();
         }
         return 'Error updating DNS record';
@@ -153,6 +133,35 @@ error_log(__METHOD__);
             return db::update(['updated' => $now], [['id', '=', $did]]);
         }
         return false;
+    }
+
+    private function validate(array $in) : array
+    {
+error_log(__METHOD__);
+
+        if (empty($in['content'])) {
+            util::log('Content must not be empty');
+            return [];
+        } elseif ($in['name'] && !preg_match('/^[a-zA-Z0-9_-]/', $in['name'])) {
+            util::log('Record name must only contain letters, numbers, _ and -');
+            return [];
+        } elseif (($in['type'] === 'A') && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
+            util::log('An "A" record must contain a legitimate IP');
+            return [];
+        }
+        if ($in['type'] === 'TXT')
+            $in['content'] = '"' . trim($in['content'], '"') . '"';
+
+        $domain = strtolower(util::enc($_POST['domain']));
+        $in['name'] = strtolower(rtrim(str_replace($domain, $in['name']), '.'));
+        $in['name'] = $in['name'] ? $in['name'] . '.' . $domain : $domain;
+
+        $in['ttl'] = intval($in['ttl']);
+        $in['prio'] = intval($in['prio']);
+        $in['updated'] = date('Y-m-d H:i:s');
+        $in['domain_id'] = intval(util::enc($_POST['did']));
+
+        return $in;
     }
 }
 
