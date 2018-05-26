@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vhosts.php 20180512
+// lib/php/plugins/vhosts.php 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
@@ -24,7 +24,7 @@ class Plugins_Vhosts extends Plugin
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
 
@@ -70,13 +70,21 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $diskquota *= 1000000;
             $mailquota *= 1000000;
             $active = $active ? 1 : 0;
 
-            if ($mailquota > $diskquota) {
+            $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
+error_log("domain=$domain");
+
+            if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
+                util::log('Domain name is invalid');
+                $_POST = []; return $this->read();
+            }
+
+           if ($mailquota > $diskquota) {
                 util::log('Mailbox quota exceeds disk quota');
                 $_POST = []; return $this->read();
             }
@@ -90,11 +98,6 @@ error_log(__METHOD__);
 //                util::log('Mailbox quota must be greater than current used diskspace of ' . util::numfmt($size_upath));
 //                $_POST = []; return $this->read();
 //            }
-
-            if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
-                util::log('Domain name is invalid');
-                $_POST = []; return $this->read();
-            }
 
             $sql = "
  UPDATE `vhosts` SET
@@ -119,7 +122,6 @@ error_log(__METHOD__);
             ]);
 
             util::log('Vhost ID ' . $this->g->in['i'] . ' updated', 'success');
-            util::ses('p', '', '1');
             return $this->list();
         } elseif ($this->g->in['i']) {
             return $this->read();
@@ -130,12 +132,13 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($this->g->in['i']) {
-            $vhost = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-            $vhost_esc = trim(escapeshellarg($vhost), "'");
-            shell_exec("nohup sh -c 'sudo delvhost $vhost_esc' > /tmp/delvhost.log 2>&1 &");
-            util::log('Removed ' . $vhost, 'success');
-            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+        if (util::is_post() && $this->g->in['i']) {
+            $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
+            if ($domain) {
+                shell_exec("nohup sh -c 'sudo delvhost $domain' > /tmp/delvhost.log 2>&1 &");
+                util::log('Removed ' . $domain, 'success');
+                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            } else util::log('ERROR: domain does not exist');
         }
         return 'Error deleting item';
     }
@@ -146,7 +149,11 @@ error_log(__METHOD__);
 
        if ($this->g->in['x'] === 'json') {
             $columns = [
-                ['dt' => 0,  'db' => 'domain',      'formatter' => function($d) { return "<b>$d</b>"; }],
+                ['dt' => 0,  'db' => 'domain',      'formatter' => function($d, $row) {
+                    return '
+                    <a class="editlink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update VHOST">
+                      <b>' . $row['domain'] . '</b></a>';
+                }],
                 ['dt' => 1,  'db' => 'num_aliases'],
                 ['dt' => 2,  'db' => null,          'formatter' => function($d) { return '/'; } ],
                 ['dt' => 3,  'db' => 'aliases'],
@@ -159,15 +166,8 @@ error_log(__METHOD__);
                 ['dt' => 10, 'db' => 'size_upath',  'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 11, 'db' => null,          'formatter' => function($d) { return '/'; } ],
                 ['dt' => 12, 'db' => 'diskquota',   'formatter' => function($d) { return util::numfmt(intval($d)); }],
-                ['dt' => 13, 'db' => 'active',      'formatter' => function($d, $row) {
-                    $active_buf = $d
-                        ? '<i class="fas fa-check text-success"></i>'
-                        : '<i class="fas fa-times text-danger"></i>';
-                    return $active_buf . '
-                    <a class="editlink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update entry for ' . $row['domain'] . '">
-                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-                    <a href="?o=vhosts&m=delete&i=' . $row['id'] . '" title="Remove Vhost" onClick="javascript: return confirm(\'Are you sure you want to remove: ' . $row['domain'] . '?\')">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                ['dt' => 13, 'db' => 'active',      'formatter' => function($d) {
+                    return '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>';
                 }],
                 ['dt' => 14, 'db' => 'id'],
                 ['dt' => 15, 'db' => 'updated'],

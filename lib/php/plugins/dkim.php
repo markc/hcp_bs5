@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/dkim.php 20180511 - 20180516
+// lib/php/plugins/dkim.php 20180511 - 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Dkim extends Plugin
@@ -25,7 +25,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $domain = trim(escapeshellarg(explode('._domainkey.', $this->in['dnstxt'])[1]), "'");
+        $domain = trim(escapeshellarg(explode('._domainkey.', $this->in['dnstxt'])[1]), "'"); // too fragile?
         exec("sudo dkim show $domain 2>&1", $retArr, $retVal);
         $buf = '
         <b>' . $retArr[0] . '</b><br>

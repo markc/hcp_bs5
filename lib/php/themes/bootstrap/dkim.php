@@ -8,7 +8,7 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
     {
 error_log(__METHOD__);
 
-        $removemodal = $this->modal([
+        $remove = $this->modal([
             'id'      => 'removemodal',
             'title'   => 'Remove DKIM Record',
             'action'  => 'delete',
@@ -16,7 +16,7 @@ error_log(__METHOD__);
             'hidden'  => '
                 <input type="hidden" name="domain" value="' . $in['domain'] . '">',
             'body'    => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for:<br><b>' . $in['domain'] . '</b></p>',
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
         ]);
 
         return '
@@ -24,8 +24,7 @@ error_log(__METHOD__);
               <h3>
                 <a href="?o=dkim&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> DKIM
                 <a href="" title="Remove this DKIM record" data-toggle="modal" data-target="#removemodal">
-                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
-                </a>
+                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>
               </h3>
             </div>
           </div><!-- END UPPER ROW -->
@@ -33,7 +32,7 @@ error_log(__METHOD__);
             <div class="col-12">' . $in['buf'] . '
             </div>
           </div>
-        </div>' . $removemodal;
+        </div>' . $remove;
 
     }
 
@@ -41,12 +40,13 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $keylen_buf = $this->dropdown([
+        $keybuf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],
-        ], 'bits', '', '', 'custom-select');
+            ['4096', '4096'],
+        ], 'keylen', '', '', 'custom-select');
 
-        $createmodal = $this->modal([
+        $create = $this->modal([
             'id'      => 'createmodal',
             'title'   => 'Create DKIM Record',
             'action'  => 'create',
@@ -60,12 +60,12 @@ error_log(__METHOD__);
                     <div class="col-6">
                       <div class="form-group">
                         <label for="selector" class="form-control-label">Selector</label>
-                        <input type="text" class="form-control" id="selector" name="selector" value="dkim">
+                        <input type="text" class="form-control" id="select" name="select" value="dkim">
                       </div>
                     </div>
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="bits" class="form-control-label">Key Length</label>' . $keylen_buf . '
+                        <label for="keylen" class="form-control-label">Key Length</label>' . $keybuf . '
                       </div>
                     </div>
                   </div>',
@@ -76,8 +76,7 @@ error_log(__METHOD__);
               <h3>
                 <i class="fas fa-address-card fa-fw"></i> DKIM
                 <a href="#" title="Add New DKIM Key" data-toggle="modal" data-target="#createmodal">
-                  <small><i class="fas fa-plus-circle fa-fw"></i></small>
-                </a>
+                  <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
               </h3>
             </div>
           </div><!-- END UPPER ROW -->
@@ -85,7 +84,7 @@ error_log(__METHOD__);
             <div class="col-12">' . $in['buf'] . '
             </div>
           </div>
-        </div>' . $createmodal;
+        </div>' . $create;
     }
 }
 

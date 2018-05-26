@@ -48,6 +48,8 @@ error_log(__METHOD__);
  INSERT INTO `" . self::$tbl . "` ($fields)
  VALUES ($values)";
 
+error_log("sql=$sql");
+
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
@@ -76,6 +78,8 @@ error_log(__METHOD__);
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
 
+error_log("sql=$sql");
+
         return self::qry($sql, $a, $type);
     }
 
@@ -100,6 +104,8 @@ error_log(__METHOD__);
  UPDATE `" . self::$tbl . "` SET$set_str
   WHERE$where_str";
 
+error_log("sql=$sql");
+
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
@@ -123,6 +129,8 @@ error_log(__METHOD__);
         $sql = "
  DELETE FROM `" . self::$tbl . "`
   WHERE $where_str";
+
+error_log("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
@@ -177,7 +185,7 @@ error_log(__METHOD__);
 
     // See http://datatables.net/usage/server-side
 
-    public static function simple($request, $table, $primaryKey, $columns)
+    public static function simple($request, $table, $primaryKey, $columns, $extra='')
     {
 error_log(__METHOD__);
 
@@ -188,6 +196,11 @@ error_log(__METHOD__);
         $limit  = self::limit($request, $columns);
         $order  = self::order($request, $columns);
         $where  = self::filter($request, $columns, $bind);
+
+        if ($extra) $where .= $where ? " AND ($extra)" : " WHERE $extra";
+
+error_log("where=$where");
+
         $query  = "
  SELECT $cols
    FROM `$table` $where $order $limit";
@@ -338,6 +351,8 @@ error_log(__METHOD__);
     public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
 error_log(__METHOD__);
+
+error_log("sql=$sql");
 
         // Argument shifting
         if ($sql === null) {

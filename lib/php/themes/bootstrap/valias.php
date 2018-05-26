@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180512
+// lib/php/themes/bootstrap/valias.php 20170101 - 20180518
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
@@ -25,7 +25,7 @@ error_log(__METHOD__);
         return '
         <div class="col-12">
           <h3>
-            <i class="fa fa-globe fa-fw"></i> Aliases
+            <i class="fa fa-globe"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
               <small><i class="fas fa-plus-circle fa-fw"></i></small>
             </a>
@@ -55,15 +55,14 @@ $(document).ready(function() {
     "ajax": "?x=json&o=valias&m=list",
     "order": [[ 5, "desc" ]],
     "columnDefs": [
-      {"targets":0,   "className":"text-truncate", "width":"25%"},
-      {"targets":3,   "className":"text-right", "width":"4rem", "sortable": false},
+      {"targets":0,   "className":"text-truncate", "width":"30%"},
+      {"targets":3,   "className":"text-right", "width":"1rem", "sortable": false},
       {"targets":4,   "visible":false},
       {"targets":5,   "visible":false},
     ],
   });
 });
         </script>';
-
     }
 
     private function editor(array $in) : string
@@ -73,19 +72,31 @@ error_log(__METHOD__);
         extract($in);
 
         $active = $active ? 1 : 0;
-        $header = $this->g->in['m'] === 'create' ? 'Add Alias' : 'Update Alias';
-        $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>
-                <button type="submit" name="m" value="create" class="btn btn-primary">Add Alias</button>' : '
-                <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=valias&m=delete&i=' . $id . '" title="Remove alias" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $source . '?\')">Remove</a>
-                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
-
-        $checked = $active ? ' checked' : '';
+        $actbuf = $active ? ' checked' : '';
+        $header = $this->g->in['m'] === 'create' ? 'Add new Alias' : 'Aliases
+                <a href="" title="Remove this Alias" data-toggle="modal" data-target="#removemodal">
+                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>';
+        $tolist = '
+                <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>';
+        $submit = $this->g->in['m'] === 'create' ? $tolist . '
+                <button type="submit" name="m" value="create" class="btn btn-primary">Add this Alias</button>' : $tolist . '
+                <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>';
+        $remove = $this->g->in['m'] === 'create' ? '' : $this->modal([
+            'id'      => 'removemodal',
+            'title'   => 'Remove Alias',
+            'action'  => 'delete',
+            'footer'  => 'Remove',
+            'hidden'  => '
+                <input type="hidden" name="i" value="' . $id . '">',
+            'body'    => '
+                  <p class="text-center">Are you sure you want to remove this alias?<br><b>' . $source . '</b></p>',
+        ]);
 
         return '
           <div class="col-12">
-            <h3><a href="?o=valias&m=list">&laquo;</a> ' . $header . '</h3>
+            <h3>
+              <a href="?o=valias&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> ' . $header . '
+            </h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
@@ -111,7 +122,7 @@ error_log(__METHOD__);
                 <div class="col-2 offset-md-6">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $checked . '>
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $actbuf . '>
                       <label class="custom-control-label" for="active">Active</label>
                     </div>
                   </div>
@@ -122,7 +133,7 @@ error_log(__METHOD__);
                 </div>
               </div>
             </form>
-          </div>';
+          </div>' . $remove;
     }
 }
 

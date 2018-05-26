@@ -10,16 +10,25 @@ class Init
     {
 error_log(__METHOD__);
 
-        $g->cfg['host'] = $g->cfg['host']
-            ? $g->cfg['host']
-            : getenv('HOSTNAME');
-
-        Util::session_start($g->sess_cookie);
-        //$_SESSION = []; // to reset session for testing
 error_log('GET=' . var_export($_GET, true));
 
 error_log('POST=' . var_export($_POST, true));
 
+        $g->cfg['host'] = $g->cfg['host']
+            ? $g->cfg['host']
+            : getenv('HOSTNAME');
+
+//        if (defined('ABSPATH')) {
+//            $page = explode('&', $_GET['page']);
+//            foreach($page as $p) {
+//                [$k, $v] = explode('=', $p);
+//                $g->in[$k] = $v;
+//            }
+//        }
+
+        Util::session_start($g->sess_cookie);
+
+        //$_SESSION = []; // to reset session for testing
 error_log('SESSION=' . var_export($_SESSION, true));
 
         util::cfg($g);
@@ -42,7 +51,7 @@ error_log('SESSION=' . var_export($_SESSION, true));
             $g->out['main'] = (string) new $p($thm);
         } else $g->out['main'] = "Error: no plugin object!";
 
-        if (empty($g->in['x']))
+        if (empty($g->in['x']) && !defined('ABSPATH'))
             foreach ($g->out as $k => $v)
                 $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
     }
@@ -53,6 +62,7 @@ error_log(__METHOD__);
 
         $g = $this->t->g;
         $x = $g->in['x'];
+//        if ($x === 'text' || defined('ABSPATH')) {
         if ($x === 'text') {
             return $g->out['main'];
         } elseif ($x === 'json') {

@@ -1,26 +1,109 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180512
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180520
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
-    public function create(array $in) : string
+    function update(array $in) : string
     {
 error_log(__METHOD__);
 
-        return $this->editor($in);
-    }
+        $remove = $this->modal([
+            'id'      => 'removemodal',
+            'title'   => 'Remove Mailbox',
+            'action'  => 'delete',
+            'footer'  => 'Remove',
+            'body'    => '
+                  <p class="text-center">Are you sure you want to remove this mailbox?<br><b>' . $in['user'] . '</b></p>',
+        ]);
 
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
+        return '
+              <div class="col-12">
+                <h3>
+                  <a href="?o=vmails&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Mailboxes
+                  <a href="" title="Remove this Mailbox" data-toggle="modal" data-target="#removemodal">
+                    <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
+                  </a>
+                </h3>
+              </div>
+            </div><!-- END UPPER ROW -->
+            <div class="row">
+              <div class="col-12">
+                <form method="post" action="' . $this->g->cfg['self'] . '">
+                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                  <div class="row">
+                    <div class="form-group col-4">
+                      <label for="domain">Email Address</label>
+                      <input type="text" class="form-control" value="' . $in['user'] . '" disabled>
+                    </div>
+                    <div class="form-group col-2">
+                      <label for="quota">Mailbox Quota</label>
+                      <input type="number" class="form-control" name="quota" id="quota" value="' . intval($in['quota'] / 1000000) . '">
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="passwd1">Password</label>
+                        <input type="password" class="form-control" name="passwd1" id="passwd1" value="' . $in['password1'] . '">
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="passwd2">Confirm Password</label>
+                        <input type="password" class="form-control" name="passwd2" id="passwd2" value="' . $in['password2'] . '">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-4">
+                      <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . ($in['spamf'] ? ' checked' : '') . '>
+                          <label class="custom-control-label" for="spamf">Spam Filter</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-4">
+                      <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in['active'] ? ' checked' : '') . '>
+                          <label class="custom-control-label" for="active">Active</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-4 text-right">
+                    <div class="btn-group">
+                      <a class="btn btn-secondary" href="?o=vmails&m=list">&laquo; Back</a>
+                      <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>' . $remove;
     }
 
     public function list(array $in) : string
     {
 error_log(__METHOD__);
+
+        $create = $this->modal([
+            'id'      => 'createmodal',
+            'title'   => 'Create New Mailbox',
+            'action'  => 'create',
+            'footer'  => 'Create',
+            'body'    => '
+                  <div class="form-group">
+                    <label for="user" class="form-control-label">Mailbox</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
+                      <label class="custom-control-label" for="spamf">Spam Filter</label>
+                    </div>
+                  </div>',
+        ]);
 
         return '
         <div class="col-12">
@@ -50,41 +133,7 @@ error_log(__METHOD__);
             <tbody>
             </tbody>
           </table>
-        </div>
-        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Mailboxes</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form method="post" action="' . $this->g->cfg['self'] . '">
-                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                <input type="hidden" name="m" value="create">
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="user" class="form-control-label">Mailbox</label>
-                    <input type="text" class="form-control" id="user" name="user">
-                  </div>
-                  <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
-                      <label class="custom-control-label" for="spamf">Spam Filter</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Add New Mailbox</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        </div>' . $create . '
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({
@@ -106,88 +155,6 @@ $(document).ready(function() {
   });
 });
         </script>';
-    }
-
-    function editor(array $in) : string
-    {
-error_log(__METHOD__);
-
-        extract($in);
-
-        $active_checked = ($active ? 1 : 0) ? ' checked' : '';
-        $filter_checked = ($spamf ? 1 : 0) ? ' checked' : '';
-
-        $passwd1  = $passwd1 ?? '';
-        $passwd2  = $passwd2 ?? '';
-
-        $header   = $this->g->in['m'] === 'create' ? 'Add Mailbox' : 'Update Mailbox';
-        $submit   = $this->g->in['m'] === 'create' ? '
-                      <a class="btn btn-secondary" href="?o=vmails&m=list">&laquo; Back</a>
-                      <button type="submit" name="m" value="create" class="btn btn-primary">Add Mailbox</button>' : '
-                      <a class="btn btn-secondary" href="?o=vmails&m=list">&laquo; Back</a>
-                      <a class="btn btn-danger" href="?o=vmails&m=delete&i=' . $this->g->in['i'] . '" title="Remove mailbox" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $user . '?\')">Remove</a>
-                      <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
-        $enable   = $this->g->in['m'] === 'create' ? '
-                <input type="text" autocorrect="off" autocapitalize="none" class="form-control" name="user" id="user" value="' . $user . '">' : '
-                <input type="text" class="form-control" value="' . $user . '" disabled>
-                <input type="hidden" name="user" id="user" value="' . $user . '">';
-
-        return '
-          <div class="col-12">
-            <h3><a href="?o=vmails&m=list">&laquo;</a> ' . $header . '</h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="col-12">
-            <form method="post" action="' . $this->g->cfg['self'] . '">
-              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-              <div class="row">
-                <div class="form-group col-4">
-                  <label for="domain">Email Address</label>' . $enable . '
-                </div>
-                <div class="form-group col-2">
-                  <label for="quota">Mailbox Quota</label>
-                  <input type="number" class="form-control" name="quota" id="quota" value="' . intval($quota / 1000000) . '">
-                </div>
-                <div class="col-3">
-                  <div class="form-group">
-                    <label for="passwd1">Password</label>
-                    <input type="password" class="form-control" name="passwd1" id="passwd1" value="' . $passwd1 . '">
-                  </div>
-                </div>
-                <div class="col-3">
-                  <div class="form-group">
-                    <label for="passwd2">Confirm Password</label>
-                    <input type="password" class="form-control" name="passwd2" id="passwd2" value="' . $passwd2 . '">
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-4">
-                  <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . $filter_checked . '>
-                      <label class="custom-control-label" for="spamf">Spam Filter</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $active_checked . '>
-                      <label class="custom-control-label" for="active">Active</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-4 text-right">
-                  <div class="btn-group">' . $submit . '
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>';
     }
 }
 
