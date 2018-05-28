@@ -17,7 +17,7 @@ error_log(__METHOD__);
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
 
-        if(!util::is_usr() && ( $o !== 'auth' || ( $m !== 'list' && $m !== 'create' ) )){
+        if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create'))){
             util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             header('Location: ' . $t->g->cfg['self'] . '?o=auth');
             exit();
