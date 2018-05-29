@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/dkim.php 20180511 - 20180520
+// lib/php/plugins/dkim.php 20180511 - 20180529
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Dkim extends Plugin
@@ -8,8 +8,8 @@ class Plugins_Dkim extends Plugin
     $in = [
         'dnstxt'  => '',
         'domain'  => '',
-        'keylen'  => '1024',
-        'select'  => 'dkim',
+        'keylen'  => '2048',
+        'select'  => 'mail',
     ];
 
     public function create() : string
