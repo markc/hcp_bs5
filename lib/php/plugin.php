@@ -17,7 +17,7 @@ error_log(__METHOD__);
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
 
-        if (!util::is_usr() && $o !== 'auth' && $m !== 'list' && $m !== 'read') {
+        if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create'))){
             util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             header('Location: ' . $t->g->cfg['self'] . '?o=auth');
             exit();
@@ -69,11 +69,14 @@ error_log(__METHOD__);
 
         if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
-            db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            return $this->list();
+            if(db::update($this->in, [['id', '=', $this->g->in['i']]])){
+                util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+                return $this->list();
+            }else{
+                util::log('Error updating item.');
+            }
         }
-        return 'Error updating item';
+        return $this->read();
     }
 
     protected function delete() : string
