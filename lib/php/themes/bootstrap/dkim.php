@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20180517
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20180529
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
@@ -44,7 +44,7 @@ error_log(__METHOD__);
             ['1024', '1024'],
             ['2048', '2048'],
             ['4096', '4096'],
-        ], 'keylen', '', '', 'custom-select');
+        ], 'keylen', '2048', '', 'custom-select');
 
         $create = $this->modal([
             'id'      => 'createmodal',
@@ -60,7 +60,7 @@ error_log(__METHOD__);
                     <div class="col-6">
                       <div class="form-group">
                         <label for="selector" class="form-control-label">Selector</label>
-                        <input type="text" class="form-control" id="select" name="select" value="dkim">
+                        <input type="text" class="form-control" id="select" name="select" value="mail">
                       </div>
                     </div>
                     <div class="col-6">
