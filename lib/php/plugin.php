@@ -17,7 +17,7 @@ error_log(__METHOD__);
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
 
-        if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create'))){
+        if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create' && $m !== 'resetpw'))){
             util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             header('Location: ' . $t->g->cfg['self'] . '?o=auth');
             exit();
@@ -52,7 +52,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list', 0);
         } else return $this->t->create($this->in);
     }
 
@@ -71,7 +71,7 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             if(db::update($this->in, [['id', '=', $this->g->in['i']]])){
                 util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list', 0);
             }else{
                 util::log('Error updating item.');
             }
@@ -87,7 +87,7 @@ error_log(__METHOD__);
             if ($this->g->in['i']) {
                 $res = db::delete([['id', '=', $this->g->in['i']]]);
                 util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list', 0);
             }
         }
         return 'Error deleting item';
