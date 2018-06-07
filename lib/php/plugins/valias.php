@@ -155,7 +155,7 @@ error_log(__METHOD__);
             }
             util::log('Alias added', 'success');
             util::ses('p', '', '1');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } else return $this->t->create($this->in);
     }
 
@@ -315,7 +315,7 @@ error_log(__METHOD__);
                 }
             }
             util::log('Changes to alias have been saved', 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } elseif ($this->g->in['i']) {
             return $this->read();
         } else return 'Error updating item';

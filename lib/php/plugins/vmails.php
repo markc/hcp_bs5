@@ -27,7 +27,7 @@ error_log(__METHOD__);
 
         if (util::is_post())
             util::exe('addvmail ' . $this->in['user'] . ($this->in['spamf'] ? '' : ' nospam'));
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     protected function read() : string
@@ -95,7 +95,7 @@ error_log(__METHOD__);
                 $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
             }
             util::log($spamf_buf . 'Mailbox details for ' . $user . ' have been saved', 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
 //        } elseif ($this->g->in['i']) {
 //            return $this->read();
         }
@@ -111,7 +111,7 @@ error_log(__METHOD__);
             if ($user) util::exe("delvmail $user");
             else util::log('ERROR: user does not exist');
         }
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     protected function list() : string

@@ -27,7 +27,7 @@ error_log(__METHOD__);
 
         // Logged-in users cannot perfom this action.
         if(util::is_usr()){
-            util::redirect($this->g->cfg['self'], 0);
+            util::redirect($this->g->cfg['self']);
         }
 
         $u = $this->in['login'];
@@ -44,7 +44,7 @@ error_log(__METHOD__);
                             ], [['id', '=', $usr['id']]]);
                             util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
                         } else util::log('Problem sending message to ' . $u, 'danger');
-                        return $this->t->list(['login' => $u]);
+                        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
                     } else util::log('Account is disabled, contact your System Administrator');
                 } else util::log('User does not exist');
             } else util::log('You must provide a valid email address');
@@ -58,7 +58,7 @@ error_log(__METHOD__);
 
         // Logged-in users cannot perform this action
         if(util::is_usr()){
-            util::redirect($this->g->cfg['self'], 0);
+            util::redirect($this->g->cfg['self']);
         }
 
         $u = $this->in['login'];
@@ -78,8 +78,7 @@ error_log(__METHOD__);
                         util::log($login.' is now logged in', 'success');
                         if ((int) $acl === 0) $_SESSION['adm'] = $id;
                         $_SESSION['m'] = 'list';
-                        header('Location: ' . $this->g->cfg['self']);
-                        exit();
+                        util::redirect($this->g->cfg['self']);
                     } else util::log('Invalid Email Or Password');
                 } else util::log('Account is disabled, contact your System Administrator');
             } else util::log('Invalid Email Or Password');
@@ -93,7 +92,7 @@ error_log(__METHOD__);
 
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please login and try again.');
-            return $this->t->list(['login' => '']);
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
 
         $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
@@ -114,11 +113,10 @@ error_log(__METHOD__);
                                 ], [['id', '=', $i]])) {
                                 util::log('Password reset for ' . $usr['login'], 'success');
                                 if (util::is_usr()) {
-                                    header('Location: ' . $this->g->cfg['self']);
-                                    exit();
+                                    util::redirect($this->g->cfg['self']);
                                 } else {
                                     unset($_SESSION['resetpw']);
-                                    return $this->t->list(['login' => $usr['login']]);
+                                    util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
                                 }
                             } else util::log('Problem updating database');
                         } else util::log($usr['login'] . ' is not allowed access');
@@ -136,8 +134,9 @@ error_log(__METHOD__);
         if(util::is_usr()){
             $u = $_SESSION['usr']['login'];
             $id = $_SESSION['usr']['id'];
-            if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
+            if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm']){
                 unset($_SESSION['adm']);
+            }
             unset($_SESSION['usr']);
             if(isset($_COOKIE['remember'])){
                 db::update(['cookie' => ''], [['id', '=', $id]]);
@@ -145,8 +144,7 @@ error_log(__METHOD__);
              }
             util::log($u . ' is now logged out', 'success');
         }
-        header('Location: ' . $this->g->cfg['self']);
-        exit();
+        util::redirect($this->g->cfg['self']);
     }
 
     // Utilities
@@ -157,7 +155,7 @@ error_log(__METHOD__);
 
         // Logged-in users cannot perfom this action.
         if(util::is_usr()){
-            util::redirect($this->g->cfg['self'], 0);
+            util::redirect($this->g->cfg['self']);
         }
 
         $otp = html_entity_decode($this->in['otp']);
@@ -172,8 +170,7 @@ error_log(__METHOD__);
                 } else util::log('Your one time password key has expired');
             } else util::log('Your one time password key no longer exists');
         } else util::log('Incorrect one time password key');
-        header('Location: ' . $this->g->cfg['self']);
-        exit();
+        util::redirect($this->g->cfg['self']);
     }
 
     private function mail_forgotpw(string $email, string $newpass, string $headers = '') : bool

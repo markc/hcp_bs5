@@ -210,15 +210,18 @@ error_log(__METHOD__);
         }
     }
 
-    public static function redirect(string $url, int $ttl = 5, string $msg = '') : void
+    public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = '') : void
     {
 error_log(__METHOD__);
-
-        header('refresh:' . $ttl . '; url=' . $url);
-        if ($ttl) echo '<!DOCTYPE html>
+        if ($method == 'refresh'){
+            header('refresh:' . $ttl . '; url=' . $url);
+            echo '<!DOCTYPE html>
 <title>Redirect...</title>
 <h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
 <pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
+        }else{
+            header('Location:' . $url);
+        }
         exit;
     }
 
@@ -281,7 +284,7 @@ error_log(__METHOD__);
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 self::log('Possible CSRF attack');
-                self::redirect('?o=' . $_SESSION['o'] . '&m=list', 0);
+                self::redirect('?o=' . $_SESSION['o'] . '&m=list');
             }
             return true;
         }

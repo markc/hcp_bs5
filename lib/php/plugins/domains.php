@@ -54,7 +54,7 @@ error_log(__METHOD__);
 
             if ($type === 'SLAVE') {
                 util::log('Created DNS Zone: ' . $domain, 'success');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
 
             $sql = "
@@ -141,7 +141,7 @@ error_log(__METHOD__);
                 'updated' => $created,
             ]);
             util::log('Created DNS Zone: ' . $domain, 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
         return $this->t->create($this->in);
     }
@@ -206,7 +206,7 @@ error_log(__METHOD__);
 
             // TODO check $res ???
             util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
 
         } elseif ($this->g->in['i']) {
 
@@ -240,7 +240,7 @@ error_log(__METHOD__);
             $res2 = db::delete([['id', '=', $this->g->in['i']]]);
             // TODO check $res1 and $res2 ???
             util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
         return 'Error deleting item';
     }
