@@ -21,7 +21,7 @@ class Plugins_Accounts extends Plugin
     {
         if (util::is_adm()) return parent::create();
         util::log('You are not authorized to perform this operation, please contact your administrator.');
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     protected function read() : string
@@ -31,19 +31,19 @@ error_log(__METHOD__);
         $usr = db::read('*', 'id', $this->g->in['i'], '', 'one');
         if (!$usr) {
             util::log('User not found.');
-            return $this->list();
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
         if (util::is_acl(0)) { // superadmin
 
         } elseif (util::is_acl(1)) { // normal admin
             if ($_SESSION['usr']['grp'] != $usr['grp']) {
                 util::log('You are not authorized to perform this operation.');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
         } else { // Other users
             if ($_SESSION['usr']['id'] != $usr['id']) {
                 util::log('You are not authorized to perform this operation.');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
         }
         return $this->t->read($usr);
@@ -86,7 +86,7 @@ error_log(__METHOD__);
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
             util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
         } else util::log('Not authorized to switch users');
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 }
 

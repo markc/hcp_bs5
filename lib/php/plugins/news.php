@@ -37,7 +37,7 @@ error_log(__METHOD__);
             $author = db::read('author', 'id', $this->g->in['i'], '', 'col');
             if ($_SESSION['usr']['id'] !== $author) {
                 util::log('You do not have permissions to delete this post');
-                return $this->list();
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
         }
         return parent::delete();
