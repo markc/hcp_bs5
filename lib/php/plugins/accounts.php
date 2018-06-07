@@ -17,15 +17,6 @@ class Plugins_Accounts extends Plugin
         //'webpw'     => '',
     ];
 
-    public function __construct(Theme $t)
-    {
-        if (!util::is_usr()) {
-            $_SESSION['redirect_to'] = $_SERVER[''];
-            util::redirect($this->g->cfg['self'] . '?o=auth', 0, '');
-        }
-        parent::__construct($t);
-    }
-
     protected function create() : string
     {
         if (util::is_adm()) return parent::create();
