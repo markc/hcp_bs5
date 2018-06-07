@@ -26,9 +26,11 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
+        $alts = '';
+        foreach (util::log() as $lvl => $msg) {
+            $alts .= $msg ?  '<p class="alert ' . $lvl . '">' . $msg . "</p>\n" : '';
+        }
+        return $alts;
     }
 
     public function nav1() : string

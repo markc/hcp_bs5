@@ -7,18 +7,13 @@ class Util
     public static function log(string $msg = '', string $lvl = 'danger') : array
     {
 error_log(__METHOD__);
-
         if ($msg) {
-            if (isset($_SESSION['l']) and $_SESSION['l']) {
-                [, $m] = explode(':', $_SESSION['l'], 2);
-                $msg = $m . '<br>' . $msg;
-            }
-            $_SESSION['l'] = $lvl . ':' . $msg;
-        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
-            $l = $_SESSION['l']; $_SESSION['l'] = '';
-            return explode(':', $l, 2);
+            $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
+        } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
+            $l = $_SESSION['log']; $_SESSION['log'] = [];
+            return $l;
         }
-        return ['', ''];
+        return [];
     }
 
     public static function enc(string $v) : string
