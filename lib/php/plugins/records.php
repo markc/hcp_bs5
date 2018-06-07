@@ -35,8 +35,8 @@ error_log(__METHOD__);
                 $this->update_domains($in['domain_id'], $in['updated'] );
                 util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
             }
-            $this->g->in['i'] = intval(util::enc($_POST['did']));
-            return $this->list();
+            $i = intval(util::enc($_POST['did']));
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
         return 'Error creating DNS record';
     }
@@ -53,8 +53,8 @@ error_log(__METHOD__);
                 $this->update_domains($in['domain_id'], $in['updated'] );
                 util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
             }
-            $this->g->in['i'] = intval(util::enc($_POST['did']));
-            return $this->list();
+            $i = intval(util::enc($_POST['did']));
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
         return 'Error updating DNS record';
     }
@@ -71,8 +71,8 @@ error_log(__METHOD__);
             db::delete([['id', '=', $this->g->in['i']]]);
             $this->update_domains($did, $now);
             util::log('Deleted DNS record ID: ' . $this->g->in['i'] . ' from ' . $dom, 'success');
-            $this->g->in['i'] = $did;
-            return $this->list();
+            $i = $did;
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
         return 'Error deleting DNS record';
     }

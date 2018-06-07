@@ -18,7 +18,7 @@ error_log(__METHOD__);
 
         if (util::is_post())
             util::exe('dkim add ' . $this->in['domain'] . ' ' . $this->in['select']. ' ' . $this->in['keylen']);
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     public function read() : string
@@ -37,7 +37,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return $this->list(); // override parent update()
+        //return $this->list(); // override parent update()
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     public function delete() : string
@@ -46,7 +47,7 @@ error_log(__METHOD__);
 
         if (util::is_post())
             util::exe('dkim del ' . $this->in['domain']);
-        return $this->list();
+        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     public function list() : string
