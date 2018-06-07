@@ -153,7 +153,7 @@ error_log(__METHOD__);
             $in['content'] = '"' . trim($in['content'], '"') . '"';
 
         $domain = strtolower(util::enc($_POST['domain']));
-        $in['name'] = strtolower(rtrim(str_replace($domain, $in['name']), '.'));
+        $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
         $in['name'] = $in['name'] ? $in['name'] . '.' . $domain : $domain;
 
         $in['ttl'] = intval($in['ttl']);
