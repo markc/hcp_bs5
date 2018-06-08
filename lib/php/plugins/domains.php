@@ -31,7 +31,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($_POST);
             extract($this->g->dns);
             $created = date('Y-m-d H:i:s');
@@ -150,7 +150,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST || $this->in['increment']) {
+        if (util::is_post() || $this->in['increment']) {
             if ($this->in['increment']) {
                 $sql = "
  SELECT content as soa

@@ -12,6 +12,7 @@ error_log(__METHOD__);
         <div class="col-md-4 offset-md-4">
           <h3><i class="fa fa-envelope"></i> Contact us</h3>
           <form action="' . $this->g->cfg['self'] . '" method="post" onsubmit="return mailform(this)">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <div class="form-group">
               <label for="subject">Subject</label>

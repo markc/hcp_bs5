@@ -21,7 +21,7 @@ class Plugins_Valias extends Plugin
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
             $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));
@@ -170,7 +170,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if ($_POST) {
+        if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
             $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));

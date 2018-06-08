@@ -86,15 +86,18 @@ table.dataTable{border-collapse: collapse !important;}
     {
 error_log(__METHOD__);
 
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-        <div class="col-12">
-          <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>' . $msg . '
-          </div>
-        </div>' : '';
+        $alts = '';
+        foreach (util::log() as $lvl => $msg) {
+            $alts .= $msg ? '
+            <div class="col-12">
+              <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>' . $msg . '
+              </div>
+            </div>' : '';
+        }
+        return $alts;
     }
 
     public function head() : string
