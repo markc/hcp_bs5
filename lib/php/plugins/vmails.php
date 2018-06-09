@@ -25,8 +25,10 @@ class Plugins_Vmails extends Plugin
     {
 error_log(__METHOD__);
 
-        if (util::is_post())
-            util::exe('addvmail ' . $this->in['user'] . ($this->in['spamf'] ? '' : ' nospam'));
+        if (util::is_post()){
+            $user = escapeshellarg($this->in['user']);
+            util::exe('addvmail ' . $user . ($this->in['spamf'] ? '' : ' nospam'));
+        }
         util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
@@ -88,7 +90,7 @@ error_log(__METHOD__);
             $spamf_buf = '';
 
             if ($spamf_old !== $spamf) {
-                $user_esc = trim(escapeshellarg($user), "'");
+                $user_esc = escapeshellarg($user);
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
                 exec("sudo spamf $user_esc $spamf_str 2>&1", $retArr, $retVal);
                 $spamf_buf = trim(implode("\n", $retArr));

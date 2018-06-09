@@ -340,6 +340,13 @@ error_log(__METHOD__);
             : "$ymd" . "00";
         return implode(' ', $ary);
     }
+
+    public static function is_valid_plan(string $plan) : bool
+    {
+        // See themes/bootstrap/vhosts.php:83
+        $valid_plans = ['personal', 'soho', 'business', 'enterprise'];
+        return in_array($plan, $valid_plans);
+    }
 }
 
 ?>

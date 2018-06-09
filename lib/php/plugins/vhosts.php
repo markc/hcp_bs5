@@ -28,6 +28,11 @@ error_log(__METHOD__);
             extract($this->in);
             $active = $active ? 1 : 0;
 
+            if(!util::is_valid_plan($plan)){
+                util::log('Invalid plan ' . $plan);
+                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            }
+
             if (file_exists('/home/u/' . $domain)) {
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
                 $_POST = []; return $this->t->create($this->in);
@@ -50,9 +55,7 @@ error_log(__METHOD__);
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            $plan_esc = trim(escapeshellarg($plan), "'");
-            $domain_esc = trim(escapeshellarg($domain), "'");
-            shell_exec("nohup sh -c 'sudo addvhost $domain_esc $plan_esc' > /tmp/addvhost.log 2>&1 &");
+            shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
