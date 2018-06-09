@@ -16,8 +16,12 @@ class Plugins_Dkim extends Plugin
     {
 error_log(__METHOD__);
 
-        if (util::is_post())
-            util::exe('dkim add ' . $this->in['domain'] . ' ' . $this->in['select']. ' ' . $this->in['keylen']);
+        if (util::is_post()){
+            $domain = escapeshellarg($this->in['domain']);
+            $select = escapeshellarg($this->in['select']);
+            $keylen = escapeshellarg($this->in['keylen']);
+            util::exe('dkim add ' . $domain . ' ' . $select . ' ' . $keylen);
+        }
         util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
@@ -25,8 +29,9 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $domain = trim(escapeshellarg(explode('._domainkey.', $this->in['dnstxt'])[1]), "'"); // too fragile?
-        exec("sudo dkim show $domain 2>&1", $retArr, $retVal);
+        $domain = explode('._domainkey.', $this->in['dnstxt'])[1]; // too fragile?
+        $domain_esc = escapeshellarg($domain);
+        exec("sudo dkim show $domain_esc 2>&1", $retArr, $retVal);
         $buf = '
         <b>' . $retArr[0] . '</b><br>
         <div style="word-break:break-all;font-family:monospace;width:100%;">' . $retArr[1] . '</div>';
@@ -45,8 +50,10 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if (util::is_post())
-            util::exe('dkim del ' . $this->in['domain']);
+        if (util::is_post()){
+            $domain = escapeshellarg($this->in['domain']);
+            util::exe('dkim del ' . $domain);
+        }
         util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 

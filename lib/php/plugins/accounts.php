@@ -20,7 +20,7 @@ class Plugins_Accounts extends Plugin
     protected function create() : string
     {
         if (util::is_adm()) return parent::create();
-        util::log('You are not authorized to perform this operation, please contact your administrator.');
+        util::log('You are not authorized to perform this action, please contact your administrator.');
         util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
@@ -37,12 +37,12 @@ error_log(__METHOD__);
 
         } elseif (util::is_acl(1)) { // normal admin
             if ($_SESSION['usr']['grp'] != $usr['grp']) {
-                util::log('You are not authorized to perform this operation.');
+                util::log('You are not authorized to perform this action.');
                 util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
         } else { // Other users
             if ($_SESSION['usr']['id'] != $usr['id']) {
-                util::log('You are not authorized to perform this operation.');
+                util::log('You are not authorized to perform this action.');
                 util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
         }
