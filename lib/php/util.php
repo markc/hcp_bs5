@@ -164,7 +164,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return self::put_cookie($name, '', time() - 1);
+        return self::put_cookie($name, '', -1);
     }
 
     public static function chkpw(string $pw, string $pw2) : bool
