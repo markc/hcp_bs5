@@ -69,10 +69,8 @@ error_log(__METHOD__);
                 extract($usr);
                 if ($acl !== 9) {
                     if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
-                        if ($this->in['remember']) {
-                            $uniq = util::random_token(32);
-                            db::update(['cookie' => $uniq], [['id', '=', $id]]);
-                            $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
+                        if ($this->in['remember']) { 
+                            $this->_rememberme($id);
                         }
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
@@ -207,6 +205,16 @@ error_log(__METHOD__);
          */
         $expire = $expire ? time() + $expire : 0;
         return setcookie($name, $value, $expire, $this->g->cfg['self'], '', $this->g->sess_cookie['secure'], $this->g->sess_cookie['httponly']);
+    }
+
+    private function _rememberme(int $usr_id) : void
+    {
+error_log(__METHOD__);
+
+        $uniq = util::random_token(32);
+        $expire = date("Y-m-d H:i:s", (time() + self::REMEMBER_ME_EXP));
+        db::qry('INSERT INTO cookies (accounts_id, token, expire) VALUES(:id, :token, :expire)', ['id'=>$usr_id, 'token'=>$uniq, 'expire'=>$expire]);
+        $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
     }
 }
 

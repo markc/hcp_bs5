@@ -164,7 +164,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return self::put_cookie($name, '', time() - 1);
+        return self::put_cookie($name, '', -1);
     }
 
     public static function chkpw(string $pw, string $pw2) : bool
@@ -189,19 +189,36 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if (!self::is_usr()) {
-            if ($c = self::get_cookie('remember')) {
-                if (is_null(db::$dbh)) db::$dbh = new db($g->db);
-                db::$tbl = 'accounts';
-                if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
-                    extract($usr);
-                    $_SESSION['usr'] = $usr;
-                    if ($acl == 0) $_SESSION['adm'] = $id;
-                    self::log($login . ' is remembered and logged back in', 'success');
-                    self::ses('o', '', $g->in['o']);
-                    self::ses('m', '', $g->in['m']);
-                }
-            }
+        if (self::is_usr())
+            return;
+
+        if (!($c = self::get_cookie('remember')))
+            return;
+
+        if (is_null(db::$dbh))
+            db::$dbh = new db($g->db);
+
+        db::$tbl = 'cookies';
+        if(!($cookie = db::read('id,accounts_id,token,expire', 'token', $c, '', 'one'))){
+            self::del_cookie('remember');
+            return;
+        }
+
+        if(strtotime($cookie['expire']) < time()){
+            db::delete([['id', '=', $cookie['id']]]);
+            self::del_cookie('remember');
+            return;
+        }
+
+        $accounts_id = (int)$cookie['accounts_id'];
+        db::$tbl = 'accounts';
+        if ($usr = db::read('id,grp,acl,login,fname,lname', 'id', $accounts_id, '', 'one')) {
+            extract($usr);
+            $_SESSION['usr'] = $usr;
+            if ($acl == 0) $_SESSION['adm'] = $id;
+            self::log($login . ' is remembered and logged back in', 'success');
+            self::ses('o', '', $g->in['o']);
+            self::ses('m', '', $g->in['m']);
         }
     }
 
@@ -295,7 +312,7 @@ error_log(__METHOD__);
 
         if (strlen($random_base64) < $length) {
             /**
-             * It happens sometimes that there are many +=\, so if
+             * It happens sometimes that there are many +=/, so if
              * the length of $random_base64 after suppressing thoses
              * characters, is less than the $length, then start over again.
              */
