@@ -20,7 +20,9 @@ echo new Init(new class
         'hash'  => 'SHA512-CRYPT',
         'host'  => '',
         'perp'  => 25,
-        'self'  => '',
+        'self'  => '/hcp/',
+        'encryption_cipher'=> 'AES-128-CBC',
+        'encryption_key'   => 'shPqOV7k+TAqhi9/6GUL5Q=='
     ],
     $in = [
         'd'     => '',          // Domain (current)
@@ -57,20 +59,16 @@ echo new Init(new class
     ],
     $nav1 = [
         'non' => [
-            ['About',       '?o=about',     'fas fa-info-circle fa-fw'],
-            ['News',        '?o=news&p=1',  'fas fa-newspaper fa-fw'],
-            ['Contact',     '?o=contact',   'fas fa-envelope fa-fw'],
-            ['Sign in',     '?o=auth',      'fas fa-sign-in-alt fa-fw'],
+            ['Webmail',     '../webmail/',      'fas fa-envelope fa-fw'],
+            ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'usr' => [
-            ['News',        '?o=news&p=1',  'fas fa-newspaper fa-fw'],
-            ['Webmail',     'webmail/',     'fas fa-envelope fa-fw'],
-            ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
+            ['Webmail',     '../webmail/',      'fas fa-envelope fa-fw'],
+            ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'adm' => [
             ['Menu',        [
-                ['News',        '?o=news&p=1',  'fas fa-newspaper fa-fw'],
-                ['Webmail',     'webmail/',     'fas fa-envelope fa-fw'],
+                ['Webmail',     '../webmail/',  'fas fa-envelope fa-fw'],
                 ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
             ], 'fas fa-bars fa-fw'],
             ['Admin',       [

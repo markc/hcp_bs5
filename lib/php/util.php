@@ -1,5 +1,5 @@
 <?php
-// lib/php/util.php 20150225 - 20180519
+// lib/php/util.php 20150225 - 20180613
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -7,6 +7,7 @@ class Util
     public static function log(string $msg = '', string $lvl = 'danger') : array
     {
 error_log(__METHOD__);
+
         if ($msg) {
             $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
         } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
@@ -156,7 +157,6 @@ error_log(__METHOD__);
     public static function put_cookie(string $name, string $value, int $expiry=604800) : string
     {
 error_log(__METHOD__);
-
         return setcookie($name, $value, time() + $expiry) ? $value : '';
     }
 
@@ -192,40 +192,47 @@ error_log(__METHOD__);
         if (self::is_usr())
             return;
 
-        if (!($c = self::get_cookie('remember')))
+        if (!$c = self::get_cookie('remember')) {
             return;
+        }
 
-        if (is_null(db::$dbh))
+        if (!$rc = self::decrypt($c, $g->cfg['encryption_cipher'], $g->cfg['encryption_key'])) {
+            self::del_cookie('remember');
+            return;
+        }
+
+        $rc = unserialize($rc);
+        $c = $rc['token'] ?? '';
+        $e = $rc['expire'] ?? 0;
+
+        if ($e < time()) {
+            util::del_cookie('remember');
+            return;
+        }
+
+        if (is_null(db::$dbh)) {
             db::$dbh = new db($g->db);
-
-        db::$tbl = 'cookies';
-        if(!($cookie = db::read('id,accounts_id,token,expire', 'token', $c, '', 'one'))){
-            self::del_cookie('remember');
-            return;
         }
 
-        if(strtotime($cookie['expire']) < time()){
-            db::delete([['id', '=', $cookie['id']]]);
-            self::del_cookie('remember');
-            return;
-        }
-
-        $accounts_id = (int)$cookie['accounts_id'];
         db::$tbl = 'accounts';
-        if ($usr = db::read('id,grp,acl,login,fname,lname', 'id', $accounts_id, '', 'one')) {
-            extract($usr);
-            $_SESSION['usr'] = $usr;
-            if ($acl == 0) $_SESSION['adm'] = $id;
-            self::log($login . ' is remembered and logged back in', 'success');
-            self::ses('o', '', $g->in['o']);
-            self::ses('m', '', $g->in['m']);
+        if (!$usr = db::read('id,grp,acl,login,fname,lname', 'cookie', $c, '', 'one')) {
+            self::del_cookie('remember');
+            return;
         }
+
+        extract($usr);
+        $_SESSION['usr'] = $usr;
+        if ($acl == 0) $_SESSION['adm'] = $id;
+        self::log($login . ' is remembered and logged back in', 'success');
+        self::ses('o', '', $g->in['o']);
+        self::ses('m', '', $g->in['m']);
     }
 
     public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = '') : void
     {
 error_log(__METHOD__);
-        if ($method == 'refresh'){
+
+        if ($method == 'refresh') {
             header('refresh:' . $ttl . '; url=' . $url);
             echo '<!DOCTYPE html>
 <title>Redirect...</title>
@@ -360,9 +367,42 @@ error_log(__METHOD__);
 
     public static function is_valid_plan(string $plan) : bool
     {
+error_log(__METHOD__);
+
         // See themes/bootstrap/vhosts.php:83
         $valid_plans = ['personal', 'soho', 'business', 'enterprise'];
         return in_array($plan, $valid_plans);
+    }
+
+    public static function encrypt(string $data, string $cipher, string $encryption_key)
+    {
+error_log(__METHOD__);
+
+        $ivlen    = openssl_cipher_iv_length($cipher);
+        $iv       = openssl_random_pseudo_bytes($ivlen);
+        $data_raw = openssl_encrypt($data, $cipher, $encryption_key, OPENSSL_RAW_DATA, $iv);
+        $hmac     = hash_hmac('sha256', $data_raw, $encryption_key, true);
+
+        return base64_encode($iv.$hmac.$data_raw);
+    }
+
+    public static function decrypt(string $data, string $cipher, string $encryption_key)
+    {
+error_log(__METHOD__);
+
+        $c        = base64_decode($data);
+        $ivlen    = openssl_cipher_iv_length($cipher);
+        $iv       = substr($c, 0, $ivlen);
+        $hmac     = substr($c, $ivlen, $sha2len = 32);
+        $data_raw = substr($c, $ivlen + $sha2len);
+        $data     = openssl_decrypt($data_raw, $cipher, $encryption_key, OPENSSL_RAW_DATA, $iv);
+        $calcmac  = hash_hmac('sha256', $data_raw, $encryption_key, true);
+
+        if (!hash_equals($hmac, $calcmac)) {
+            return false;
+        }
+error_log('return data='.var_export($data,true));
+        return $data;
     }
 }
 

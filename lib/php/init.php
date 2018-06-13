@@ -14,9 +14,7 @@ error_log('GET=' . var_export($_GET, true));
 
 error_log('POST=' . var_export($_POST, true));
 
-        $g->cfg['host'] = $g->cfg['host']
-            ? $g->cfg['host']
-            : getenv('HOSTNAME');
+        $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
 //        if (defined('ABSPATH')) {
 //            $page = explode('&', $_GET['page']);

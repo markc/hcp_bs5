@@ -26,9 +26,9 @@ class Plugins_Auth extends Plugin
 error_log(__METHOD__);
 
         // Logged-in users cannot perfom this action.
-        if(util::is_usr()){
-            util::redirect($this->g->cfg['self']);
-        }
+//        if(util::is_usr()){
+//            util::redirect($this->g->cfg['self']);
+//        }
 
         $u = $this->in['login'];
 
@@ -57,9 +57,9 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         // Logged-in users cannot perform this action
-        if(util::is_usr()){
-            util::redirect($this->g->cfg['self']);
-        }
+//        if(util::is_usr()){
+//            util::redirect($this->g->cfg['self']);
+//        }
 
         $u = $this->in['login'];
         $p = $this->in['webpw'];
@@ -69,7 +69,7 @@ error_log(__METHOD__);
                 extract($usr);
                 if ($acl !== 9) {
                     if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
-                        if ($this->in['remember']) { 
+                        if ($this->in['remember']) {
                             $this->_rememberme($id);
                         }
                         $_SESSION['usr'] = $usr;
@@ -152,9 +152,9 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         // Logged-in users cannot perfom this action.
-        if(util::is_usr()){
-            util::redirect($this->g->cfg['self']);
-        }
+//        if(util::is_usr()){
+//            util::redirect($this->g->cfg['self']);
+//        }
 
         $otp = html_entity_decode($this->in['otp']);
         if (strlen($otp) === self::OTP_LENGTH) {

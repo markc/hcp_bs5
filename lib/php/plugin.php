@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugin.php 20150101 - 20180517
+// lib/php/plugin.php 20150101 - 20180613
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
@@ -18,7 +18,7 @@ error_log(__METHOD__);
         $m = $t->g->in['m'];
 
         if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create' && $m !== 'resetpw'))){
-            util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
+//            util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             util::redirect($t->g->cfg['self'] . '?o=auth');
         }
 
