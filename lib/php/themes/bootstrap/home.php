@@ -38,12 +38,14 @@ Some of the features are...
 You can change the content of this page by creating a file called
 <code>lib/php/home.tpl</code> and add any Bootstrap 4 based layout and
 text you care to. For example...
+      </p>
 <pre>
 &lt;div class="col-12"&gt;
 &lt;h1>Your Page Title&lt;/h1&gt;
 &lt;p>Lorem ipsum...&lt;/p&gt;
 &lt;/div&gt;
 </pre>
+      <p>
 Modifying the navigation menus above can be done by creating
 a <code>lib/.ht_conf.php</code> file and copying the
 <a href="https://github.com/netserva/hcp/blob/master/index.php#L60">
