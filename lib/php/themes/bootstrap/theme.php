@@ -170,8 +170,8 @@ error_log(__METHOD__);
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
         return '
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
-              <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
+              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
+              <div class="dropdown-menu">' . join('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
