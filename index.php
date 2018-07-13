@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20180515
+// index.php 20150101 - 20180713
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -59,16 +59,16 @@ echo new Init(new class
     ],
     $nav1 = [
         'non' => [
-            ['Webmail',     '../webmail/',      'fas fa-envelope fa-fw'],
+            ['Webmail',     '../',              'fas fa-envelope fa-fw'],
             ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'usr' => [
-            ['Webmail',     '../webmail/',      'fas fa-envelope fa-fw'],
+            ['Webmail',     '../',              'fas fa-envelope fa-fw'],
             ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'adm' => [
             ['Menu',        [
-                ['Webmail',     '../webmail/',  'fas fa-envelope fa-fw'],
+                ['Webmail',     '../',          'fas fa-envelope fa-fw'],
                 ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
             ], 'fas fa-bars fa-fw'],
             ['Admin',       [
