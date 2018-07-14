@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/records.php 20180323
+// lib/php/themes/bootstrap/records.php 20180714
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
@@ -10,6 +10,7 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
         ['NS',         'NS'],
         ['TXT',        'TXT'],
         ['AAAA',       'AAAA'],
+        ['CAA',        'CAA'],
         ['AFSDB',      'AFSDB'],
         ['CERT',       'CERT'],
         ['CNAME',      'CNAME'],
