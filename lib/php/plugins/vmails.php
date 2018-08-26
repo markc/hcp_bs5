@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vmails.php 20180530
+// lib/php/plugins/vmails.php 20180826
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vmails extends Plugin
@@ -25,11 +25,14 @@ class Plugins_Vmails extends Plugin
     {
 error_log(__METHOD__);
 
-        if (util::is_post()){
-            $user = escapeshellarg($this->in['user']);
-            util::exe('addvmail ' . $user . ($this->in['spamf'] ? '' : ' nospam'));
+        if (util::is_post()) {
+            if (!filter_var($this->in['user'], FILTER_VALIDATE_EMAIL)) {
+                util::log('Email address (' . $this->in['user'] . ') is invalid');
+                $_POST = []; return $this->read();
+            }
+            util::exe('addvmail ' . $this->in['user'] . ($this->in['spamf'] ? '' : ' nospam'));
         }
-        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     protected function read() : string
@@ -49,10 +52,10 @@ error_log(__METHOD__);
             $active = $active ? 1 : 0;
             $spamf  = $spamf ? 1 : 0;
 
-//            if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//                util::log('Email address is invalid');
-//                $_POST = []; return $this->read();
-//            }
+            if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
+                util::log("Email address ($user) is invalid");
+                $_POST = []; return $this->read();
+            }
 
             if ($passwd1 && $passwd2) {
                 if (!util::chkpw($passwd1, $passwd2)) {
@@ -88,7 +91,6 @@ error_log(__METHOD__);
 
             $spamf_old = db::read('spamf', 'id', $this->g->in['i'], '', 'col');
             $spamf_buf = '';
-
             if ($spamf_old !== $spamf) {
                 $user_esc = escapeshellarg($user);
                 $spamf_str = ($spamf === 1) ? 'on' : 'off';
@@ -97,9 +99,7 @@ error_log(__METHOD__);
                 $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
             }
             util::log($spamf_buf . 'Mailbox details for ' . $user . ' have been saved', 'success');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
-//        } elseif ($this->g->in['i']) {
-//            return $this->read();
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
         return 'Error updating item';
     }
@@ -113,7 +113,7 @@ error_log(__METHOD__);
             if ($user) util::exe("delvmail $user");
             else util::log('ERROR: user does not exist');
         }
-        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     protected function list() : string

@@ -80,7 +80,6 @@ error_log(__METHOD__);
             $active = $active ? 1 : 0;
 
             $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
-error_log("domain=$domain");
 
             if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
                 util::log('Domain name is invalid');

@@ -1,5 +1,5 @@
 <?php
-// lib/php/init.php 20150101 - 20180512
+// lib/php/init.php 20150101 - 20180826
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
@@ -8,14 +8,15 @@ class Init
 
     public function __construct(object $g)
     {
-error_log(__METHOD__);
+//error_log(__METHOD__);
 
-error_log('GET=' . var_export($_GET, true));
+//error_log('GET=' . var_export($_GET, true));
 
-error_log('POST=' . var_export($_POST, true));
+//error_log('POST=' . var_export($_POST, true));
 
         $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
+// Callled from Wordpress
 //        if (defined('ABSPATH')) {
 //            $page = explode('&', $_GET['page']);
 //            foreach($page as $p) {
@@ -27,7 +28,7 @@ error_log('POST=' . var_export($_POST, true));
         Util::session_start($g->sess_cookie);
 
         //$_SESSION = []; // to reset session for testing
-error_log('SESSION=' . var_export($_SESSION, true));
+//error_log('SESSION=' . var_export($_SESSION, true));
 
         util::cfg($g);
         $g->in = util::esc($g->in);

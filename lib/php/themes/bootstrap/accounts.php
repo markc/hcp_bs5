@@ -28,6 +28,7 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
+//error_log(var_export($in, true));
 
         extract($in);
         $aclgrp_buf = '';

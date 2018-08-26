@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180520
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20180826
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
@@ -33,10 +33,11 @@ error_log(__METHOD__);
                   <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
                   <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                   <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+                  <input type="hidden" name="user" value="' . $in['user'] . '">
                   <div class="row">
                     <div class="form-group col-4">
-                      <label for="domain">Email Address</label>
-                      <input type="text" class="form-control" value="' . $in['user'] . '" disabled>
+                      <label for="user">Email Address</label>
+                      <input type="text" class="form-control" id="user" value="' . $in['user'] . '" disabled>
                     </div>
                     <div class="form-group col-2">
                       <label for="quota">Mailbox Quota</label>
@@ -45,13 +46,13 @@ error_log(__METHOD__);
                     <div class="col-3">
                       <div class="form-group">
                         <label for="passwd1">Password</label>
-                        <input type="password" class="form-control" name="passwd1" id="passwd1" value="' . $in['password1'] . '">
+                        <input type="password" class="form-control" name="passwd1" id="passwd1" value="">
                       </div>
                     </div>
                     <div class="col-3">
                       <div class="form-group">
                         <label for="passwd2">Confirm Password</label>
-                        <input type="password" class="form-control" name="passwd2" id="passwd2" value="' . $in['password2'] . '">
+                        <input type="password" class="form-control" name="passwd2" id="passwd2" value="">
                       </div>
                     </div>
                   </div>
