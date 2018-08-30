@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vhosts.php 20180520
+// lib/php/plugins/vhosts.php 20180830
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
@@ -37,16 +37,11 @@ error_log(__METHOD__);
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
                 $_POST = []; return $this->t->create($this->in);
             }
-
-            if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
-                util::log("Invalid domain name: gethostbyname($domain)");
+            
+            if ($mailquota > $diskquota) {
+                util::log('Mailbox quota exceeds domain disk quota');
                 $_POST = []; return $this->t->create($this->in);
             }
-
-//            if ($mailquota > $diskquota) {
-//                util::log('Mailbox quota exceeds domain disk quota');
-//                $_POST = []; return $this->t->create($this->in);
-//            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
 
@@ -81,25 +76,10 @@ error_log(__METHOD__);
 
             $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
 
-            if (!filter_var(gethostbyname($domain . '.'), FILTER_VALIDATE_IP)) {
-                util::log('Domain name is invalid');
-                $_POST = []; return $this->read();
-            }
-
-           if ($mailquota > $diskquota) {
+            if ($mailquota > $diskquota) {
                 util::log('Mailbox quota exceeds disk quota');
                 $_POST = []; return $this->read();
             }
-
-            $size_upath = db::qry("
- SELECT size_upath
-   FROM logging
-  WHERE name = :name", ['name' => $domain], 'col');
-
-//            if ($mailquota < $size_upath) {
-//                util::log('Mailbox quota must be greater than current used diskspace of ' . util::numfmt($size_upath));
-//                $_POST = []; return $this->read();
-//            }
 
             $sql = "
  UPDATE `vhosts` SET
