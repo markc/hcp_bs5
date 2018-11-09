@@ -1,5 +1,5 @@
 <?php
-// lib/php/ddns.php 20180606 - 20181102
+// lib/php/ddns.php 20180606 - 20181109
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 //error_log(__FILE__.' '.$_SERVER['REMOTE_ADDR']);
@@ -16,7 +16,7 @@ if (file_exists(APIKEY)) {
 $db = [
     'host'  => '127.0.0.1', // DB site
     'name'  => 'sysadm',    // DB name
-    'pass'  => '.ht_pw',    // MySQL password override
+    'pass'  => '../.ht_pw', // MySQL password override
     'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
     'port'  => '3306',      // DB port
     'sock'  => '',          // '/run/mysqld/mysqld.sock',
@@ -31,8 +31,6 @@ class Db extends \PDO
 
     public function __construct(array $dbcfg)
     {
-error_log(__METHOD__);
-
         if (is_null(self::$dbh)) {
             extract($dbcfg);
             $dsn = $type === 'mysql'
@@ -54,15 +52,11 @@ error_log(__METHOD__);
 
 function enc(string $v) : string
 {
-error_log(__METHOD__);
-
     return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
 }
 
 function inc_soa(string $soa) : string
 {
-error_log(__METHOD__);
-
     $ary = explode(' ', $soa);
     $ymd = date('Ymd');
     $day = substr($ary[2], 0, 8);
