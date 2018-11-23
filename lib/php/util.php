@@ -200,7 +200,7 @@ error_log(__METHOD__);
                     if (password_verify(html_entity_decode($apikey, ENT_QUOTES, 'UTF-8'), $usr['webpw'])) {
 error_log("API login for id=$apiusr");
                         $_SESSION['usr'] = $usr;
-                        if ($usr['acl'] == 0) $_SESSION['adm'] = $id;
+                        if ($usr['acl'] == 0) $_SESSION['adm'] = $apiusr;
                     } else die('Invalid Email Or Password');
                 } else die('Account is disabled, contact your System Administrator');
             } else die('Invalid Email Or Password');
