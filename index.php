@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20180713
+// index.php 20150101 - 20181123
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -21,10 +21,9 @@ echo new Init(new class
         'host'  => '',
         'perp'  => 25,
         'self'  => '/hcp/',
-        'encryption_cipher'=> 'AES-128-CBC',
-        'encryption_key'   => 'shPqOV7k+TAqhi9/6GUL5Q=='
     ],
     $in = [
+        'a'     => '',          // API (apiusr:apikey)
         'd'     => '',          // Domain (current)
         'g'     => null,        // Group/Category
         'i'     => null,        // Item or ID
@@ -114,14 +113,6 @@ echo new Init(new class
             'type'  => '',          // mysql | sqlite | '' to disable
             'user'  => 'pdns',      // Alt DNS DB user
         ],
-    ],
-    $sess_cookie = [
-        'name'      => 'HCPSESS',
-        'lifetime'  => 0,
-        'path'      => '',
-        'domain'    => '',
-        'secure'    => false,
-        'httponly'  => true
     ],
     $acl = [
         0 => 'SuperAdmin',

@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20180517
+// lib/php/plugins/auth.php 20150101 - 20181122
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
@@ -21,14 +21,10 @@ class Plugins_Auth extends Plugin
         'passwd2'   => '',
     ];
 
+    // forgotpw
     public function create() : string
     {
 error_log(__METHOD__);
-
-        // Logged-in users cannot perfom this action.
-//        if(util::is_usr()){
-//            util::redirect($this->g->cfg['self']);
-//        }
 
         $u = $this->in['login'];
 
@@ -52,14 +48,10 @@ error_log(__METHOD__);
         return $this->t->create(['login' => $u]);
     }
 
+    // login
     public function list() : string
     {
 error_log(__METHOD__);
-
-        // Logged-in users cannot perform this action
-//        if(util::is_usr()){
-//            util::redirect($this->g->cfg['self']);
-//        }
 
         $u = $this->in['login'];
         $p = $this->in['webpw'];
@@ -70,7 +62,9 @@ error_log(__METHOD__);
                 if ($acl !== 9) {
                     if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
                         if ($this->in['remember']) {
-                            $this->_rememberme($id);
+                            $uniq = util::random_token(32);
+                            db::update(['cookie' => $uniq], [['id', '=', $id]]);
+                            util::put_cookie('remember', $uniq, self::REMEMBER_ME_EXP);
                         }
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
@@ -84,6 +78,7 @@ error_log(__METHOD__);
         return $this->t->list(['login' => $u]);
     }
 
+    // resetpw
     public function update() : string
     {
 error_log(__METHOD__);
@@ -151,11 +146,6 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        // Logged-in users cannot perfom this action.
-//        if(util::is_usr()){
-//            util::redirect($this->g->cfg['self']);
-//        }
-
         $otp = html_entity_decode($this->in['otp']);
         if (strlen($otp) === self::OTP_LENGTH) {
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
@@ -190,31 +180,6 @@ If you did not request this action then please ignore this message.
 ' . $host . '?o=auth&m=resetpw&otp=' . $newpass,
             $headers
         );
-    }
-
-    public function setcookie(string $name, string $value, int $expire) : bool
-    {
-error_log(__METHOD__);
-
-        if ((empty($value) || $expire < 0) && isset($_COOKIE[$name])) unset($_COOKIE[$name]);
-
-        /**
-         * Auth Cookies must be transmitted only over a
-         * secure HTTPS connection from the client, and
-         * must be accessible only through the HTTP protocol.
-         */
-        $expire = $expire ? time() + $expire : 0;
-        return setcookie($name, $value, $expire, $this->g->cfg['self'], '', $this->g->sess_cookie['secure'], $this->g->sess_cookie['httponly']);
-    }
-
-    private function _rememberme(int $usr_id) : void
-    {
-error_log(__METHOD__);
-
-        $uniq = util::random_token(32);
-        $expire = date("Y-m-d H:i:s", (time() + self::REMEMBER_ME_EXP));
-        db::qry('INSERT INTO cookies (accounts_id, token, expire) VALUES(:id, :token, :expire)', ['id'=>$usr_id, 'token'=>$uniq, 'expire'=>$expire]);
-        $this->setcookie('remember', $uniq, self::REMEMBER_ME_EXP);
     }
 }
 

@@ -1,5 +1,5 @@
 <?php
-// lib/php/util.php 20150225 - 20180613
+// lib/php/util.php 20150225 - 20181122
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -185,52 +185,53 @@ error_log(__METHOD__);
         return false;
     }
 
+    public static function chkapi(object $g) : void
+    {
+error_log(__METHOD__);
+
+        [$apiusr, $apikey] = explode(':', $g->in['a'], 2);
+
+        if (!self::is_usr($apiusr)) { // if this user has already logged in then avoid extra DB lookup
+            if (is_null(db::$dbh)) db::$dbh = new db($g->db);
+            db::$tbl = 'accounts';
+
+            if ($usr = db::read('id,grp,acl,login,fname,lname,webpw', 'id', $apiusr, '', 'one')) {
+                if ($usr['acl'] !== 9) {
+                    if (password_verify(html_entity_decode($apikey, ENT_QUOTES, 'UTF-8'), $usr['webpw'])) {
+error_log("API login for id=$apiusr");
+                        $_SESSION['usr'] = $usr;
+                        if ($usr['acl'] == 0) $_SESSION['adm'] = $id;
+                    } else die('Invalid Email Or Password');
+                } else die('Account is disabled, contact your System Administrator');
+            } else die('Invalid Email Or Password');
+        } else {
+error_log("API id=$apiusr is already logged in");
+        }
+    }
+
     public static function remember(object $g) : void
     {
 error_log(__METHOD__);
 
-        if (self::is_usr())
-            return;
-
-        if (!$c = self::get_cookie('remember')) {
-            return;
+        if (!self::is_usr()) {
+            if ($c = self::get_cookie('remember')) {
+                if (is_null(db::$dbh)) db::$dbh = new db($g->db);
+                db::$tbl = 'accounts';
+                if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
+                    extract($usr);
+                    $_SESSION['usr'] = $usr;
+                    if ($acl == 0) $_SESSION['adm'] = $id;
+                    self::log($login . ' is remembered and logged back in', 'success');
+                    self::ses('o', '', $g->in['o']);
+                    self::ses('m', '', $g->in['m']);
+                }
+            }
         }
-
-        if (!$rc = self::decrypt($c, $g->cfg['encryption_cipher'], $g->cfg['encryption_key'])) {
-            self::del_cookie('remember');
-            return;
-        }
-
-        $rc = unserialize($rc);
-        $c = $rc['token'] ?? '';
-        $e = $rc['expire'] ?? 0;
-
-        if ($e < time()) {
-            util::del_cookie('remember');
-            return;
-        }
-
-        if (is_null(db::$dbh)) {
-            db::$dbh = new db($g->db);
-        }
-
-        db::$tbl = 'accounts';
-        if (!$usr = db::read('id,grp,acl,login,fname,lname', 'cookie', $c, '', 'one')) {
-            self::del_cookie('remember');
-            return;
-        }
-
-        extract($usr);
-        $_SESSION['usr'] = $usr;
-        if ($acl == 0) $_SESSION['adm'] = $id;
-        self::log($login . ' is remembered and logged back in', 'success');
-        self::ses('o', '', $g->in['o']);
-        self::ses('m', '', $g->in['m']);
     }
 
     public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = '') : void
     {
-error_log(__METHOD__);
+error_log(__METHOD__."($url)");
 
         if ($method == 'refresh') {
             header('refresh:' . $ttl . '; url=' . $url);
@@ -328,15 +329,14 @@ error_log(__METHOD__);
 
         return substr($random_base64, 0, $length);
     }
-
+/*
     public static function session_start(array $cfg) : bool
     {
 error_log(__METHOD__);
 
-        /**
-         * Default session cookie paramters
-         * http://php.net/manual/en/session.configuration.php
-         */
+//      Default session cookie paramters
+//      http://php.net/manual/en/session.configuration.php
+
         $_sess_cookie_params = session_get_cookie_params();
 
         $name     = $cfg['name'] ?? session_name();
@@ -350,7 +350,7 @@ error_log(__METHOD__);
         session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
         return session_start();
     }
-
+*/
     public static function inc_soa(string $soa) : string
     {
 error_log(__METHOD__);
@@ -373,7 +373,7 @@ error_log(__METHOD__);
         $valid_plans = ['personal', 'soho', 'business', 'enterprise'];
         return in_array($plan, $valid_plans);
     }
-
+/*
     public static function encrypt(string $data, string $cipher, string $encryption_key)
     {
 error_log(__METHOD__);
@@ -404,6 +404,7 @@ error_log(__METHOD__);
 error_log('return data='.var_export($data,true));
         return $data;
     }
+*/
 }
 
 ?>

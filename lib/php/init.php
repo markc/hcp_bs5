@@ -1,5 +1,5 @@
 <?php
-// lib/php/init.php 20150101 - 20180826
+// lib/php/init.php 20150101 - 20181123
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
@@ -8,7 +8,7 @@ class Init
 
     public function __construct(object $g)
     {
-//error_log(__METHOD__);
+error_log(__METHOD__);
 
 //error_log('GET=' . var_export($_GET, true));
 
@@ -16,19 +16,10 @@ class Init
 
         $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
-// Callled from Wordpress
-//        if (defined('ABSPATH')) {
-//            $page = explode('&', $_GET['page']);
-//            foreach($page as $p) {
-//                [$k, $v] = explode('=', $p);
-//                $g->in[$k] = $v;
-//            }
-//        }
-
-        Util::session_start($g->sess_cookie);
+        session_start();
 
         //$_SESSION = []; // to reset session for testing
-//error_log('SESSION=' . var_export($_SESSION, true));
+error_log('SESSION=' . var_export($_SESSION, true));
 
         util::cfg($g);
         $g->in = util::esc($g->in);
@@ -46,11 +37,11 @@ class Init
 
         $p  = 'plugins_' . $g->in['o'];
         if (class_exists($p)) {
-            util::remember($g);
+            $g->in['a'] ? util::chkapi($g) : util::remember($g);
             $g->out['main'] = (string) new $p($thm);
         } else $g->out['main'] = "Error: no plugin object!";
 
-        if (empty($g->in['x']) && !defined('ABSPATH'))
+        if (empty($g->in['x']))
             foreach ($g->out as $k => $v)
                 $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
     }
@@ -61,9 +52,8 @@ error_log(__METHOD__);
 
         $g = $this->t->g;
         $x = $g->in['x'];
-//        if ($x === 'text' || defined('ABSPATH')) {
         if ($x === 'text') {
-            return $g->out['main'];
+            return preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main']));
         } elseif ($x === 'json') {
             header('Content-Type: application/json');
             return $g->out['main'];
@@ -79,10 +69,11 @@ error_log(__METHOD__);
 
     public function __destruct()
     {
+//error_log('SESSION=' . var_export($_SESSION, true));
         error_log($_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }
-
+/*
 function dbg($var = null)
 {
     if (is_object($var))
@@ -93,5 +84,5 @@ function dbg($var = null)
     ob_end_clean();
     error_log($ob);
 }
-
+*/
 ?>

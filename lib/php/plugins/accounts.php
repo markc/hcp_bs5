@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/users.php 20150101 - 20180517
+// lib/php/plugins/users.php 20150101 - 20181123
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Accounts extends Plugin
@@ -14,7 +14,6 @@ class Plugins_Accounts extends Plugin
         'fname'     => '',
         'lname'     => '',
         'altemail'  => '',
-        //'webpw'     => '',
     ];
 
     protected function create() : string
