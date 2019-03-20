@@ -1,6 +1,6 @@
 <?php
-// lib/php/init.php 20150101 - 20181123
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/init.php 20150101 - 20190320
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
@@ -19,7 +19,7 @@ error_log(__METHOD__);
         session_start();
 
         //$_SESSION = []; // to reset session for testing
-error_log('SESSION=' . var_export($_SESSION, true));
+//error_log('SESSION=' . var_export($_SESSION, true));
 
         util::cfg($g);
         $g->in = util::esc($g->in);
@@ -73,7 +73,7 @@ error_log(__METHOD__);
         error_log($_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4));
     }
 }
-/*
+
 function dbg($var = null)
 {
     if (is_object($var))
@@ -84,5 +84,5 @@ function dbg($var = null)
     ob_end_clean();
     error_log($ob);
 }
-*/
+
 ?>

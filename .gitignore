@@ -16,3 +16,5 @@ tld_order.php
 cfcp/
 cfpp/
 lib/php/home.tpl
+lib/php/plugins/bion/
+lib/php/themes/bootstrap/bion/

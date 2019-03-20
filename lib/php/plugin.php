@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugin.php 20150101 - 20180613
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugin.php 20150101 - 20190320
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
 {
@@ -16,7 +16,6 @@ error_log(__METHOD__);
 
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
-
         if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create' && $m !== 'resetpw'))){
 //            util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             util::redirect($t->g->cfg['self'] . '?o=auth');
@@ -32,6 +31,7 @@ error_log(__METHOD__);
                 db::$dbh = new db($t->g->db);
             db::$tbl = $this->tbl;
         }
+
         $this->buf .= $this->{$t->g->in['m']}();
     }
 
@@ -51,7 +51,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } else return $this->t->create($this->in);
     }
 
