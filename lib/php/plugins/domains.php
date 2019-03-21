@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/domains.php 20150101 - 20180520
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/domains.php 20150101 - 20190320
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
 {
@@ -150,8 +150,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        if (util::is_post() || $this->in['increment']) {
-            if ($this->in['increment']) {
+        if ($this->in['increment']) {
+//            if ($this->in['increment']) {
                 $sql = "
  SELECT content as soa
    FROM records
@@ -166,9 +166,9 @@ error_log(__METHOD__);
                 $retry    = $oldsoa[4];
                 $expire   = $oldsoa[5];
                 $ttl      = $oldsoa[6];
-            } else {
-                extract($_POST);
-            }
+//            } else {
+//                extract($_POST);
+//            }
 
             $today = date('Ymd');
             $serial_day = substr($serial, 0, 8);
@@ -206,9 +206,11 @@ error_log(__METHOD__);
 
             // TODO check $res ???
             util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
 
-        } elseif ($this->g->in['i']) {
+        } elseif (util::is_post() && $this->g->in['i']) {
+
+            extract($_POST);
 
             $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
             if ($dom['type'] === 'SLAVE') {
@@ -252,7 +254,7 @@ error_log(__METHOD__);
         if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => 0,   'db' => 'name',       'formatter' => function($d, $row) {
-                    return ($row['type'] === 'MASTER') ? '
+                    return ($row['type'] !== 'SLAVE') ? '
                     <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
                       <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
                 }],
@@ -260,11 +262,15 @@ error_log(__METHOD__);
                 ['dt' => 2,   'db' => 'records'],
                 ['dt' => 3,   'db' => 'soa',        'formatter' => function($d, $row) {
                     $soa = explode(' ', $row['soa']);
-                    return ($row['type'] === 'MASTER') ? '
+                    return ($row['type'] !== 'SLAVE') ? '
         <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
                 }],
-                ['dt' => 4,   'db' => 'updated'],
-                ['dt' => 5,   'db' => 'id'],
+                ['dt' => 4,  'db' => 'id', 'formatter' => function($d, $row) {
+                    return '
+                    <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 5,   'db' => 'updated'],
             ];
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }

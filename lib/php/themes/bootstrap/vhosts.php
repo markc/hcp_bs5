@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20180520
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20190320
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
 {
@@ -80,15 +80,6 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        // TODO migrate plans to a database table
-        $plans = [
-            ['Select Plan', ''],
-            ['Personal - 1 GB Storage, 1 Domain, 1 Website, 1 Mailbox', 'personal'],
-            ['SOHO - 5 GB Storage, 2 Domains, 2 Websites, 5 Mailboxes', 'soho'],
-            ['Business - 10 GB Storage, 5 Domains, 5 Websites, 10 Mailboxes', 'business'],
-            ['Enterprise - 20 GB Storage, 10 Domains, 10 Websites, 20 Mailboxes', 'enterprise'],
-        ];
-
         $create = $this->modal([
             'id'      => 'createmodal',
             'title'   => 'Create New Vhost',
@@ -99,9 +90,37 @@ error_log(__METHOD__);
                     <label for="domain" class="form-control-label">Vhost</label>
                     <input type="text" class="form-control" id="domain" name="domain">
                   </div>
-                  <div class="form-group">
-                    <label for="plan" class="form-control-label">Plan</label>
-                    ' . $this->dropdown($plans, 'plan', '', '', 'custom-select') . '
+                  <div class="row">
+                    <div class="col-12 col-sm-6">
+                      <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" name="cms" id="cms" checked>
+                          <label class="custom-control-label" for="cms">WordPress</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                      <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" name="ssl" id="ssl">
+                          <label class="custom-control-label" for="ssl">Self Signed SSL</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12 col-sm-6">
+                      <div class="form-group">
+                        <label for="ip" class="form-control-label">IP (optional)</label>
+                        <input type="text" class="form-control" id="ip" name="ip">
+                      </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                      <div class="form-group">
+                        <label for="uuser" class="form-control-label">Custom User</label>
+                        <input type="text" class="form-control" id="uuser" name="uuser">
+                      </div>
+                    </div>
                   </div>',
         ]);
 

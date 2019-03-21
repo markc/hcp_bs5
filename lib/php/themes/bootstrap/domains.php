@@ -21,6 +21,7 @@ error_log(__METHOD__);
     public function list(array $in) : string
     {
 error_log(__METHOD__);
+var_export($in, true);
 
         $create = $this->modal([
             'id'      => 'createmodal',
@@ -32,6 +33,17 @@ error_log(__METHOD__);
                 <label for="domain" class="form-control-label">Domain</label>
                 <input type="text" class="form-control" id="domain" name="domain">
               </div>',
+        ]);
+
+        $remove = $this->modal([
+            'id'      => 'removemodal',
+            'title'   => 'Remove DNS Zone',
+            'action'  => 'delete',
+            'footer'  => 'Remove',
+            'hidden'  => '
+                <input type="hidden" id="removemodalid" name="i" value="">',
+            'body'    => '
+                <p class="text-center">Are you sure you want to remove this domain?<br><b id="removemodalname"></b></p>',
         ]);
 
         return '
@@ -53,23 +65,24 @@ error_log(__METHOD__);
                   <th>Type</th>
                   <th>Records</th>
                   <th>Serial</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
               </tbody>
             </table>
           </div>
-        </div>' . $create . '
+        </div>' . $create . $remove . '
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=domains&m=list",
-    "order": [[ 4, "desc" ]],
+    "order": [[ 5, "desc" ]],
     "columnDefs": [
       {"targets":0, "className":"text-truncate", "width":"40%"},
-      {"targets":4, "visible":false},
+      {"targets":4, "width":"2rem", "className":"text-right", "sortable": false},
       {"targets":5, "visible":false},
     ],
   });
@@ -80,6 +93,11 @@ $(document).ready(function() {
     });
     return false;
   }));
+  $(document).on("click", ".delete", {}, function() {
+    var row = $(this).closest("tr");
+    $("#removemodalid").val($(this).attr("data-rowid"));
+    $("#removemodalname").text($(this).attr("data-rowname"));
+  });
 });
         </script>';
     }

@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/vhosts.php 20180830
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/vhosts.php 20190321
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
 {
@@ -17,7 +17,10 @@ class Plugins_Vhosts extends Plugin
         'mailquota' => 500000000,
         'uid'       => 1000,
         'uname'     => '',
-        'plan'      => 'personal',
+        'cms'       => '',
+        'ssl'       => '',
+        'ip'        => '',
+        'uuser'     => '',
     ];
 
     protected function create() : string
@@ -26,22 +29,22 @@ error_log(__METHOD__);
 
         if (util::is_post()) {
             extract($this->in);
-            $active = $active ? 1 : 0;
+//            $active = $active ? 1 : 0;
 
-            if(!util::is_valid_plan($plan)){
-                util::log('Invalid plan ' . $plan);
-                util::redirect($this->g->cfg['self'] . '?o=vhosts');
-            }
+//            if(!util::is_valid_plan($plan)){
+//                util::log('Invalid plan ' . $plan);
+//                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+//            }
 
             if (file_exists('/home/u/' . $domain)) {
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
                 $_POST = []; return $this->t->create($this->in);
             }
-            
-            if ($mailquota > $diskquota) {
-                util::log('Mailbox quota exceeds domain disk quota');
-                $_POST = []; return $this->t->create($this->in);
-            }
+
+//            if ($mailquota > $diskquota) {
+//                util::log('Mailbox quota exceeds domain disk quota');
+//                $_POST = []; return $this->t->create($this->in);
+//            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
 
@@ -50,7 +53,11 @@ error_log(__METHOD__);
                 $_POST = []; return $this->t->create($this->in);
             }
 
-            shell_exec("nohup sh -c 'sudo addvhost $domain $plan' > /tmp/addvhost.log 2>&1 &");
+            $cms = ($cms === 'on') ? 'wp' : 'none';
+            $ssl = ($ssl === 'on') ? 'self' : 'le';
+            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+
+            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
             util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }

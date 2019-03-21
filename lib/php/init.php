@@ -10,9 +10,9 @@ class Init
     {
 error_log(__METHOD__);
 
-//error_log('GET=' . var_export($_GET, true));
+error_log('GET=' . var_export($_GET, true));
 
-//error_log('POST=' . var_export($_POST, true));
+error_log('POST=' . var_export($_POST, true));
 
         $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
