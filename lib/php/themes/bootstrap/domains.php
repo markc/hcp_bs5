@@ -30,9 +30,9 @@ var_export($in, true);
             'footer'  => 'Create',
             'body'    => '
             <div class="form-group">
-                <label for="domain" class="form-control-label">Domain</label>
-                <input type="text" class="form-control" id="domain" name="domain">
-              </div>',
+              <label for="domain" class="form-control-label">Domain</label>
+              <input type="text" class="form-control" id="domain" name="domain">
+            </div>',
         ]);
 
         $remove = $this->modal([
@@ -44,6 +44,15 @@ var_export($in, true);
                 <input type="hidden" id="removemodalid" name="i" value="">',
             'body'    => '
                 <p class="text-center">Are you sure you want to remove this domain?<br><b id="removemodalname"></b></p>',
+        ]);
+
+        $shwho = $this->modal([
+            'id'      => 'shwhomodal',
+            'title'   => 'Domain Info for <b id="shwho-name"></b>',
+            'action'  => 'shwho',
+            'footer'  => '',
+            'body'    => '
+            <pre id="shwho-info"></pre>',
         ]);
 
         return '
@@ -72,7 +81,7 @@ var_export($in, true);
               </tbody>
             </table>
           </div>
-        </div>' . $create . $remove . '
+        </div>' . $create . $remove . $shwho . '
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
@@ -87,16 +96,23 @@ $(document).ready(function() {
     ],
   });
   $(document).on("click", ".serial", {}, (function() {
-    var a = $(this)
+    var a = $(this);
     $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
       $(a).text(data);
     });
     return false;
   }));
   $(document).on("click", ".delete", {}, function() {
-    var row = $(this).closest("tr");
     $("#removemodalid").val($(this).attr("data-rowid"));
     $("#removemodalname").text($(this).attr("data-rowname"));
+  });
+  $(document).on("click", ".shwho", {}, function() {
+    var $this = $(this);
+    $("#shwho-name").text($this.attr("data-rowname"));
+    $.post("?x=text&o=domains&m=shwho&name=" + $this.attr("data-rowname"), function(data) {
+      $("#shwho-info").text(data);
+    });
+    return false;
   });
 });
         </script>';

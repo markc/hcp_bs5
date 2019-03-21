@@ -267,6 +267,8 @@ error_log(__METHOD__);
                 }],
                 ['dt' => 4,  'db' => 'id', 'formatter' => function($d, $row) {
                     return '
+                    <a href="" class="shwho" data-toggle="modal" data-target="#shwhomodal" title="Show Domain Info" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="fas fa-info-circle fa-fw cursor-pointer"></i></a>
                     <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
@@ -275,6 +277,13 @@ error_log(__METHOD__);
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
         return $this->t->list([]);
+    }
+
+    protected function shwho() : string
+    {
+error_log(__METHOD__);
+
+        return shell_exec('sudo shwho ' . $this->in['name']);
     }
 }
 
