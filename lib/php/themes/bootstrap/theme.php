@@ -212,7 +212,11 @@ error_log(__METHOD__);
         extract($ary);
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $footer = $footer ? '
-                  <button type="submit" class="btn btn-primary">' . $footer . '</button>' : '';
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">' . $footer . '</button>
+                </div>' : '';
+
         return '
         <div class="modal fade" id="' . $id . '" tabindex="-1" role="dialog" aria-labelledby="' . $id . '" aria-hidden="true">
           <div class="modal-dialog" role="document">
@@ -229,10 +233,7 @@ error_log(__METHOD__);
                 <input type="hidden" name="m" value="' . $action . '">
                 <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
                 <div class="modal-body">' . $body . '
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>' . $footer . '
-                </div>
+                </div>' . $footer . '
               </form>
             </div>
           </div>
