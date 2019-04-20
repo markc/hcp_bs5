@@ -8,14 +8,17 @@ class Plugins_Domains extends Plugin
     $dbh = null,
     $tbl = 'domains',
     $in = [
-        'name'        => '',
-        'master'      => '',
-        'last_check'  => '',
-        'disabled'    => 0,
-        'type'        => '',
+        'name'          => '',
+        'master'        => '',
+        'last_check'    => '',
+        'disabled'      => 0,
+        'type'          => '',
         'notified_serial' => '',
-        'account'     => '',
-        'increment'   => 0,
+        'account'       => '',
+        'increment'     => 0,
+        'ip'            => '',
+        'ns1'           => '',
+        'ns2'           => '',
     ];
 
     public function __construct(Theme $t)
@@ -28,6 +31,23 @@ error_log(__METHOD__);
     }
 
     protected function create() : string
+    {
+error_log(__METHOD__);
+
+        if (util::is_post()) {
+            extract($_POST);
+
+//            $cms = ($cms === 'on') ? 'wp' : 'none';
+//            $ssl = ($ssl === 'on') ? 'self' : 'le';
+//            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+
+            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
+            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
+            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+        }
+    }
+
+    protected function create2() : string
     {
 error_log(__METHOD__);
 

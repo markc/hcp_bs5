@@ -32,6 +32,18 @@ var_export($in, true);
             <div class="form-group">
               <label for="domain" class="form-control-label">Domain</label>
               <input type="text" class="form-control" id="domain" name="domain">
+            <div class="form-group">
+            </div>
+              <label for="ip" class="form-control-label">IP</label>
+              <input type="text" class="form-control" id="ip" name="ip">
+            <div class="form-group">
+            </div>
+              <label for="ns1" class="form-control-label">NS1</label>
+              <input type="text" class="form-control" id="ns1" name="ns1">
+            <div class="form-group">
+            </div>
+              <label for="ns2" class="form-control-label">NS2</label>
+              <input type="text" class="form-control" id="ns2" name="ns2">
             </div>',
         ]);
 

@@ -9,12 +9,3 @@ webmail/
 lib/uploads/*.jpg
 whmcs/
 .well-known/
-delete_tblpricing.sh
-synergytld.php
-testpricing.php
-tld_order.php
-cfcp/
-cfpp/
-lib/php/home.tpl
-lib/php/plugins/bion/
-lib/php/themes/bootstrap/bion/
