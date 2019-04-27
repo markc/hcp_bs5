@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/bion/clients.php 20190225 - 20190225
+// lib/php/plugins/bion/clients.php 20190225 - 20190427
 // Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Bion_Clients extends Plugin
@@ -14,7 +14,7 @@ class Plugins_Bion_Clients extends Plugin
 
     protected function list() : string
     {
-error_log(__METHOD__.' x='.$this->g->in['x']);
+//error_log(__METHOD__.' x='.$this->g->in['x']);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [

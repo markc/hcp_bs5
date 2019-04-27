@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/bion/sites.php 20190225 - 20190225
+// lib/php/themes/bootstrap/bion/sites.php 20190225 - 20190427
 // Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Bion_Sites extends Themes_Bootstrap_Theme
@@ -31,6 +31,17 @@ error_log(__METHOD__);
 
         extract($in);
 
+        $res = db::qry("
+ SELECT name
+   FROM `bion_clients`");
+//error_log(var_export($res,true));
+
+        foreach($res as $k => $v) $clients_ary[] = [$v['name'], $v['name']];
+        $clients_buf = $this->dropdown($clients_ary, 'client', "$client", 'Select...', 'custom-select');
+
+//error_log($clients_buf);
+error_log(var_export($clients_ary,true));
+
         $createmodal = $this->modal([
             'id'      => 'createmodal',
             'title'   => 'Create New Site',
@@ -48,7 +59,15 @@ error_log(__METHOD__);
                   <div class="form-group">
                     <label for="postcode" class="form-control-label">Site Postcode</label>
                     <input type="text" class="form-control" id="postcode" name="postcode" value="' . $postcode . '" required>
-                  </div>'
+                  </div>
+                  <div class="form-group">
+                    <label for="client" class="form-control-label">Client</label><br>' . $clients_buf . '
+                  </div>
+                  <script>
+                      document.addEventListener("DOMContentLoaded", function(){
+                          tail.select("#client", { search: true });
+                      });
+                  </script>'
         ]);
 
         return '
@@ -69,6 +88,7 @@ error_log(__METHOD__);
                     <th class="w-25">Site Name</th>
                     <th>Site City</th>
                     <th>Site Postcode</th>
+                    <th>Client</th>
                   </tr>
                 </thead>
                 <tbody>

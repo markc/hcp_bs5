@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/bion/units.php 20190225 - 20190225
+// lib/php/themes/bootstrap/bion/units.php 20190225 - 20190427
 // Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Bion_Units extends Themes_Bootstrap_Theme
@@ -31,6 +31,14 @@ error_log(__METHOD__);
 
         extract($in);
 
+        $res = db::qry("
+ SELECT name
+   FROM `bion_sites`");
+//error_log(var_export($res,true));
+
+        foreach($res as $k => $v) $sites_ary[] = [$v['name'], $v['name']];
+        $sites_buf = $this->dropdown($sites_ary, 'site', "$site", 'Select...', 'custom-select');
+
         $createmodal = $this->modal([
             'id'      => 'createmodal',
             'title'   => 'Create New Unit',
@@ -61,7 +69,14 @@ error_log(__METHOD__);
                     <label for="link_charts" class="form-control-label">Link Charts</label>
                     <input type="text" class="form-control" id="link_charts" name="link_charts" value="' . $link_charts . '" required>
                   </div>
-
+                  <div class="form-group">
+                    <label for="sites class="form-control-label">Site</label><br>' . $sites_buf . '
+                  </div>
+                  <script>
+                      document.addEventListener("DOMContentLoaded", function(){
+                          tail.select("#site", { search: true });
+                      });
+                  </script>
                   '
         ]);
 
@@ -86,6 +101,7 @@ error_log(__METHOD__);
                     <th>Link Admin</th>
                     <th>Link Files</th>
                     <th>Link Charts</th>
+                    <th>Site</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -101,10 +117,11 @@ $(document).ready(function() {
     "columnDefs": [
       {"targets":0,   "width":"12%"},
       {"targets":1,   "width":"8%"},
-      {"targets":2,   "className":"text-truncate", "width":"20%"},
-      {"targets":3,   "className":"text-truncate", "width":"20%"},
-      {"targets":4,   "className":"text-truncate", "width":"20%"},
-      {"targets":5,   "className":"text-truncate", "width":"20%"},
+      {"targets":2,   "className":"text-truncate", "width":"16%"},
+      {"targets":3,   "className":"text-truncate", "width":"16%"},
+      {"targets":4,   "className":"text-truncate", "width":"16%"},
+      {"targets":5,   "className":"text-truncate", "width":"16%"},
+      {"targets":6,   "className":"text-truncate", "width":"16%"},
     ]
   });
 });
