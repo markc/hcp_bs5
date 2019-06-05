@@ -8,6 +8,7 @@ class Plugins_Records extends Plugin
     $tbl = 'records',
     $in = [
         'content'     => '',
+        'domain'      => '',
         'name'        => '',
         'prio'        => 0,
         'ttl'         => 300,
@@ -149,10 +150,10 @@ error_log(__METHOD__);
             util::log('An "A" record must contain a legitimate IP');
             return [];
         }
-error_log('before content='.in['content']);
+error_log('before content='.$in['content']);
         if ($in['type'] === 'TXT')
             $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
-error_log('after content='.in['content']);
+error_log('after content='.$in['content']);
 
         if ($in['type'] === 'CAA')
             $in['content'] = trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"');
