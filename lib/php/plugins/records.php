@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/records.php 20150101 - 20180523
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/records.php 20150101 - 20190605
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Records extends Plugin
 {
@@ -142,15 +142,18 @@ error_log(__METHOD__);
         if (empty($in['content'])) {
             util::log('Content must not be empty');
             return [];
-        } elseif ($in['name'] && !preg_match('/^[a-zA-Z0-9_-]/', $in['name'])) {
-            util::log('Record name must only contain letters, numbers, _ and -');
+        } elseif ($in['name'] && !preg_match('/^[a-zA-Z0-9_-\*]/', $in['name'])) {
+            util::log('Record name must only contain letters, numbers and _ - or only *');
             return [];
         } elseif (($in['type'] === 'A') && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
             util::log('An "A" record must contain a legitimate IP');
             return [];
         }
         if ($in['type'] === 'TXT')
-            $in['content'] = '"' . trim($in['content'], '"') . '"';
+            $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
+
+        if ($in['type'] === 'CAA')
+            $in['content'] = trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"');
 
         $domain = strtolower(util::enc($_POST['domain']));
         $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
