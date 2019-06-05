@@ -54,7 +54,7 @@ error_log(__METHOD__);
                 util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
         return 'Error updating DNS record';
     }
@@ -142,7 +142,7 @@ error_log(__METHOD__);
         if (empty($in['content'])) {
             util::log('Content must not be empty');
             return [];
-        } elseif ($in['name'] && !preg_match('/^[a-zA-Z0-9_-*]/', $in['name'])) {
+        } elseif ($in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
             util::log('Record name must only contain letters, numbers and _ - or only *');
             return [];
         } elseif (($in['type'] === 'A') && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
