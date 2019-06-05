@@ -36,7 +36,7 @@ error_log(__METHOD__);
                 util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
         return 'Error creating DNS record';
     }
@@ -146,7 +146,7 @@ error_log(__METHOD__);
         } elseif ($in['type'] === 'CAA' && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
             util::log('CAA record content must only contain letters, numbers');
             return [];
-        } elseif ($in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
+        } elseif ($in['name'] && $in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
             util::log('Record name must only contain letters, numbers and _ - or only *');
             return [];
         } elseif (($in['type'] === 'A') && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
