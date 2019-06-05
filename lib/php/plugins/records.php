@@ -50,7 +50,7 @@ error_log(__METHOD__);
             if (!empty($in)) {
                 $dom = util::enc($_POST['domain']);
                 $in['created'] = $in['updated'];
-                db::update($this->in, [['id', '=', $this->g->in['i']]]);
+                db::update($in, [['id', '=', $this->g->in['i']]]);
                 $this->update_domains($in['domain_id'], $in['updated'] );
                 util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
             }
@@ -152,7 +152,7 @@ error_log(__METHOD__);
         }
 error_log('before content='.$in['content']);
         if ($in['type'] === 'TXT')
-            $in['content'] = '\\\\"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '\\\\"';
+            $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
 error_log('after content='.$in['content']);
 
         if ($in['type'] === 'CAA')
