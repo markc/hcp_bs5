@@ -8,7 +8,6 @@ class Plugins_Records extends Plugin
     $tbl = 'records',
     $in = [
         'content'     => '',
-        'domain'      => '',
         'name'        => '',
         'prio'        => 0,
         'ttl'         => 300,
@@ -49,10 +48,11 @@ error_log(__METHOD__);
         if (util::is_post()) {
             $in = $this->validate($this->in);
             if (!empty($in)) {
+                $dom = util::enc($_POST['domain']);
                 $in['created'] = $in['updated'];
                 db::update($this->in, [['id', '=', $this->g->in['i']]]);
                 $this->update_domains($in['domain_id'], $in['updated'] );
-                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $in['domain'], 'success');
+                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
             }
             $i = intval(util::enc($_POST['did']));
             util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
