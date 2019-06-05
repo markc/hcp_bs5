@@ -152,11 +152,11 @@ error_log(__METHOD__);
         }
 error_log('before content='.$in['content']);
         if ($in['type'] === 'TXT')
-            $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
+            $in['content'] = '\"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '\"';
 error_log('after content='.$in['content']);
 
         if ($in['type'] === 'CAA')
-            $in['content'] = trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"');
+            $in['content'] = htmlspecialchars_decode($in['content'], ENT_COMPAT);
 
         $domain = strtolower(util::enc($_POST['domain']));
         $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
