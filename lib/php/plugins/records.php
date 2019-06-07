@@ -143,14 +143,14 @@ error_log(__METHOD__);
         if (empty($in['content'])) {
             util::log('Content must not be empty');
             return [];
-        } elseif ($in['type'] === 'CAA' && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
-            util::log('CAA record content must only contain letters, numbers');
-            return [];
-        } elseif ($in['name'] && $in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
-            util::log('Record name must only contain letters, numbers and _ - or only *');
-            return [];
         } elseif (($in['type'] === 'A') && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
             util::log('An "A" record must contain a legitimate IP');
+            return [];
+        } elseif ($in['type'] === 'CAA' && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
+            util::log('CAA record content must only contain letters and numbers');
+            return [];
+        } elseif ($in['name'] && $in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
+            util::log('Record name must contain letters, numbers, _ - or only *');
             return [];
         }
 

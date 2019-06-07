@@ -305,6 +305,13 @@ error_log(__METHOD__);
 
         return shell_exec('sudo shwho ' . $this->in['name']);
     }
+
+    protected function incsoa() : string
+    {
+error_log(__METHOD__);
+
+        return shell_exec('sudo incsoa ' . $this->in['name']);
+    }
 }
 
 ?>
