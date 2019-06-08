@@ -29,21 +29,41 @@ var_export($in, true);
             'action'  => 'create',
             'footer'  => 'Create',
             'body'    => '
-            <div class="form-group">
-              <label for="domain" class="form-control-label">Domain</label>
-              <input type="text" class="form-control" id="domain" name="domain">
-            <div class="form-group">
+            <div class="form-group row">
+              <label for="domain" class="col-sm-2 col-form-label">Domain</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="domain" name="domain">
+              </div>
             </div>
-              <label for="ip" class="form-control-label">IP</label>
-              <input type="text" class="form-control" id="ip" name="ip">
-            <div class="form-group">
+            <div class="form-group row">
+              <label for="ip" class="col-sm-2 col-form-label">IP</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ip" name="ip">
+              </div>
             </div>
-              <label for="ns1" class="form-control-label">NS1</label>
-              <input type="text" class="form-control" id="ns1" name="ns1">
-            <div class="form-group">
+            <div class="form-group row">
+              <label for="ns1" class="col-sm-2 col-form-label">NS1</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ns1" name="ns1">
+              </div>
             </div>
-              <label for="ns2" class="form-control-label">NS2</label>
-              <input type="text" class="form-control" id="ns2" name="ns2">
+            <div class="form-group row">
+              <label for="ns2" class="col-sm-2 col-form-label">NS2</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ns2" name="ns2">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="mxhost" class="col-sm-2 col-form-label">MXHost</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="mxhost" name="mxhost">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="spfip" class="col-sm-2 col-form-label">SPF IP</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="spfip" name="spfip">
+              </div>
             </div>',
         ]);
 

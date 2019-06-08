@@ -37,13 +37,20 @@ error_log(__METHOD__);
         if (util::is_post()) {
             extract($_POST);
 
+//            $err = var_export($_POST, true);
+//util::log('<pre>'.$err.'</pre>');
 //            $cms = ($cms === 'on') ? 'wp' : 'none';
 //            $ssl = ($ssl === 'on') ? 'self' : 'le';
 //            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+// wtf, we are not creating a new vhost!!!
+//            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
+//            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
+//            util::redirect($this->g->cfg['self'] . '?o=vhosts');
 
-            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
-            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
-            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+// Usage: addpdns domain ip ns1 ns2 [mx] [spfip] [sshkey]
+
+            util::exe("addpdns $domain $ip $ns1 $ns2 $mxhost $spfip");
+            return $this->t->create($this->in);
         }
     }
 

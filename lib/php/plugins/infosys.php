@@ -1,6 +1,6 @@
 <?php
-// plugins/infosys.php 20170225 - 20180430
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// plugins/infosys.php 20170225 - 20190608
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_InfoSys extends Plugin
 {
@@ -62,10 +62,12 @@ error_log(__METHOD__);
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
 
-        $hn  = is_readable('/proc/sys/kernel/hostname')
-            ? trim(file_get_contents('/proc/sys/kernel/hostname'))
-            : 'Unknown';
-        $ip  = gethostbyname($hn);
+//        $hn  = is_readable('/proc/sys/kernel/hostname')
+//            ? trim(file_get_contents('/proc/sys/kernel/hostname'))
+//            : 'Unknown';
+
+        $ip  = gethostbyname(gethostname());
+        $hn  = gethostbyaddr($ip);
         $knl = is_readable('/proc/version')
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
