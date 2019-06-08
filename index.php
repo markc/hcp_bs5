@@ -1,6 +1,6 @@
 <?php
-// index.php 20150101 - 20181123
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20190608
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
@@ -42,7 +42,7 @@ echo new Init(new class
         'nav3'  => '',
         'head'  => 'NetServa',
         'main'  => 'Error: missing page!',
-        'foot'  => 'Copyright (C) 2015-2018 Mark Constable (AGPL-3.0)',
+        'foot'  => 'Copyright (C) 2015-2019 Mark Constable (AGPL-3.0)',
         'js'   => '',
         'end'   => '',
     ],
