@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/vmails.php 20180826
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/vmails.php 20180826 - 20190827
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vmails extends Plugin
 {
@@ -30,7 +30,7 @@ error_log(__METHOD__);
                 util::log('Email address (' . $this->in['user'] . ') is invalid');
                 $_POST = []; return $this->read();
             }
-            util::exe('addvmail ' . $this->in['user'] . ($this->in['spamf'] ? '' : ' nospam'));
+            util::exe('addvmail ' . $this->in['user']);
         }
         util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
@@ -50,7 +50,7 @@ error_log(__METHOD__);
             extract($this->in);
             $quota *= 1000000;
             $active = $active ? 1 : 0;
-            $spamf  = $spamf ? 1 : 0;
+//            $spamf  = $spamf ? 1 : 0;
 
             if (!filter_var($user, FILTER_VALIDATE_EMAIL)) {
                 util::log("Email address ($user) is invalid");
@@ -88,6 +88,9 @@ error_log(__METHOD__);
                 'quota'   => $quota,
                 'updated' => date('Y-m-d H:i:s'),
             ]);
+/*
+Spam filtering is now on globally by default so to disable spam filtering requires
+a sieve filter per user.
 
             $spamf_old = db::read('spamf', 'id', $this->g->in['i'], '', 'col');
             $spamf_buf = '';
@@ -99,6 +102,8 @@ error_log(__METHOD__);
                 $spamf_buf = $spamf_buf ? '<pre>' . $spamf_buf . '</pre>' : '';
             }
             util::log($spamf_buf . 'Mailbox details for ' . $user . ' have been saved', 'success');
+*/
+            util::log('Mailbox details for ' . $user . ' have been saved', 'success');
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
         return 'Error updating item';

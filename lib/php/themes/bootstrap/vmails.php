@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20180826
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20190827
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
@@ -58,12 +58,14 @@ error_log(__METHOD__);
                   </div>
                   <div class="row">
                     <div class="col-4">
+<!--
                       <div class="form-group">
                         <div class="custom-control custom-checkbox">
                           <input type="checkbox" class="custom-control-input" name="spamf" id="spamf"' . ($in['spamf'] ? ' checked' : '') . '>
                           <label class="custom-control-label" for="spamf">Spam Filter</label>
                         </div>
                       </div>
+-->
                     </div>
                     <div class="col-4">
                       <div class="form-group">
@@ -98,12 +100,14 @@ error_log(__METHOD__);
                     <label for="user" class="form-control-label">Mailbox</label>
                     <input type="text" class="form-control" id="user" name="user">
                   </div>
+<!--
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
                       <input type="checkbox" class="custom-control-input" name="spamf" id="spamf" checked>
                       <label class="custom-control-label" for="spamf">Spam Filter</label>
                     </div>
-                  </div>',
+                  </div>
+-->',
         ]);
 
         return '
