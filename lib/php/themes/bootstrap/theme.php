@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/theme.php 20150101 - 20190427
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/theme.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Theme extends Theme
 {
@@ -11,10 +11,8 @@ error_log(__METHOD__);
         return '
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
-
     <style>
 body{min-height:75rem;padding-top:5rem;}
 table,form{width:100%;}
@@ -35,7 +33,6 @@ table.dataTable{border-collapse: collapse !important;}
 .media img {
   max-width: 100%;
   height: auto;
-  /*margin-bottom: 0.75rem;*/
 }
 .media-blank {
   width: 300px;
@@ -46,16 +43,11 @@ table.dataTable{border-collapse: collapse !important;}
 .alert pre {
   margin: 0;
 }
-  .columns {column-gap:1.5em;columns:1;}
-/*body{ background:yellow; }*/
+.columns {
+  column-gap:1.5em;columns:1;}
 
-@media (min-width:576px) {
-  /*body{ background:red; }*/
-}
 @media (min-width:768px) {
-  /*body{ background:blue; }*/
   .columns {column-gap:1.5em;columns:2;}
-
   .media {
     flex-direction: row;
     align-items: flex-start;
@@ -67,14 +59,14 @@ table.dataTable{border-collapse: collapse !important;}
     max-width: 200px;
   }
 }
+
 @media (min-width:992px) {
-  /*body{ background: green; }*/
   .media-img, .media-blank, .media img {
     max-width: 100%;
   }
 }
+
 @media (min-width:1200px) {
-  /*body{ background: white; }*/
   .columns {column-gap:1.5em;columns:3;}
   .media-title {
     display: flex;
@@ -202,34 +194,12 @@ error_log(__METHOD__);
 
         return '
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<!--
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
--->
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/fontawesome.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/solid.min.js"></script>
-
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-
-
-
-    ';
-    }
-
-    public function js_old() : string
-    {
-error_log(__METHOD__);
-
-        return '
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://use.fontawesome.com/releases/v5.0.11/js/solid.js" integrity="sha384-Y5YpSlHvzVV0DWYRcgkEu96v/nptti7XYp3D8l+PquwfpOnorjWA+dC7T6wRgZFI" crossorigin="anonymous"></script>
-    <script src="https://use.fontawesome.com/releases/v5.0.11/js/fontawesome.js" integrity="sha384-KPnpIFJjPHLMZMALe0U04jClDmqlLhkBM6ZEkFvs9AiWRYwaDXPhn2D5lr8sypQ+" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tail.select@0.5.10/js/tail.select.min.js"></script>';
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>';
     }
 
     protected function modal(array $ary) : string
@@ -258,7 +228,7 @@ error_log(__METHOD__);
                 <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
                 <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
                 <input type="hidden" name="m" value="' . $action . '">
-                <input type="hidden" id="i" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
                 <div class="modal-body">' . $body . '
                 </div>' . $footer . '
               </form>
