@@ -46,9 +46,9 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
 
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
-error_log('in='.var_export($in, true));
+elog('in='.var_export($in, true));
 
         return '
         <div class="col-12">

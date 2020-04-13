@@ -24,7 +24,7 @@ class Plugins_Auth extends Plugin
     // forgotpw
     public function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $u = $this->in['login'];
 
@@ -51,7 +51,7 @@ error_log(__METHOD__);
     // login
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $u = $this->in['login'];
         $p = $this->in['webpw'];
@@ -81,7 +81,7 @@ error_log(__METHOD__);
     // resetpw
     public function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please login and try again.');
@@ -122,7 +122,7 @@ error_log(__METHOD__);
 
     public function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if(util::is_usr()){
             $u = $_SESSION['usr']['login'];
@@ -144,7 +144,7 @@ error_log(__METHOD__);
 
     public function resetpw() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $otp = html_entity_decode($this->in['otp']);
         if (strlen($otp) === self::OTP_LENGTH) {
@@ -163,7 +163,7 @@ error_log(__METHOD__);
 
     private function mail_forgotpw(string $email, string $newpass, string $headers = '') : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
             . $this->g->cfg['host']

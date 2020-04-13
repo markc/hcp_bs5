@@ -23,7 +23,7 @@ class Plugins_Domains extends Plugin
 
     public function __construct(Theme $t)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($t->g->dns['db']['type'])
             $this->dbh = new db($t->g->dns['db']);
@@ -32,7 +32,7 @@ error_log(__METHOD__);
 
     protected function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             extract($_POST);
@@ -56,7 +56,7 @@ error_log(__METHOD__);
 
     protected function create2() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             extract($_POST);
@@ -175,7 +175,7 @@ error_log(__METHOD__);
 
     protected function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->in['increment']) {
 //            if ($this->in['increment']) {
@@ -258,7 +258,7 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->g->in['i']) {
             $sql = "
@@ -276,7 +276,7 @@ error_log(__METHOD__);
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
@@ -308,14 +308,14 @@ error_log(__METHOD__);
 
     protected function shwho() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return shell_exec('sudo shwho ' . $this->in['name']);
     }
 
     protected function incsoa() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return shell_exec('sudo incsoa ' . $this->in['name']);
     }

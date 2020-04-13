@@ -6,9 +6,9 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
-error_log(var_export($in,true));
+elog(var_export($in,true));
 
         extract($in);
 

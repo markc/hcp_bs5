@@ -6,7 +6,7 @@ class Plugins_InfoSys extends Plugin
 {
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $mem = $dif = $cpu = [];
         $cpu_name = $procs = '';

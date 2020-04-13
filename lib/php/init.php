@@ -8,11 +8,11 @@ class Init
 
     public function __construct(object $g)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
-error_log('GET=' . var_export($_GET, true));
+elog('GET=' . var_export($_GET, true));
 
-error_log('POST=' . var_export($_POST, true));
+elog('POST=' . var_export($_POST, true));
 
         $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
@@ -48,7 +48,7 @@ error_log('POST=' . var_export($_POST, true));
 
     public function __toString() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $g = $this->t->g;
         $x = $g->in['x'];
@@ -70,7 +70,7 @@ error_log(__METHOD__);
     public function __destruct()
     {
 //error_log('SESSION=' . var_export($_SESSION, true));
-        error_log($_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4));
+        elog(__FILE__.' '.$_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4)."\n");
     }
 }
 

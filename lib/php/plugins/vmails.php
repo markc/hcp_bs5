@@ -15,7 +15,7 @@ class Plugins_Vmails extends Plugin
 
     protected function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             if (!filter_var($this->in['user'], FILTER_VALIDATE_EMAIL)) {
@@ -29,7 +29,7 @@ error_log(__METHOD__);
 
     protected function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         extract($this->in);
 
@@ -48,7 +48,7 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             util::exe('delvmail ' . $this->in['user']);
@@ -58,7 +58,7 @@ error_log(__METHOD__);
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [

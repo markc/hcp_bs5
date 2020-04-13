@@ -12,7 +12,7 @@ class Plugin
 
     public function __construct(Theme $t)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
@@ -37,14 +37,14 @@ error_log(__METHOD__);
 
     public function __toString() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->buf;
     }
 
     protected function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
@@ -57,14 +57,14 @@ error_log(__METHOD__);
 
     protected function read() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
     protected function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             $this->in['updated'] = date('Y-m-d H:i:s');
@@ -80,7 +80,7 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             if ($this->g->in['i']) {
@@ -94,14 +94,14 @@ error_log(__METHOD__);
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
     }
 
     public function __call(string $name, array $args) : string
     {
-error_log(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
+elog(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
 
         return 'Plugin::' . $name . '() not implemented';
     }

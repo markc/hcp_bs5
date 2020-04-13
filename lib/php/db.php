@@ -9,7 +9,7 @@ class Db extends \PDO
 
     public function __construct(array $dbcfg)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (is_null(self::$dbh)) {
             extract($dbcfg);
@@ -32,7 +32,7 @@ error_log(__METHOD__);
 
     public static function create(array $ary)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $fields = $values = '';
         foreach($ary as $k =>$v) {
@@ -48,7 +48,7 @@ error_log(__METHOD__);
  INSERT INTO `" . self::$tbl . "` ($fields)
  VALUES ($values)";
 
-error_log("sql=$sql");
+elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
@@ -67,7 +67,7 @@ error_log("sql=$sql");
         string $extra = '',
         string $type  = 'all')
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $w = $where ? "
     WHERE $where = :wval" : '';
@@ -78,14 +78,14 @@ error_log(__METHOD__);
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
 
-error_log("sql=$sql");
+elog("sql=$sql");
 
         return self::qry($sql, $a, $type);
     }
 
     public static function update(array $set, array $where)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $set_str = '';
         foreach($set as $k =>$v) $set_str .= "
@@ -104,7 +104,7 @@ error_log(__METHOD__);
  UPDATE `" . self::$tbl . "` SET$set_str
   WHERE$where_str";
 
-error_log("sql=$sql");
+elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
@@ -117,7 +117,7 @@ error_log("sql=$sql");
 
     public static function delete(array $where)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $where_str = '';
         $where_ary = [];
@@ -130,7 +130,7 @@ error_log(__METHOD__);
  DELETE FROM `" . self::$tbl . "`
   WHERE $where_str";
 
-error_log("sql=$sql");
+elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
@@ -143,7 +143,7 @@ error_log("sql=$sql");
 
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         try {
             if ($type !==  'all') $sql .= ' LIMIT 1';
@@ -165,7 +165,7 @@ error_log(__METHOD__);
     // bind value statement
     public static function bvs($stm, array $ary)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {
@@ -187,7 +187,7 @@ error_log(__METHOD__);
 
     public static function simple($request, $table, $primaryKey, $columns, $extra='')
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $db     = self::$dbh;
         $cols   = '`' . implode("`, `", self::pluck($columns, 'db')) . '`';
@@ -199,7 +199,7 @@ error_log(__METHOD__);
 
         if ($extra) $where .= $where ? " AND ($extra)" : " WHERE $extra";
 
-error_log("where=$where");
+elog("where=$where");
 
         $query  = "
  SELECT $cols
@@ -225,7 +225,7 @@ error_log("where=$where");
 
     public static function data_output($columns, $data)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $out = array();
 
@@ -251,7 +251,7 @@ error_log(__METHOD__);
 
     public static function limit($request, $columns)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $limit = '';
 
@@ -264,7 +264,7 @@ error_log(__METHOD__);
 
     public static function order($request, $columns)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $order = '';
 
@@ -292,7 +292,7 @@ error_log(__METHOD__);
 
     public static function filter($request, $columns, &$bindings)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $globalSearch = $columnSearch = [];
         $dtColumns = self::pluck($columns, 'dt');
@@ -350,9 +350,9 @@ error_log(__METHOD__);
 
     public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
-error_log("sql=$sql");
+elog("sql=$sql");
 
         // Argument shifting
         if ($sql === null) {
@@ -384,7 +384,7 @@ error_log("sql=$sql");
 
     private static function fatal($msg)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         echo json_encode(["error" => $msg]);
         exit(0);
@@ -392,7 +392,7 @@ error_log(__METHOD__);
 
     private static function bind(&$a, $val, $type)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $key = ':binding_' . count($a);
         $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
@@ -401,7 +401,7 @@ error_log(__METHOD__);
 
     private static function pluck($a, $prop)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $out = [];
         for($i = 0, $len = count($a) ; $i < $len ; $i++) {
@@ -412,7 +412,7 @@ error_log(__METHOD__);
 
     private static function _flatten($a, $join = ' AND ')
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (! $a) {
             return '';

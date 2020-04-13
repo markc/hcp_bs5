@@ -6,7 +6,7 @@ class Themes_Bootstrap_Theme extends Theme
 {
     public function css() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -80,7 +80,7 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function log() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
@@ -98,7 +98,7 @@ error_log(__METHOD__);
 
     public function head() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
@@ -121,7 +121,7 @@ error_log(__METHOD__);
 
     public function nav1(array $a = []) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
@@ -137,14 +137,14 @@ error_log(__METHOD__);
 
     public function nav2() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
     }
 
     public function nav3() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_usr()) {
             $usr[] = ['Change Profile', '?o=accounts&m=read&i=' . $_SESSION['usr']['id'], 'fas fa-user fa-fw'];
@@ -160,7 +160,7 @@ error_log(__METHOD__);
 
     public function nav_dropdown(array $a = []) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
@@ -179,7 +179,7 @@ error_log(__METHOD__);
 
     public function main() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <main class="container">
@@ -190,7 +190,7 @@ error_log(__METHOD__);
 
     public function js() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -204,7 +204,7 @@ error_log(__METHOD__);
 
     protected function modal(array $ary) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         extract($ary);
         $hidden = isset($hidden) && $hidden ? $hidden : '';

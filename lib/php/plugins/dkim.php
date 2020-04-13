@@ -14,7 +14,7 @@ class Plugins_Dkim extends Plugin
 
     public function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()){
             $domain = escapeshellarg($this->in['domain']);
@@ -27,7 +27,7 @@ error_log(__METHOD__);
 
     public function read() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $domain = explode('._domainkey.', $this->in['dnstxt'])[1]; // too fragile?
         $domain_esc = escapeshellarg($domain);
@@ -40,7 +40,7 @@ error_log(__METHOD__);
 
     public function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         //return $this->list(); // override parent update()
         util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
@@ -48,7 +48,7 @@ error_log(__METHOD__);
 
     public function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()){
             $domain = escapeshellarg($this->in['domain']);
@@ -59,7 +59,7 @@ error_log(__METHOD__);
 
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $buf = '<p style="columns:350px 3;column-rule: 1px dotted #ddd;text-align:center;">';
         exec("sudo dkim list 2>&1", $retArr, $retVal);

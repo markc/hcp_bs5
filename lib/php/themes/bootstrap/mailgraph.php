@@ -6,7 +6,7 @@ class Themes_Bootstrap_MailGraph extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
         <h3><i class="fa fa-envelope fa-fw" aria-hidden="true"></i> MailServer Graph</h3>

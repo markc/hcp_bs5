@@ -16,7 +16,7 @@ class Plugins_Records extends Plugin
 
     public function __construct(Theme $t)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($t->g->dns['db']['type'])
             $this->dbh = new db($t->g->dns['db']);
@@ -25,7 +25,7 @@ error_log(__METHOD__);
 
     protected function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             $in = $this->validate($this->in);
@@ -43,7 +43,7 @@ error_log(__METHOD__);
 
     protected function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             $in = $this->validate($this->in);
@@ -62,7 +62,7 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             $dom = util::enc($_POST['domain']);
@@ -80,7 +80,7 @@ error_log(__METHOD__);
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
@@ -113,7 +113,7 @@ error_log(__METHOD__);
 
     private function update_domains(int $did, string $now) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($did && $now) {
             $sql = "
@@ -138,7 +138,7 @@ error_log(__METHOD__);
 
     private function validate(array $in) : array
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (empty($in['content'])) {
             util::log('Content must not be empty');

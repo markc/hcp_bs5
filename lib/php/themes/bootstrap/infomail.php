@@ -6,7 +6,7 @@ class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
 {
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         extract($in);
 

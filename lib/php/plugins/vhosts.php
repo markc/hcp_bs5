@@ -25,7 +25,7 @@ class Plugins_Vhosts extends Plugin
 
     protected function create() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             extract($this->in);
@@ -66,14 +66,14 @@ error_log(__METHOD__);
 
     protected function read() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
     protected function update() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) {
             extract($this->in);
@@ -119,7 +119,7 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post() && $this->g->in['i']) {
             $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
@@ -134,7 +134,7 @@ error_log(__METHOD__);
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
        if ($this->g->in['x'] === 'json') {
             $columns = [

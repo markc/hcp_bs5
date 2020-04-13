@@ -10,21 +10,21 @@ class Theme
 
     public function __construct(object $g)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $this->g = $g;
     }
 
     public function __toString() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->buf;
     }
 
     public function log() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
@@ -35,7 +35,7 @@ error_log(__METHOD__);
 
     public function nav1() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $o = '?o='.$this->g->in['o'];
         return '
@@ -49,7 +49,7 @@ error_log(__METHOD__);
 
     public function head() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <header>
@@ -61,7 +61,7 @@ error_log(__METHOD__);
 
     public function main() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <main>' . $this->g->out['log'] . $this->g->out['main'] . '
@@ -70,7 +70,7 @@ error_log(__METHOD__);
 
     public function foot() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <footer class="text-center">
@@ -81,7 +81,7 @@ error_log(__METHOD__);
 
     public function end() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return '
     <pre>' . $this->g->out['end'] . '
@@ -90,7 +90,7 @@ error_log(__METHOD__);
 
     public function html() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         extract($this->g->out, EXTR_SKIP);
         return '<!DOCTYPE html>
@@ -114,7 +114,7 @@ error_log(__METHOD__);
         string $class = '',
         string $extra = '') : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $opt = $label ? '
                 <option value="">' . ucfirst($label) . '</option>' : '';
@@ -133,7 +133,7 @@ error_log(__METHOD__);
 
     public function __call(string $name, array $args) : string
     {
-error_log(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
+elog(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
 
         return 'Theme::' . $name . '() not implemented';
     }

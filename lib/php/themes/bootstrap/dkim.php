@@ -6,7 +6,7 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
     public function read(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $remove = $this->modal([
             'id'      => 'removemodal',
@@ -38,7 +38,7 @@ error_log(__METHOD__);
 
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $keybuf = $this->dropdown([
             ['1024', '1024'],

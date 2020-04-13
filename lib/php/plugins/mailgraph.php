@@ -6,7 +6,7 @@ class Plugins_MailGraph extends Plugin
 {
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $return = '';
         $images = ['0-n', '1-n', '2-n', '3-n'];

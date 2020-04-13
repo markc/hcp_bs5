@@ -6,7 +6,7 @@ class Util
 {
     public static function log(string $msg = '', string $lvl = 'danger') : array
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($msg) {
             $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
@@ -19,14 +19,14 @@ error_log(__METHOD__);
 
     public static function enc(string $v) : string
     {
-error_log(__METHOD__."($v)");
+elog(__METHOD__."($v)");
 
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
 
     public static function esc(array $in) : array
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
@@ -37,7 +37,7 @@ error_log(__METHOD__);
     // TODO please document what $k, $v and $x are for?
     public static function ses(string $k, string $v = '', string $x = null) : string
     {
-error_log(__METHOD__."($k, $v, $x)");
+elog(__METHOD__."($k, $v, $x)");
 
         return $_SESSION[$k] =
             (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x :
@@ -50,7 +50,7 @@ error_log(__METHOD__."($k, $v, $x)");
 
     public static function cfg(object $g) : void
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (file_exists($g->cfg['file'])) {
             foreach(include $g->cfg['file'] as $k => $v) {
@@ -61,7 +61,7 @@ error_log(__METHOD__);
 
     public static function exe(string $cmd, bool $ret = false) : bool
     {
-error_log(__METHOD__."($cmd)");
+elog(__METHOD__."($cmd)");
 
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
         util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
@@ -70,14 +70,14 @@ error_log(__METHOD__."($cmd)");
 
     public static function run(string $cmd) : string
     {
-error_log(__METHOD__."($cmd)");
+elog(__METHOD__."($cmd)");
 
         return exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1');
     }
 
     public static function now(string $date1, string $date2 = null) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (!is_numeric($date1)) $date1 = strtotime($date1);
         if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
@@ -115,14 +115,14 @@ error_log(__METHOD__);
 
     public static function is_adm() : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return isset($_SESSION['adm']);
     }
 
     public static function is_usr(int $id = null) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return (is_null($id))
             ? isset($_SESSION['usr'])
@@ -131,14 +131,14 @@ error_log(__METHOD__);
 
     public static function is_acl(int $acl) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
 
     public static function genpw(int $length = 10) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return str_replace('.', '_',
             substr(password_hash((string)time(), PASSWORD_DEFAULT),
@@ -147,7 +147,7 @@ error_log(__METHOD__);
 
     public static function get_nav(array $nav = []) : array
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return isset($_SESSION['usr'])
             ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
@@ -156,27 +156,27 @@ error_log(__METHOD__);
 
     public static function get_cookie(string $name, string $default='') : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $_COOKIE[$name] ?? $default;
     }
 
     public static function put_cookie(string $name, string $value, int $expiry=604800) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
         return setcookie($name, $value, time() + $expiry) ? $value : '';
     }
 
     public static function del_cookie(string $name) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return self::put_cookie($name, '', -1);
     }
 
     public static function chkpw(string $pw, string $pw2 = '') : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (strlen($pw) > 11) {
             if (preg_match('/[0-9]+/', $pw)) {
@@ -196,7 +196,7 @@ error_log(__METHOD__);
 
     public static function chkapi(object $g) : void
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         [$apiusr, $apikey] = explode(':', $g->in['a'], 2);
 
@@ -207,20 +207,20 @@ error_log(__METHOD__);
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw', 'id', $apiusr, '', 'one')) {
                 if ($usr['acl'] !== 9) {
                     if (password_verify(html_entity_decode($apikey, ENT_QUOTES, 'UTF-8'), $usr['webpw'])) {
-error_log("API login for id=$apiusr");
+elog("API login for id=$apiusr");
                         $_SESSION['usr'] = $usr;
                         if ($usr['acl'] == 0) $_SESSION['adm'] = $apiusr;
                     } else die('Invalid Email Or Password');
                 } else die('Account is disabled, contact your System Administrator');
             } else die('Invalid Email Or Password');
         } else {
-error_log("API id=$apiusr is already logged in");
+elog("API id=$apiusr is already logged in");
         }
     }
 
     public static function remember(object $g) : void
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (!self::is_usr()) {
             if ($c = self::get_cookie('remember')) {
@@ -240,7 +240,7 @@ error_log(__METHOD__);
 
     public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = '') : void
     {
-error_log(__METHOD__."($url)");
+elog(__METHOD__."($url)");
 
         if ($method == 'refresh') {
             header('refresh:' . $ttl . '; url=' . $url);
@@ -256,14 +256,14 @@ error_log(__METHOD__."($url)");
 
     public static function m_list(string $obj) : void
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         self::redirect('?o=' . $obj . '&m=list');
     }
 
     public static function numfmt(float $size, int $precision = null) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($size == 0) return '0';
         if ($size >= 1000000000000) return round(($size / 1000000000000), $precision??3) . ' TB';
@@ -276,7 +276,7 @@ error_log(__METHOD__);
     // numfmt() was wrong, we want MB not MiB
     public static function numfmtsi(float $size, int $precision = 2) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($size == 0) return "0";
         $base = log($size, 1024);
@@ -286,7 +286,7 @@ error_log(__METHOD__);
 
     public static function is_valid_domain_name(string $domainname) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $domainname = idn_to_ascii($domainname);
         return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domainname)
@@ -296,7 +296,7 @@ error_log(__METHOD__);
 
     public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT') : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
         return $hash === 'SHA512-CRYPT'
@@ -306,7 +306,7 @@ error_log(__METHOD__);
 
     public static function sec2time(int $seconds) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@$seconds");
@@ -315,7 +315,7 @@ error_log(__METHOD__);
 
     public static function is_post() : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
@@ -329,7 +329,7 @@ error_log(__METHOD__);
 
     public static function random_token(int $length = 32) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $random_base64 = base64_encode(random_bytes($length));
         $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
@@ -348,7 +348,7 @@ error_log(__METHOD__);
 /*
     public static function session_start(array $cfg) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
 //      Default session cookie paramters
 //      http://php.net/manual/en/session.configuration.php
@@ -369,7 +369,7 @@ error_log(__METHOD__);
 */
     public static function inc_soa(string $soa) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $ary = explode(' ', $soa);
         $ymd = date('Ymd');
@@ -383,7 +383,7 @@ error_log(__METHOD__);
 
     public static function is_valid_plan(string $plan) : bool
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         // See themes/bootstrap/vhosts.php:83
         $valid_plans = ['personal', 'soho', 'business', 'enterprise'];
@@ -392,7 +392,7 @@ error_log(__METHOD__);
 /*
     public static function encrypt(string $data, string $cipher, string $encryption_key)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $ivlen    = openssl_cipher_iv_length($cipher);
         $iv       = openssl_random_pseudo_bytes($ivlen);
@@ -404,7 +404,7 @@ error_log(__METHOD__);
 
     public static function decrypt(string $data, string $cipher, string $encryption_key)
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $c        = base64_decode($data);
         $ivlen    = openssl_cipher_iv_length($cipher);
@@ -417,7 +417,7 @@ error_log(__METHOD__);
         if (!hash_equals($hmac, $calcmac)) {
             return false;
         }
-error_log('return data='.var_export($data,true));
+elog('return data='.var_export($data,true));
         return $data;
     }
 */

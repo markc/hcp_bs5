@@ -8,7 +8,7 @@ class Plugins_InfoMail extends Plugin
 
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->t->list([
             'mailq' => shell_exec('mailq'),
@@ -23,7 +23,7 @@ error_log(__METHOD__);
 
     public function pflog_renew()
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $this->pflogs = shell_exec('sudo pflogs');
         return $this->list();

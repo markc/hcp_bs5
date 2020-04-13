@@ -2,8 +2,8 @@
 // lib/php/ddns.php 20180606 - 20181109
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-//error_log(__FILE__.' '.$_SERVER['REMOTE_ADDR']);
-//error_log(var_export($_REQUEST, true));
+//elog(__FILE__.' '.$_SERVER['REMOTE_ADDR']);
+//elog(var_export($_REQUEST, true));
 
 define('APIKEY', "../.ht_ddns");
 

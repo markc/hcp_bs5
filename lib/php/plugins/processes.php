@@ -6,7 +6,7 @@ class Plugins_Processes extends Plugin
 {
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->t->list(['procs' => shell_exec('sudo processes')]);
     }

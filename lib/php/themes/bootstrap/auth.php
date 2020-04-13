@@ -7,7 +7,7 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
     // forgotpw (create new pw)
     public function create(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         extract($in);
 
@@ -40,8 +40,8 @@ error_log(__METHOD__);
     // signin (read current pw)
     public function list(array $in) : string
     {
-error_log(__METHOD__);
-error_log(var_export($in,true));
+elog(__METHOD__);
+elog(var_export($in,true));
 
         extract($in);
 
@@ -84,8 +84,8 @@ error_log(var_export($in,true));
     // resetpw (update pw)
     public function update(array $in) : string
     {
-error_log(__METHOD__);
-error_log(var_export($in,true));
+elog(__METHOD__);
+elog(var_export($in,true));
 
         extract($in);
 

@@ -25,7 +25,7 @@ class Plugins_Accounts extends Plugin
 
     protected function read() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $usr = db::read('*', 'id', $this->g->in['i'], '', 'one');
         if (!$usr) {
@@ -50,14 +50,14 @@ error_log(__METHOD__);
 
     protected function delete() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_post()) return parent::delete();
     }
 
     protected function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if ($this->g->in['x'] === 'json') {
             $columns = [
@@ -79,7 +79,7 @@ error_log(__METHOD__);
 
     protected function switch_user()
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (util::is_adm() and !is_null($this->g->in['i'])) {
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');

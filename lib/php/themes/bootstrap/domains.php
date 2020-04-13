@@ -6,21 +6,21 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 {
     public function create(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->editor($in);
     }
 
     public function update(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         return $this->editor($in);
     }
 
     public function list(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 var_export($in, true);
 
         $create = $this->modal([
@@ -152,7 +152,7 @@ $(document).ready(function() {
 
     private function editor(array $in) : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         $domain = $in['name'];
         $soa = isset($in['soa'])

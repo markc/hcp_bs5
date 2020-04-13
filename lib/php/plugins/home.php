@@ -6,7 +6,7 @@ class Plugins_Home extends Plugin
 {
     public function list() : string
     {
-error_log(__METHOD__);
+elog(__METHOD__);
 
         if (file_exists(INC . 'home.tpl')) {
             ob_start();
