@@ -1,6 +1,6 @@
 <?php
-// lib/php/init.php 20150101 - 20190320
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/init.php 20150101 - 20200413
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
@@ -83,6 +83,10 @@ function dbg($var = null)
     $ob = ob_get_contents();
     ob_end_clean();
     error_log($ob);
+}
+
+function elog(string $content) {
+    if (DBG) error_log($content);
 }
 
 ?>

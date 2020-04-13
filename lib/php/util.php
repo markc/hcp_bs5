@@ -1,6 +1,6 @@
 <?php
-// lib/php/util.php 20150225 - 20181122
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/util.php 20150225 - 20200413
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
@@ -59,13 +59,20 @@ error_log(__METHOD__);
         }
     }
 
-    public static function exe(string $cmd) : bool
+    public static function exe(string $cmd, bool $ret = false) : bool
     {
 error_log(__METHOD__."($cmd)");
 
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
         util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
         return $retVal;
+    }
+
+    public static function run(string $cmd) : string
+    {
+error_log(__METHOD__."($cmd)");
+
+        return exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1');
     }
 
     public static function now(string $date1, string $date2 = null) : string
@@ -167,21 +174,23 @@ error_log(__METHOD__);
         return self::put_cookie($name, '', -1);
     }
 
-    public static function chkpw(string $pw, string $pw2) : bool
+    public static function chkpw(string $pw, string $pw2 = '') : bool
     {
 error_log(__METHOD__);
 
-        if (strlen($pw) > 9) {
+        if (strlen($pw) > 11) {
             if (preg_match('/[0-9]+/', $pw)) {
                 if (preg_match('/[A-Z]+/', $pw)) {
                     if (preg_match('/[a-z]+/', $pw)) {
-                        if ($pw === $pw2) {
-                            return true;
-                        } else util::log('Passwords do not match, please try again');
+                        if ($pw2) {
+                            if ($pw === $pw2) {
+                                return true;
+                            } else util::log('Passwords do not match, please try again');
+                        } else return true;
                     } else util::log('Password must contains at least one lower case letter');
                 } else util::log('Password must contains at least one captital letter');
             } else util::log('Password must contains at least one number');
-        } else util::log('Passwords must be at least 10 characters');
+        } else util::log('Passwords must be at least 12 characters');
         return false;
     }
 
@@ -243,6 +252,13 @@ error_log(__METHOD__."($url)");
             header('Location:' . $url);
         }
         exit;
+    }
+
+    public static function m_list(string $obj) : void
+    {
+error_log(__METHOD__);
+
+        self::redirect('?o=' . $obj . '&m=list');
     }
 
     public static function numfmt(float $size, int $precision = null) : string
