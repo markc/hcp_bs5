@@ -99,21 +99,23 @@ elog('in='.var_export($in, true));
         </form>
       </div>
       </div>
-      <div class="row mt-2">
-        <table id=records class="table table-sm" style="min-width:1100px;table-layout:fixed">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Content</th>
-              <th>Type</th>
-              <th>Priority</th>
-              <th>TTL</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
+      <div class="row">
+        <div class="col-12">
+          <table id=records class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Content</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>TTL</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
         <script>
 $(document).ready(function() {
 
