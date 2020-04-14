@@ -64,7 +64,7 @@ elog('in='.var_export($in, true));
         <form class="form-inline" method="post" action="' . $this->g->cfg['self'] . '">
           <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
           <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-          <input type="hidden" id="i" name="i" value="0">
+          <input type="hidden" name="i" id="i" value="0">
           <input type="hidden" name="did" value="' . $in['did'] . '">
           <input type="hidden" name="domain" value="' . $in['domain'] . '">
           <div class="col-xl-3 col-md-6 col-12 my-2">

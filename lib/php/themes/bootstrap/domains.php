@@ -112,8 +112,7 @@ var_export($in, true);
               <tbody>
               </tbody>
             </table>
-          </div>
-        </div>' . $create . $remove . $shwho . '
+          </div>' . $create . $remove . $shwho . '
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
@@ -128,6 +127,7 @@ $(document).ready(function() {
       {"targets":5, "visible":false},
     ],
   });
+
   $(document).on("click", ".serial", {}, (function() {
     var a = $(this);
     $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
@@ -135,10 +135,12 @@ $(document).ready(function() {
     });
     return false;
   }));
+
   $(document).on("click", ".delete", {}, function() {
     $("#removemodalid").val($(this).attr("data-rowid"));
     $("#removemodalname").text($(this).attr("data-rowname"));
   });
+
   $(document).on("click", ".shwho", {}, function() {
     var $this = $(this);
     $("#shwho-name").text($this.attr("data-rowname"));
