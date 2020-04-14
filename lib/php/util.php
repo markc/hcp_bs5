@@ -327,46 +327,6 @@ elog(__METHOD__);
         return false;
     }
 
-    public static function random_token(int $length = 32) : string
-    {
-elog(__METHOD__);
-
-        $random_base64 = base64_encode(random_bytes($length));
-        $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
-
-        if (strlen($random_base64) < $length) {
-            /**
-             * It happens sometimes that there are many +=/, so if
-             * the length of $random_base64 after suppressing thoses
-             * characters, is less than the $length, then start over again.
-             */
-            return self::random_token($length);
-        }
-
-        return substr($random_base64, 0, $length);
-    }
-/*
-    public static function session_start(array $cfg) : bool
-    {
-elog(__METHOD__);
-
-//      Default session cookie paramters
-//      http://php.net/manual/en/session.configuration.php
-
-        $_sess_cookie_params = session_get_cookie_params();
-
-        $name     = $cfg['name'] ?? session_name();
-        $lifetime = $cfg['lifetime'] ?? $_sess_cookie_params['lifetime'];
-        $path     = $cfg['path'] ?? $_sess_cookie_params['path'];
-        $domain   = $cfg['domain'] ?? $_sess_cookie_params['domain'];
-        $secure   = $cfg['secure'] ?? $_sess_cookie_params['secure'];
-        $httponly = $cfg['httponly'] ?? $_sess_cookie_params['httponly'];
-
-        session_name($name);
-        session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
-        return session_start();
-    }
-*/
     public static function inc_soa(string $soa) : string
     {
 elog(__METHOD__);
@@ -380,47 +340,6 @@ elog(__METHOD__);
             : "$ymd" . "00";
         return implode(' ', $ary);
     }
-
-    public static function is_valid_plan(string $plan) : bool
-    {
-elog(__METHOD__);
-
-        // See themes/bootstrap/vhosts.php:83
-        $valid_plans = ['personal', 'soho', 'business', 'enterprise'];
-        return in_array($plan, $valid_plans);
-    }
-/*
-    public static function encrypt(string $data, string $cipher, string $encryption_key)
-    {
-elog(__METHOD__);
-
-        $ivlen    = openssl_cipher_iv_length($cipher);
-        $iv       = openssl_random_pseudo_bytes($ivlen);
-        $data_raw = openssl_encrypt($data, $cipher, $encryption_key, OPENSSL_RAW_DATA, $iv);
-        $hmac     = hash_hmac('sha256', $data_raw, $encryption_key, true);
-
-        return base64_encode($iv.$hmac.$data_raw);
-    }
-
-    public static function decrypt(string $data, string $cipher, string $encryption_key)
-    {
-elog(__METHOD__);
-
-        $c        = base64_decode($data);
-        $ivlen    = openssl_cipher_iv_length($cipher);
-        $iv       = substr($c, 0, $ivlen);
-        $hmac     = substr($c, $ivlen, $sha2len = 32);
-        $data_raw = substr($c, $ivlen + $sha2len);
-        $data     = openssl_decrypt($data_raw, $cipher, $encryption_key, OPENSSL_RAW_DATA, $iv);
-        $calcmac  = hash_hmac('sha256', $data_raw, $encryption_key, true);
-
-        if (!hash_equals($hmac, $calcmac)) {
-            return false;
-        }
-elog('return data='.var_export($data,true));
-        return $data;
-    }
-*/
 }
 
 ?>

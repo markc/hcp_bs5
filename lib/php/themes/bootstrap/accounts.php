@@ -86,30 +86,32 @@ elog(__METHOD__.' '.var_export($in, true));
         ]);
 
         return '
-            <div class="col-12">
-              <h3>
-                <i class="fas fa-users fa-fw"></i> Accounts
-                <a href="" title="Add new account" data-toggle="modal" data-target="#createmodal">
-                  <small><i class="fas fa-plus-circle fa-fw"></i></small>
-                </a>
-              </h3>
-            </div>
-          </div><!-- END UPPER ROW -->
-          <div class="row">
-            <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-              <thead class="nowrap">
-                <tr>
-                  <th class="w-25">User ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th class="w-25">Alt Email</th>
-                  <th>ACL</th>
-                  <th>Grp</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>' . $createmodal . '
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-users fa-fw"></i> Accounts
+            <a href="" title="Add new account" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class=col-12>
+          <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th class="w-25">User ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th class="w-25">Alt Email</th>
+                <th>ACL</th>
+                <th>Grp</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>' . $createmodal . '
             <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
