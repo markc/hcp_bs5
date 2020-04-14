@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/vhosts.php 20190321
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/vhosts.php 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
 {

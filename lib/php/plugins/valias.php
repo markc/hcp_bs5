@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/valias.php 20170225 - 20180518
-// Copyright (C) 1995-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/valias.php 20170225 - 20200414
+// Copyright (C) 1995-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
@@ -315,7 +315,7 @@ elog(__METHOD__);
                 }
             }
             util::log('Changes to alias have been saved', 'success');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::relist();
         } elseif ($this->g->in['i']) {
             return $this->read();
         } else return 'Error updating item';

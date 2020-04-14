@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/users.php 20150101 - 20181123
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/users.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Accounts extends Plugin
 {
@@ -86,7 +86,7 @@ elog(__METHOD__);
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
             util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
         } else util::log('Not authorized to switch users');
-        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        util::relist();
     }
 }
 

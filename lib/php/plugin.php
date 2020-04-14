@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugin.php 20150101 - 20190320
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugin.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
 {
@@ -17,7 +17,6 @@ elog(__METHOD__);
         $o = $t->g->in['o'];
         $m = $t->g->in['m'];
         if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create' && $m !== 'resetpw'))){
-//            util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
             util::redirect($t->g->cfg['self'] . '?o=auth');
         }
 
@@ -51,7 +50,7 @@ elog(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::relist();
         } else return $this->t->create($this->in);
     }
 
@@ -70,7 +69,7 @@ elog(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             if(db::update($this->in, [['id', '=', $this->g->in['i']]])){
                 util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                util::relist();
             }else{
                 util::log('Error updating item.');
             }
@@ -86,7 +85,7 @@ elog(__METHOD__);
             if ($this->g->in['i']) {
                 $res = db::delete([['id', '=', $this->g->in['i']]]);
                 util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                util::relist();
             }
         }
         return 'Error deleting item';

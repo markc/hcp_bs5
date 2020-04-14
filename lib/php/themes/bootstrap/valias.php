@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/valias.php 20170101 - 20180518
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/valias.php 20170101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 {
@@ -33,7 +33,7 @@ elog(__METHOD__);
         </div>
       </div><!-- END UPPER ROW -->
       <div class="row">
-        <div class="table-responsive">
+        <div class="col-12">
           <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
             <thead class="nowrap">
               <tr>
@@ -54,6 +54,7 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=valias&m=list",
     "order": [[ 5, "desc" ]],
+    "scrollX": true,
     "columnDefs": [
       {"targets":0,   "className":"text-truncate", "width":"30%"},
       {"targets":3,   "className":"text-right", "width":"1rem", "sortable": false},

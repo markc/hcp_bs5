@@ -340,6 +340,20 @@ elog(__METHOD__);
             : "$ymd" . "00";
         return implode(' ', $ary);
     }
+
+    public static function random_token(int $length = 32) : string
+    {
+elog(__METHOD__);
+
+        $random_base64 = base64_encode(random_bytes($length));
+        $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
+
+        if (strlen($random_base64) < $length) {
+            return self::random_token($length);
+        }
+
+        return substr($random_base64, 0, $length);
+    }
 }
 
 ?>

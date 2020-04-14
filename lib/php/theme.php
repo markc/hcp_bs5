@@ -1,6 +1,6 @@
 <?php
-// lib/php/theme.php 20150101 - 20180512
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/theme.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
 {
@@ -124,16 +124,16 @@ elog(__METHOD__);
             $t = str_replace('?t=', '', $v[1]);
             $s = $sel === $t ? ' selected' : '';
             $buf .= '
-                <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+                        <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
         }
         return '
-              <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
-              </select>';
+                      <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
+                      </select>';
     }
 
     public function __call(string $name, array $args) : string
     {
-elog(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
+elog(__METHOD__ . '() name = ' . $name);
 
         return 'Theme::' . $name . '() not implemented';
     }

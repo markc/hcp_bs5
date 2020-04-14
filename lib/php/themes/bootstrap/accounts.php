@@ -112,7 +112,7 @@ elog(__METHOD__.' '.var_export($in, true));
             </tbody>
           </table>
         </div>' . $createmodal . '
-            <script>
+        <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
     "processing": true,
@@ -126,7 +126,7 @@ $(document).ready(function() {
     ]
   });
 });
-          </script>';
+        </script>';
     }
 
     private function editor(array $in) : string

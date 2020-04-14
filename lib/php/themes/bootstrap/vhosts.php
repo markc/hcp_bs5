@@ -134,7 +134,7 @@ elog(__METHOD__);
         </div>
       </div><!-- END UPPER ROW -->
       <div class="row">
-        <div class="table-responsive">
+        <div class="col-12">
           <table id=vhosts class="table table-sm" style="min-width:1100px;table-layout:fixed">
             <thead class="nowrap">
               <tr>
@@ -165,8 +165,9 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=vhosts&m=list",
     "order": [[ 15, "desc" ]],
+    "scrollX": true,
     "columnDefs": [
-      {"targets":0,   "className":"text-truncate", "width":"30%"},
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
       {"targets":1,   "className":"text-right", "width":"3rem"},
       {"targets":2,   "className":"text-center", "width":"0.5rem", "sortable": false},
       {"targets":3,   "width":"3rem"},

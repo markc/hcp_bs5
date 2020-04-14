@@ -1,6 +1,6 @@
 <?php
-// lib/php/plugins/auth.php 20150101 - 20181122
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/auth.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
 {
@@ -85,7 +85,7 @@ elog(__METHOD__);
 
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please login and try again.');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::relist();
         }
 
         $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
@@ -101,7 +101,7 @@ elog(__METHOD__);
                             if (db::update([
                                     'webpw'   => password_hash($p1, PASSWORD_DEFAULT),
                                     'otp'     => '',
-                                    'otpttl'  => '',
+                                    'otpttl'  => 0,
                                     'updated' => date('Y-m-d H:i:s'),
                                 ], [['id', '=', $i]])) {
                                 util::log('Password reset for ' . $usr['login'], 'success');
@@ -109,7 +109,7 @@ elog(__METHOD__);
                                     util::redirect($this->g->cfg['self']);
                                 } else {
                                     unset($_SESSION['resetpw']);
-                                    util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                                    util::relist();
                                 }
                             } else util::log('Problem updating database');
                         } else util::log($usr['login'] . ' is not allowed access');
