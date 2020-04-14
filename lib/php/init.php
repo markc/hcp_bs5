@@ -1,5 +1,5 @@
 <?php
-// lib/php/init.php 20150101 - 20200413
+// lib/php/init.php 20150101 - 20200414
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
@@ -10,16 +10,15 @@ class Init
     {
 elog(__METHOD__);
 
-elog('GET=' . var_export($_GET, true));
-
-elog('POST=' . var_export($_POST, true));
-
-        $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
-
         session_start();
 
+elog('GET=' . var_export($_GET, true));
+elog('POST=' . var_export($_POST, true));
+elog('SESSION=' . var_export($_SESSION, true));
+
         //$_SESSION = []; // to reset session for testing
-//error_log('SESSION=' . var_export($_SESSION, true));
+
+        $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
 
         util::cfg($g);
         $g->in = util::esc($g->in);

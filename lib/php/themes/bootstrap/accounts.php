@@ -1,6 +1,6 @@
 <?php
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20180517
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 {
@@ -27,13 +27,14 @@ elog(__METHOD__);
 
     public function list(array $in) : string
     {
-elog(__METHOD__);
-//elog(var_export($in, true));
+elog(__METHOD__.' '.var_export($in, true));
 
         extract($in);
         $aclgrp_buf = '';
 
         if (util::is_adm()) {
+            $acl = $_SESSION['usr']['acl'];
+            $grp = $_SESSION['usr']['grp'];
             $acl_ary = $grp_ary = [];
             foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
             $acl_buf = $this->dropdown($acl_ary, 'acl', "$acl", '', 'custom-select');
@@ -68,19 +69,19 @@ elog(__METHOD__);
             'body'    => '
                   <div class="form-group">
                     <label for="login" class="form-control-label">Email ID</label>
-                    <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
+                    <input type="email" class="form-control" id="login" name="login" value="" required>
                   </div>
                   <div class="form-group">
                     <label for="fname" class="form-control-label">First Name</label>
-                    <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
+                    <input type="text" class="form-control" id="fname" name="fname" value="" required>
                   </div>
                   <div class="form-group">
                     <label for="lname" class="form-control-label">Last Name</label>
-                    <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
+                    <input type="text" class="form-control" id="lname" name="lname" value="" required>
                   </div>
                   <div class="form-group">
                     <label for="altemail" class="form-control-label">Alt Email</label>
-                    <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
+                    <input type="text" class="form-control" id="altemail" name="altemail" value="">
                   </div>' . $aclgrp_buf,
         ]);
 
@@ -95,22 +96,20 @@ elog(__METHOD__);
             </div>
           </div><!-- END UPPER ROW -->
           <div class="row">
-            <div class="table-responsive">
-              <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-                <thead class="nowrap">
-                  <tr>
-                    <th class="w-25">User ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th class="w-25">Alt Email</th>
-                    <th>ACL</th>
-                    <th>Grp</th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>' . $createmodal . '
+            <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
+              <thead class="nowrap">
+                <tr>
+                  <th class="w-25">User ID</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th class="w-25">Alt Email</th>
+                  <th>ACL</th>
+                  <th>Grp</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>' . $createmodal . '
             <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
@@ -118,6 +117,7 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=accounts&m=list",
 //    "order": [[ 8, "desc" ]],
+    "scrollX": true,
     "columnDefs": [
       {"targets":0, "className":"text-truncate"},
       {"targets":3, "className":"text-truncate"},

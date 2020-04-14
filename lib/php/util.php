@@ -254,11 +254,11 @@ elog(__METHOD__."($url)");
         exit;
     }
 
-    public static function m_list(string $obj) : void
+    public static function relist() : void
     {
 elog(__METHOD__);
 
-        self::redirect('?o=' . $obj . '&m=list');
+        self::redirect('?o=' . $_SESSION['o'] . '&m=list');
     }
 
     public static function numfmt(float $size, int $precision = null) : string

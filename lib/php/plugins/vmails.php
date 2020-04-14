@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugins/vmails.php 20180826 - 20200413
+// lib/php/plugins/vmails.php 20180826 - 20200414
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vmails extends Plugin
@@ -24,7 +24,7 @@ elog(__METHOD__);
             }
             util::exe('addvmail ' . $this->in['user']);
         }
-        util::m_list($this->g->in['o']);
+        util::relist();
     }
 
     protected function update() : string
@@ -43,7 +43,7 @@ elog(__METHOD__);
                 util::exe("chpw $user '$password'");
             }
         }
-        util::m_list($this->g->in['o']);
+        util::relist();
     }
 
     protected function delete() : string
@@ -53,7 +53,7 @@ elog(__METHOD__);
         if (util::is_post()) {
             util::exe('delvmail ' . $this->in['user']);
         }
-        util::m_list($this->g->in['o']);
+        util::relist();
     }
 
     protected function list() : string

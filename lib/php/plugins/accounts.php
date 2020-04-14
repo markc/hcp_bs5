@@ -20,7 +20,7 @@ class Plugins_Accounts extends Plugin
     {
         if (util::is_adm()) return parent::create();
         util::log('You are not authorized to perform this action, please contact your administrator.');
-        util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        util::relist();
     }
 
     protected function read() : string
@@ -30,19 +30,20 @@ elog(__METHOD__);
         $usr = db::read('*', 'id', $this->g->in['i'], '', 'one');
         if (!$usr) {
             util::log('User not found.');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            util::relist();
         }
-        if (util::is_acl(0)) { // superadmin
 
+        if (util::is_acl(0)) {
+            // superadmin
         } elseif (util::is_acl(1)) { // normal admin
             if ($_SESSION['usr']['grp'] != $usr['grp']) {
                 util::log('You are not authorized to perform this action.');
-                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                util::relist();
             }
         } else { // Other users
             if ($_SESSION['usr']['id'] != $usr['id']) {
                 util::log('You are not authorized to perform this action.');
-                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                util::relist();
             }
         }
         return $this->t->read($usr);
@@ -74,7 +75,7 @@ elog(__METHOD__);
             ];
             return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
         }
-        return $this->t->list([]);
+        return $this->t->list($this->in);
     }
 
     protected function switch_user()
