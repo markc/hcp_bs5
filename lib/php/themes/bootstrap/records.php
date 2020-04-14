@@ -60,6 +60,7 @@ elog('in='.var_export($in, true));
         </div>
       </div>
       <div class="row">
+        <div class=col-12>
         <form class="form-inline" method="post" action="' . $this->g->cfg['self'] . '">
           <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
           <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
@@ -97,6 +98,7 @@ elog('in='.var_export($in, true));
           </div>
         </form>
       </div>
+      </div>
       <div class="row mt-2">
         <table id=records class="table table-sm" style="min-width:1100px;table-layout:fixed">
           <thead>
@@ -120,6 +122,7 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "?x=json&o=records&m=list&did=' . $in['did'] . '",
     "order": [[ 9, "desc" ]],
+    "scrollX": true,
     "columnDefs": [
       {"targets":0,   "className":"text-truncate", "width":"30%"},
       {"targets":1,   "className":"text-truncate", "width":"30%"},
