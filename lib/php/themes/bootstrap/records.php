@@ -127,12 +127,12 @@ $(document).ready(function() {
     "scrollX": true,
     "columnDefs": [
       {"targets":0,   "width":"30%"},
-      {"targets":1,   "width":"30%",
+      {"targets":1,   "width":"40%",
         render: function ( data, type, row ) {
-            return type === "display" && data.length > 36 ? data.substr( 0, 36 ) + "…" : data; }},
-      {"targets":2,   "width":"4rem"},
-      {"targets":3,   "width":"4rem"},
-      {"targets":4,   "width":"5rem"},
+            return type === "display" && data.length > 40 ? data.substr( 0, 40 ) + "…" : data; }},
+      {"targets":2,   "width":"3rem"},
+      {"targets":3,   "width":"3rem"},
+      {"targets":4,   "width":"3rem"},
       {"targets":5,   "width":"2rem", "className":"text-right", "sortable": false},
       {"targets":6,   "visible":false},
       {"targets":7,   "visible":false},
