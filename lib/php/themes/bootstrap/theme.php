@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/theme.php 20150101 - 20200414
+// lib/php/themes/bootstrap/theme.php 20150101 - 20200505
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Theme extends Theme
@@ -17,6 +17,7 @@ elog(__METHOD__);
 body{min-height:75rem;padding-top:5rem;}
 table,form{width:100%;}
 table.dataTable{border-collapse: collapse !important;}
+.table{table-layout: fixed;}
 
 .media {
   flex-direction: column;
