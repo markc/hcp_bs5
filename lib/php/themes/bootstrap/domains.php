@@ -99,7 +99,7 @@ var_export($in, true);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <table id="domains" class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <table id="domains" class="table table-sm" style="display:none;min-width:1100px;table-layout:fixed">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -118,7 +118,7 @@ $(document).ready(function() {
   $("#domains").DataTable({
     "processing": true,
     "serverSide": true,
-    "ajax": "?x=json&o=domains&m=list",
+    "ajax": { "url": "?x=json&o=domains&m=list", "deferLoading": 10 },
     "order": [[ 5, "desc" ]],
     "scrollX": true,
     "columnDefs": [
@@ -127,6 +127,8 @@ $(document).ready(function() {
       {"targets":5, "visible":false},
     ],
   });
+
+$("#domains").show();
 
   $(document).on("click", ".serial", {}, (function() {
     var a = $(this);

@@ -9,3 +9,4 @@ webmail/
 lib/uploads/*.jpg
 whmcs/
 .well-known/
+rspamd/
