@@ -127,7 +127,9 @@ $(document).ready(function() {
     "scrollX": true,
     "columnDefs": [
       {"targets":0,   "className":"text-truncate", "width":"30%"},
-      {"targets":1,   "className":"col-2","className":"text-truncate", "width":"30%"},
+      {"targets":1,   "className":"text-truncate", "width":"30%",
+        render: function ( data, type, row ) {
+            return type === "display" && data.length > 10 ? data.substr( 0, 10 ) + "…" : data; }},
       {"targets":2,   "width":"4rem"},
       {"targets":3,   "width":"4rem"},
       {"targets":4,   "width":"5rem"},
