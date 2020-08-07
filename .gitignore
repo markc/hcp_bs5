@@ -10,3 +10,4 @@ lib/uploads/*.jpg
 whmcs/
 .well-known/
 rspamd/
+phpliteadmin.*

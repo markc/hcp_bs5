@@ -1,6 +1,6 @@
 <?php
-// plugins/infosys.php 20170225 - 20190608
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// plugins/infosys.php 20170225 - 20200807
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_InfoSys extends Plugin
 {
@@ -58,13 +58,9 @@ elog(__METHOD__);
         $dp  = floor(($du / $dt) * 100);
 
         $mt  = (float) $mem['MemTotal'] * 1024;
-        $mf  = (float) ($mem['MemFree'] + $mem['Cached']) * 1024;
+        $mf  = (float) $mem['MemAvailable'] * 1024;
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
-
-//        $hn  = is_readable('/proc/sys/kernel/hostname')
-//            ? trim(file_get_contents('/proc/sys/kernel/hostname'))
-//            : 'Unknown';
 
         $ip  = gethostbyname(gethostname());
         $hn  = gethostbyaddr($ip);
@@ -80,11 +76,11 @@ elog(__METHOD__);
             'dsk_total' => util::numfmt($dt),
             'dsk_used'  => util::numfmt($du),
             'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
-            'mem_free'  => util::numfmt($mf),
+            'mem_free'  => util::numfmtsi($mf),
             'mem_pcnt'  => $mp,
             'mem_text'  => $mp > 5 ? $mp . '%' : '',
-            'mem_total' => util::numfmt($mt),
-            'mem_used'  => util::numfmt($mu),
+            'mem_total' => util::numfmtsi($mt),
+            'mem_used'  => util::numfmtsi($mu),
             'os_name'   => $os,
             'uptime'    => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
             'loadav'    => $lav,
