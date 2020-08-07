@@ -1,10 +1,10 @@
 <?php
-// index.php 20150101 - 20200413
+// index.php 20150101 - 20200807
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
-const DBG = true;
+const DBG = false;
 
 spl_autoload_register(function ($c) {
     $f = INC . str_replace(['\\', '_'], [DS, DS], strtolower($c)) . '.php';
