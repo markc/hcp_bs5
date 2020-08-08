@@ -58,7 +58,7 @@ elog(__METHOD__);
         $dp  = floor(($du / $dt) * 100);
 
         $mt  = (float) $mem['MemTotal'] * 1024;
-        $mf  = (float) ($mem['MemFree'] + $mem['Cached'] + $mem['Buffers'] + $mem['SReclaimable']) * 1024;
+        $mf  = (float) ($mem['MemFree'] + $mem['Cached'] + $mem['Buffers'] + $mem['SReclaimable'] + $mem['Shmem']) * 1024;
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
 
