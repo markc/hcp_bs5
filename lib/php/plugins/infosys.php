@@ -58,7 +58,7 @@ elog(__METHOD__);
         $dp  = floor(($du / $dt) * 100);
 
         $mt  = (float) $mem['MemTotal'] * 1024;
-        $mf  = (float) $mem['MemAvailable'] * 1024;
+        $mf  = (float) ($mem['Buffers'] + $mem['Cached'] + $mem['MemFree']) * 1024;
         $mu  = (float) $mt - $mf;
         $mp  = floor(($mu / $mt) * 100);
 
@@ -70,11 +70,11 @@ elog(__METHOD__);
 
         return $this->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
-            'dsk_free'  => util::numfmt($df),
+            'dsk_free'  => util::numfmtsi($df),
             'dsk_pcnt'  => $dp,
             'dsk_text'  => $dp > 5 ? $dp. '%' : '',
-            'dsk_total' => util::numfmt($dt),
-            'dsk_used'  => util::numfmt($du),
+            'dsk_total' => util::numfmtsi($dt),
+            'dsk_used'  => util::numfmtsi($du),
             'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
             'mem_free'  => util::numfmt($mf),
             'mem_pcnt'  => $mp,
