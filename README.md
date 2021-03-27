@@ -95,7 +95,9 @@ fresh Ubuntu install then you could install the entire NetServa SH and HCP
 system by ssh'ing into the system (or for example, "lxc exec c1 bash" for a
 local LXD container) and...
 
-    curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
+    wget https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh
+    # cat setup-sh
+    . setup-sh
     setup-all
 
 This may take 5 to 15 mintes to complete depending on the bandwidth
