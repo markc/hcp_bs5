@@ -24,9 +24,9 @@ This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 The PHP web interface relies on the [NetServa SH] scripts being installed
 on the primary and target hosts so the first thing to do, as root...
 
-    curl -s https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh | bash
+    wget https://raw.githubusercontent.com/netserva/sh/master/bin/setup-sh ; . setup-sh
 
-_Please first review the very simple script by removing the `| bash` part._
+_Please first review the very simple script with "cat setup-sh"._
 
 This installs the `SH` (Shell Helper) aliases and scripts into a `/root/.sh`
 directory and activates the environment variables and special aliases. See
