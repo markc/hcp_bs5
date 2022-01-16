@@ -1,25 +1,26 @@
 <?php
+
+declare(strict_types=1);
 // lib/php/plugins/valias.php 20170225 - 20200414
 // Copyright (C) 1995-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
-    protected
-    $tbl = 'valias',
-    $in = [
-        'aid'    => 1,
-        'hid'    => 1,
+    protected $tbl = 'valias';
+    protected $in = [
+        'aid' => 1,
+        'hid' => 1,
         'source' => '',
         'target' => '',
         'active' => 0,
     ];
 
-// TODO recfactor common parts of create() and update() into private methods
-// yep, as of 20170704 this is still a medium to high priority TODO
+    // TODO recfactor common parts of create() and update() into private methods
+    // yep, as of 20170704 this is still a medium to high priority TODO
 
-    protected function create() : string
+    protected function create(): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         if (util::is_post()) {
             extract($this->in);
@@ -29,101 +30,128 @@ elog(__METHOD__);
 
             if (empty($source[0])) {
                 util::log('Alias source address is empty');
-                $_POST = []; return $this->t->create($this->in);
+                $_POST = [];
+
+                return $this->t->create($this->in);
             }
 
             if (empty($targets[0])) {
                 util::log('Alias target address is empty');
-                $_POST = []; return $this->t->create($this->in);
+                $_POST = [];
+
+                return $this->t->create($this->in);
             }
 
             foreach ($sources as $s) {
-                if (empty($s)) continue;
-                $lhs = ''; $rhs = '';
-                if (strpos($s, '@') !== false)
-                    list($lhs, $rhs) = explode('@', $s);
-                else $rhs = $s;
-
-                if (!$domain = idn_to_ascii($rhs)) {
-                    util::log('Invalid source domain: ' . $rhs);
-                    $_POST = []; return $this->t->create($this->in);
+                if (empty($s)) {
+                    continue;
+                }
+                $lhs = '';
+                $rhs = '';
+                if (str_contains($s, '@')) {
+                    [$lhs, $rhs] = explode('@', $s);
+                } else {
+                    $rhs = $s;
                 }
 
-                $sql = "
+                if (!$domain = idn_to_ascii($rhs)) {
+                    util::log('Invalid source domain: '.$rhs);
+                    $_POST = [];
+
+                    return $this->t->create($this->in);
+                }
+
+                $sql = '
  SELECT `id`
    FROM `vhosts`
-  WHERE `domain` = :domain";
+  WHERE `domain` = :domain';
 
                 $hid = db::qry($sql, ['domain' => $domain], 'col');
 
                 if (!$hid) {
-                    util::log($domain . ' does not exist as a local domain');
-                    $_POST = []; return $this->t->create($this->in);
+                    util::log($domain.' does not exist as a local domain');
+                    $_POST = [];
+
+                    return $this->t->create($this->in);
                 }
 
                 if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
                     util::log('Alias source address is invalid');
-                    $_POST = []; return $this->t->create($this->in);
+                    $_POST = [];
+
+                    return $this->t->create($this->in);
                 }
 
-                $sql = "
+                $sql = '
  SELECT 1 FROM `valias`
-  WHERE `source` = :catchall";
+  WHERE `source` = :catchall';
 
                 $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
-//elog("catchall=$catchall");
+                //elog("catchall=$catchall");
 
-                if ($catchall !== 1) {
-                    $sql = "
+                if (1 !== $catchall) {
+                    $sql = '
  SELECT `source`
    FROM `valias`
-  WHERE `source` = :source";
+  WHERE `source` = :source';
 
                     $num_results = count(db::qry($sql, ['source' => $s]));
 
                     if ($num_results) {
-                        util::log($s . ' already exists as an alias');
-                        $_POST = []; return $this->t->create($this->in);
+                        util::log($s.' already exists as an alias');
+                        $_POST = [];
+
+                        return $this->t->create($this->in);
                     }
                 }
 
-                $sql = "
+                $sql = '
  SELECT `user`
    FROM `vmails`
-  WHERE `user` = :source";
+  WHERE `user` = :source';
 
                 $num_results = count(db::qry($sql, ['source' => $s]));
 
                 if ($num_results) {
-                    util::log($s . ' already exists as a regular mailbox');
-                    $_POST = []; return $this->t->create($this->in);
+                    util::log($s.' already exists as a regular mailbox');
+                    $_POST = [];
+
+                    return $this->t->create($this->in);
                 }
 
                 foreach ($targets as $t) {
-                    if (empty($t)) continue;
-                    list($tlhs, $trhs) = explode('@', $t);
+                    if (empty($t)) {
+                        continue;
+                    }
+                    [$tlhs, $trhs] = explode('@', $t);
 
                     if (!$tdomain = idn_to_ascii($trhs)) {
-                        util::log('Invalid target domain: ' . $tdomain);
-                        $_POST = []; return $this->t->create($this->in);
+                        util::log('Invalid target domain: '.$tdomain);
+                        $_POST = [];
+
+                        return $this->t->create($this->in);
                     }
 
                     if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
                         util::log('Alias target address is invalid');
-                        $_POST = []; return $this->t->create($this->in);
+                        $_POST = [];
+
+                        return $this->t->create($this->in);
                     }
 
-                    if ($catchall !== 1) {
+                    if (1 !== $catchall) {
                         if ($t === $s) {
                             util::log('Alias source and target addresses must not be the same');
-                            $_POST = []; return $this->t->create($this->in);
+                            $_POST = [];
+
+                            return $this->t->create($this->in);
                         }
                     }
                 }
 
-                $target  = implode(',', $targets);
+                $target = implode(',', $targets);
 
-                $sql = "
+                $sql = '
  INSERT INTO `valias` (
         `active`,
         `hid`,
@@ -138,37 +166,39 @@ elog(__METHOD__);
         :target,
         :updated,
         :created
-)";
+)';
                 $s = filter_var($s, FILTER_VALIDATE_EMAIL)
                     ? $s
-                    : '@' . $domain;
+                    : '@'.$domain;
 
                 $result = db::qry($sql, [
-                    'active'  => $active ? 1 : 0,
-                    'hid'     => $hid,
-                    'source'  => $s,
-                    'target'  => $target,
+                    'active' => $active ? 1 : 0,
+                    'hid' => $hid,
+                    'source' => $s,
+                    'target' => $target,
                     'updated' => date('Y-m-d H:i:s'),
-                    'created' => date('Y-m-d H:i:s')
+                    'created' => date('Y-m-d H:i:s'),
                 ]);
                 // test $result?
             }
             util::log('Alias added', 'success');
             util::ses('p', '', '1');
-            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
-        } else return $this->t->create($this->in);
+            util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        } else {
+            return $this->t->create($this->in);
+        }
     }
 
-    protected function read() : string
+    protected function read(): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
-    protected function update() : string
+    protected function update(): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         if (util::is_post()) {
             extract($this->in);
@@ -178,117 +208,142 @@ elog(__METHOD__);
 
             if (empty($source[0])) {
                 util::log('Alias source address is empty');
-                $_POST = []; return $this->read();
+                $_POST = [];
+
+                return $this->read();
             }
 
             if (empty($targets[0])) {
                 util::log('Alias target address is empty');
-                $_POST = []; return $this->read();
+                $_POST = [];
+
+                return $this->read();
             }
 
             foreach ($sources as $s) {
-                if (empty($s)) continue;
-                $lhs = ''; $rhs = '';
-                if (strpos($s, '@') !== false)
-                    list($lhs, $rhs) = explode('@', $s);
-                else $rhs = $s;
-
-                if (!$domain = idn_to_ascii($rhs)) {
-                    util::log('Invalid source domain: ' . $rhs);
-                    $_POST = []; return $this->read();
+                if (empty($s)) {
+                    continue;
+                }
+                $lhs = '';
+                $rhs = '';
+                if (str_contains($s, '@')) {
+                    [$lhs, $rhs] = explode('@', $s);
+                } else {
+                    $rhs = $s;
                 }
 
-                $sql = "
+                if (!$domain = idn_to_ascii($rhs)) {
+                    util::log('Invalid source domain: '.$rhs);
+                    $_POST = [];
+
+                    return $this->read();
+                }
+
+                $sql = '
  SELECT `id`
    FROM `vhosts`
-  WHERE `domain` = :domain";
+  WHERE `domain` = :domain';
 
                 $hid = db::qry($sql, ['domain' => $domain], 'col');
 
                 if (!$hid) {
-                    util::log($domain . ' does not exist as a local domain');
-                    $_POST = []; return $this->read();
+                    util::log($domain.' does not exist as a local domain');
+                    $_POST = [];
+
+                    return $this->read();
                 }
 
                 if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
                     util::log('Alias source address is invalid');
-                    $_POST = []; return $this->read();
+                    $_POST = [];
+
+                    return $this->read();
                 }
 
-                $sql = "
+                $sql = '
  SELECT 1
    FROM `valias`
-  WHERE `source` = :catchall";
+  WHERE `source` = :catchall';
 
                 $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
-//elog("catchall=$catchall");
+                //elog("catchall=$catchall");
 
-                if ($catchall !== 1) {
-                    $sql = "
+                if (1 !== $catchall) {
+                    $sql = '
  SELECT `user`
    FROM `vmails`
-  WHERE `user` = :source";
+  WHERE `user` = :source';
 
                     $num_results = count(db::qry($sql, ['source' => $s]));
 
                     if ($num_results) {
-                        util::log($s . ' already exists as a regular mailbox');
-                        $_POST = []; return $this->read();
+                        util::log($s.' already exists as a regular mailbox');
+                        $_POST = [];
+
+                        return $this->read();
                     }
                 }
 
                 foreach ($targets as $t) {
-                    if (empty($t)) continue;
-                    list($tlhs, $trhs) = explode('@', $t);
+                    if (empty($t)) {
+                        continue;
+                    }
+                    [$tlhs, $trhs] = explode('@', $t);
 
                     if (!$tdomain = idn_to_ascii($trhs)) {
-                        util::log('Invalid target domain: ' . $tdomain);
-                        $_POST = []; return $this->read();
+                        util::log('Invalid target domain: '.$tdomain);
+                        $_POST = [];
+
+                        return $this->read();
                     }
 
                     if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
                         util::log('Alias target address is invalid');
-                        $_POST = []; return $this->read();
+                        $_POST = [];
+
+                        return $this->read();
                     }
 
-                    if ($catchall !== 1) {
+                    if (1 !== $catchall) {
                         if ($t === $s) {
                             util::log('Alias source and target addresses must not be the same');
-                            $_POST = []; return $this->read();
+                            $_POST = [];
+
+                            return $this->read();
                         }
                     }
                 }
 
-                $target  = implode(',', $targets);
+                $target = implode(',', $targets);
                 $s = filter_var($s, FILTER_VALIDATE_EMAIL)
                     ? $s
-                    : '@' . $domain;
+                    : '@'.$domain;
 
-                $sql = "
+                $sql = '
  SELECT `source`
    FROM `valias`
-  WHERE `source` = :source";
+  WHERE `source` = :source';
 
                 $exists = count(db::qry($sql, ['source' => $s]));
 
-                if ($exists or (count($sources) == 1)) {
-                    $sql = "
+                if ($exists or (1 == count($sources))) {
+                    $sql = '
  UPDATE `valias` SET
         `active`  = :active,
         `source`  = :source,
         `target`  = :target,
         `updated` = :updated
-  WHERE `id` = :id";
+  WHERE `id` = :id';
 
                     $result = db::qry($sql, [
-                        'id'      => $this->g->in['i'],
-                        'active'  => $active,
-                        'source'  => $s,
-                        'target'  => $target,
+                        'id' => $this->g->in['i'],
+                        'active' => $active,
+                        'source' => $s,
+                        'target' => $target,
                         'updated' => date('Y-m-d H:i:s'),
                     ]);
                 } else {
-                    $sql = "
+                    $sql = '
  INSERT INTO `valias` (
         `active`,
         `hid`,
@@ -303,14 +358,14 @@ elog(__METHOD__);
         :target,
         :updated,
         :created
-)";
+)';
                     $result = db::qry($sql, [
-                        'active'  => $active ? 1 : 0,
-                        'hid'     => $hid,
-                        'source'  => $s,
-                        'target'  => $target,
+                        'active' => $active ? 1 : 0,
+                        'hid' => $hid,
+                        'source' => $s,
+                        'target' => $target,
                         'updated' => date('Y-m-d H:i:s'),
-                        'created' => date('Y-m-d H:i:s')
+                        'created' => date('Y-m-d H:i:s'),
                     ]);
                 }
             }
@@ -318,32 +373,32 @@ elog(__METHOD__);
             util::relist();
         } elseif ($this->g->in['i']) {
             return $this->read();
-        } else return 'Error updating item';
+        } else {
+            return 'Error updating item';
+        }
     }
 
-    protected function list() : string
+    protected function list(): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
-        if ($this->g->in['x'] === 'json') {
+        if ('json' === $this->g->in['x']) {
             $columns = [
-                ['dt' => 0, 'db' => 'source', 'formatter' => function($d, $row) {
+                ['dt' => 0, 'db' => 'source', 'formatter' => function ($d, $row) {
                     return '
-                    <a href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $d . '">
-                      <b>' . $d . ' </b></a>';
+                    <a href="?o=valias&m=update&i='.$row['id'].'" title="Update entry for '.$d.'">
+                      <b>'.$d.' </b></a>';
                 }],
-                ['dt' => 1, 'db' => 'target', 'formatter' => function($d) { return str_replace(',', '<br>', $d); }],
+                ['dt' => 1, 'db' => 'target', 'formatter' => fn ($d) => str_replace(',', '<br>', $d)],
                 ['dt' => 2, 'db' => 'domain'],
-                ['dt' => 3, 'db' => 'active', 'formatter' => function($d) {
-                    return '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>';
-                }],
+                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="fas '.($d ? 'fa-check text-success' : 'fa-times text-danger').'"></i>'],
                 ['dt' => 4, 'db' => 'id'],
                 ['dt' => 5, 'db' => 'updated'],
             ];
+
             return json_encode(db::simple($_GET, 'valias_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
+
         return $this->t->list([]);
     }
 }
-
-?>

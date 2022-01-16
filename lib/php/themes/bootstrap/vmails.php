@@ -1,19 +1,21 @@
 <?php
+
+declare(strict_types=1);
 // lib/php/themes/bootstrap/vmails.php 20170101 - 20200413
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
-    public function list(array $in) : string
+    public function list(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         $create = $this->modal([
-            'id'      => 'createmodal',
-            'title'   => 'Create New Mailbox',
-            'action'  => 'create',
-            'footer'  => 'Create',
-            'body'    => '
+            'id' => 'createmodal',
+            'title' => 'Create New Mailbox',
+            'action' => 'create',
+            'footer' => 'Create',
+            'body' => '
                   <div class="form-group">
                     <label for="user" class="form-control-label">Email Address</label>
                     <input type="text" class="form-control" id="user" name="user">
@@ -21,21 +23,21 @@ elog(__METHOD__);
         ]);
 
         $remove = $this->modal([
-            'id'      => 'removemodal',
-            'title'   => 'Remove Mailbox',
-            'action'  => 'delete',
-            'footer'  => 'Remove',
-            'body'    => '
+            'id' => 'removemodal',
+            'title' => 'Remove Mailbox',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'body' => '
                 <input type="hidden" id="removeuser" name="user" value="">
                 <p class="text-center">Are you sure you want to remove this mailbox?<br><b id=targetuser></b></p>',
         ]);
 
         $update = $this->modal([
-            'id'      => 'updatemodal',
-            'title'   => 'Change Password',
-            'action'  => 'update',
-            'footer'  => 'Update',
-            'body'    => '
+            'id' => 'updatemodal',
+            'title' => 'Change Password',
+            'action' => 'update',
+            'footer' => 'Update',
+            'body' => '
                 <input type="hidden" id="updateuser" name="user" value="">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
@@ -72,7 +74,7 @@ elog(__METHOD__);
             <tbody>
             </tbody>
           </table>
-        </div>' . $create . $remove . $update .'
+        </div>'.$create.$remove.$update.'
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({
@@ -124,5 +126,3 @@ $(document).ready(function() {
         </script>';
     }
 }
-
-?>

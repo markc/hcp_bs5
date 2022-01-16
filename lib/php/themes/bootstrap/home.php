@@ -1,12 +1,14 @@
 <?php
+
+declare(strict_types=1);
 // lib/php/themes/bootstrap/home.php 20150101 - 20180503
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
 {
-    public function list(array $in) : string
+    public function list(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         return '
     <div class="col-12">
@@ -61,5 +63,3 @@ Comments and pull requests are most welcome via the Issue Tracker link below.
     </div>';
     }
 }
-
-?>

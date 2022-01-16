@@ -1,34 +1,36 @@
 <?php
+
+declare(strict_types=1);
 // lib/php/themes/bootstrap/domains.php 20170225 - 20200414
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 {
-    public function create(array $in) : string
+    public function create(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         return $this->editor($in);
     }
 
-    public function update(array $in) : string
+    public function update(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         return $this->editor($in);
     }
 
-    public function list(array $in) : string
+    public function list(array $in): string
     {
-elog(__METHOD__);
-var_export($in, true);
+        elog(__METHOD__);
+        var_export($in, true);
 
         $create = $this->modal([
-            'id'      => 'createmodal',
-            'title'   => 'Create DNS Zone',
-            'action'  => 'create',
-            'footer'  => 'Create',
-            'body'    => '
+            'id' => 'createmodal',
+            'title' => 'Create DNS Zone',
+            'action' => 'create',
+            'footer' => 'Create',
+            'body' => '
             <div class="form-group row">
               <label for="domain" class="col-sm-2 col-form-label">Domain</label>
               <div class="col-sm-10">
@@ -68,22 +70,22 @@ var_export($in, true);
         ]);
 
         $remove = $this->modal([
-            'id'      => 'removemodal',
-            'title'   => 'Remove DNS Zone',
-            'action'  => 'delete',
-            'footer'  => 'Remove',
-            'hidden'  => '
+            'id' => 'removemodal',
+            'title' => 'Remove DNS Zone',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'hidden' => '
                 <input type="hidden" id="removemodalid" name="i" value="">',
-            'body'    => '
+            'body' => '
                 <p class="text-center">Are you sure you want to remove this domain?<br><b id="removemodalname"></b></p>',
         ]);
 
         $shwho = $this->modal([
-            'id'      => 'shwhomodal',
-            'title'   => 'Domain Info for <b id="shwho-name"></b>',
-            'action'  => 'shwho',
-            'footer'  => '',
-            'body'    => '
+            'id' => 'shwhomodal',
+            'title' => 'Domain Info for <b id="shwho-name"></b>',
+            'action' => 'shwho',
+            'footer' => '',
+            'body' => '
             <pre id="shwho-info"></pre>',
         ]);
 
@@ -112,7 +114,7 @@ var_export($in, true);
               <tbody>
               </tbody>
             </table>
-          </div>' . $create . $remove . $shwho . '
+          </div>'.$create.$remove.$shwho.'
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
@@ -155,35 +157,35 @@ $("#domains").show();
         </script>';
     }
 
-    private function editor(array $in) : string
+    private function editor(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         $domain = $in['name'];
         $soa = isset($in['soa'])
             ? explode(' ', $in['soa'])
             : ['', '', '', 7200, 540, 604800, 300];
 
-        if ($this->g->in['m'] === 'create') {
+        if ('create' === $this->g->in['m']) {
             $serial = $hidden = '';
             $header = 'Add Domain';
             $submit = '
                 <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
                 <button type="submit" id="m" name="m" value="create" class="btn btn-primary">Add Domain</button>';
         } else {
-            $serial = '&nbsp;&nbsp;<small>Serial: ' . $soa[2] . '</small>';
+            $serial = '&nbsp;&nbsp;<small>Serial: '.$soa[2].'</small>';
             $header = $domain;
             $submit = '
                 <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
                 <button type="submit" id="m" name="m" value="update" class="btn btn-primary">Update</button>';
             $hidden = '
-            <input type="hidden" name="serial" value="' . $soa[2] . '">';
+            <input type="hidden" name="serial" value="'.$soa[2].'">';
         }
 
         return '
           <div class="col-12">
           <h3>
-            <i class="fa fa-globe fa-fw"></i>  ' . $header . $serial . '
+            <i class="fa fa-globe fa-fw"></i>  '.$header.$serial.'
             <a href="" title="Add new domain" data-toggle="modal" data-target="#createmodal">
               <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
           </h3>
@@ -191,51 +193,51 @@ elog(__METHOD__);
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <form method="post" action="' . $this->g->cfg['self'] . '">
-              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
+            <form method="post" action="'.$this->g->cfg['self'].'">
+              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
+              <input type="hidden" name="o" value="'.$this->g->in['o'].'">
+              <input type="hidden" name="i" value="'.$this->g->in['i'].'">'.$hidden.'
               <div class="row">
                 <div class="col-3">
                   <div class="form-group">
                     <label for="primary">Primary</label>
-                    <input type="text" class="form-control" id="primary" name="primary" value="' . $soa[0] . '" required>
+                    <input type="text" class="form-control" id="primary" name="primary" value="'.$soa[0].'" required>
                   </div>
                 </div>
                 <div class="col-3">
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" class="form-control" id="email" name="email" value="' . $soa[1] . '" required>
+                    <input type="text" class="form-control" id="email" name="email" value="'.$soa[1].'" required>
                   </div>
                 </div>
                 <div class="col-1">
                   <div class="form-group">
                     <label for="refresh">Refresh</label>
-                    <input type="text" class="form-control" id="refresh" name="refresh" value="' . $soa[3] . '" required>
+                    <input type="text" class="form-control" id="refresh" name="refresh" value="'.$soa[3].'" required>
                   </div>
                 </div>
                 <div class="col-1">
                   <div class="form-group">
                     <label for="retry">Retry</label>
-                    <input type="text" class="form-control" id="retry" name="retry" value="' . $soa[4] . '" required>
+                    <input type="text" class="form-control" id="retry" name="retry" value="'.$soa[4].'" required>
                   </div>
                 </div>
                 <div class="col-2">
                   <div class="form-group">
                     <label for="expire">Expire</label>
-                    <input type="text" class="form-control" id="expire" name="expire" value="' . $soa[5] . '" required>
+                    <input type="text" class="form-control" id="expire" name="expire" value="'.$soa[5].'" required>
                   </div>
                 </div>
                 <div class="col-2">
                   <div class="form-group">
                     <label for="ttl">TTL</label>
-                    <input type="text" class="form-control" id="ttl" name="ttl" value="' . $soa[6] . '" required>
+                    <input type="text" class="form-control" id="ttl" name="ttl" value="'.$soa[6].'" required>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="btn-group">' . $submit . '
+                  <div class="btn-group">'.$submit.'
                   </div>
                 </div>
               </div>

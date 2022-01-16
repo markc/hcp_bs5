@@ -1,22 +1,24 @@
 <?php
+
+declare(strict_types=1);
 // lib/php/themes/bootstrap/dkim.php 20180511 - 20180529
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
-    public function read(array $in) : string
+    public function read(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         $remove = $this->modal([
-            'id'      => 'removemodal',
-            'title'   => 'Remove DKIM Record',
-            'action'  => 'delete',
-            'footer'  => 'Remove',
-            'hidden'  => '
-                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
-            'body'    => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
+            'id' => 'removemodal',
+            'title' => 'Remove DKIM Record',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'hidden' => '
+                <input type="hidden" name="domain" value="'.$in['domain'].'">',
+            'body' => '
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>'.$in['domain'].'</b></p>',
         ]);
 
         return '
@@ -29,16 +31,15 @@ elog(__METHOD__);
             </div>
           </div><!-- END UPPER ROW -->
           <div class="row">
-            <div class="col-12">' . $in['buf'] . '
+            <div class="col-12">'.$in['buf'].'
             </div>
           </div>
-        </div>' . $remove;
-
+        </div>'.$remove;
     }
 
-    public function list(array $in) : string
+    public function list(array $in): string
     {
-elog(__METHOD__);
+        elog(__METHOD__);
 
         $keybuf = $this->dropdown([
             ['1024', '1024'],
@@ -47,11 +48,11 @@ elog(__METHOD__);
         ], 'keylen', '2048', '', 'custom-select');
 
         $create = $this->modal([
-            'id'      => 'createmodal',
-            'title'   => 'Create DKIM Record',
-            'action'  => 'create',
-            'footer'  => 'Create',
-            'body'    => '
+            'id' => 'createmodal',
+            'title' => 'Create DKIM Record',
+            'action' => 'create',
+            'footer' => 'Create',
+            'body' => '
                   <div class="form-group">
                     <label for="user" class="form-control-label">Domain</label>
                     <input type="text" class="form-control" id="domain" name="domain">
@@ -65,7 +66,7 @@ elog(__METHOD__);
                     </div>
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="keylen" class="form-control-label">Key Length</label>' . $keybuf . '
+                        <label for="keylen" class="form-control-label">Key Length</label>'.$keybuf.'
                       </div>
                     </div>
                   </div>',
@@ -81,11 +82,9 @@ elog(__METHOD__);
             </div>
           </div><!-- END UPPER ROW -->
           <div class="row">
-            <div class="col-12">' . $in['buf'] . '
+            <div class="col-12">'.$in['buf'].'
             </div>
           </div>
-        </div>' . $create;
+        </div>'.$create;
     }
 }
-
-?>

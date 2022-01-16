@@ -11,3 +11,4 @@ whmcs/
 .well-known/
 rspamd/
 phpliteadmin.*
+.php-cs-fixer.cache
