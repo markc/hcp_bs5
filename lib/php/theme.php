@@ -134,7 +134,7 @@ class Theme
         $buf = '';
         $c = $class ? ' class="'.$class.'"' : '';
         foreach ($ary as $k => $v) {
-            $t = str_replace('?t=', '', $v[1]);
+            $t = str_replace('?t=', '', (string) $v[1]);
             $s = $sel === $t ? ' selected' : '';
             $buf .= '
                         <option value="'.$t.'"'.$s.'>'.$v[0].'</option>';
