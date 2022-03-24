@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/util.php 20150225 - 20200413
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/util.php 20150225 - 20220324
+// Copyright (C) 2015-2022 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
@@ -73,7 +73,7 @@ class Util
         exec('sudo '.escapeshellcmd($cmd).' 2>&1', $retArr, $retVal);
         util::log('<pre>'.trim(implode("\n", $retArr)).'</pre>', $retVal ? 'danger' : 'success');
 
-        return $retVal;
+        return (boolval($retVal) ? true : false);
     }
 
     public static function run(string $cmd): string
