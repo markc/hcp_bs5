@@ -30,30 +30,6 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-6">
-            <br>
-            <h5>RAM <small>'.$mem_used.' / '.$mem_total.', '.$mem_free.' free</small></h5>
-            <div class="progress">
-              <div class="progress-bar bg-'.$mem_color.'" role="progressbar" aria-valuenow="'.$mem_pcnt.'"
-              aria-valuemin="0" aria-valuemax="100" style="width:'.$mem_pcnt.'%" title="Used Memory">'.$mem_text.'
-              </div>
-            </div>
-            <br>
-            <h5>Disk <small>'.$dsk_used.' / '.$dsk_total.', '.$dsk_free.' free</small></h5>
-            <div class="progress">
-              <div class="progress-bar bg-'.$dsk_color.'" role="progressbar" aria-valuenow="'.$dsk_pcnt.'"
-              aria-valuemin="0" aria-valuemax="100" style="width:'.$dsk_pcnt.'%" title="Used Disk Space">'.$dsk_text.'
-              </div>
-            </div>
-            <br>
-            <h5>CPU <small>'.$cpu_all.'</small></h5>
-            <div class="progress">
-              <div class="progress-bar bg-'.$cpu_color.'" role="progressbar" aria-valuenow="'.$cpu_pcnt.'"
-              aria-valuemin="0" aria-valuemax="100" style="width:'.$cpu_pcnt.'%" title="Used Disk Space">'.$cpu_text.'
-              </div>
-            </div>
-            <br>
-          </div>
-          <div class="col-6">
             <div class="table-responsive">
               <table class="table table-sm table-bordered">
                 <tbody>
@@ -88,6 +64,30 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
                 </tbody>
               </table>
             </div>
+          </div>
+          <div class="col-6">
+            <br>
+            <h5>RAM <small>'.$mem_used.' / '.$mem_total.', '.$mem_free.' free</small></h5>
+            <div class="progress">
+              <div class="progress-bar bg-'.$mem_color.'" role="progressbar" aria-valuenow="'.$mem_pcnt.'"
+              aria-valuemin="0" aria-valuemax="100" style="width:'.$mem_pcnt.'%" title="Used Memory">'.$mem_text.'
+              </div>
+            </div>
+            <br>
+            <h5>Disk <small>'.$dsk_used.' / '.$dsk_total.', '.$dsk_free.' free</small></h5>
+            <div class="progress">
+              <div class="progress-bar bg-'.$dsk_color.'" role="progressbar" aria-valuenow="'.$dsk_pcnt.'"
+              aria-valuemin="0" aria-valuemax="100" style="width:'.$dsk_pcnt.'%" title="Used Disk Space">'.$dsk_text.'
+              </div>
+            </div>
+            <br>
+            <h5>CPU <small>'.$cpu_all.'</small></h5>
+            <div class="progress">
+              <div class="progress-bar bg-'.$cpu_color.'" role="progressbar" aria-valuenow="'.$cpu_pcnt.'"
+              aria-valuemin="0" aria-valuemax="100" style="width:'.$cpu_pcnt.'%" title="Used Disk Space">'.$cpu_text.'
+              </div>
+            </div>
+            <br>
           </div>
         </div>';
     }
