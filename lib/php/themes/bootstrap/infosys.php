@@ -58,32 +58,32 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
               <table class="table table-sm table-bordered">
                 <tbody>
                   <tr>
-                    <td><b>Hostname</b></td>
-                    <td>'.$hostname.'</td>
+                    <td class="w-25"><b>Hostname</b></td>
+                    <td class="w-75">'.$hostname.'</td>
                   </tr>
                   <tr>
-                    <td><b>Host IP</b></td>
-                    <td>'.$host_ip.'</td>
+                    <td class="w-25"><b>Host IP</b></td>
+                    <td class="w-75">'.$host_ip.'</td>
                   </tr>
                   <tr>
-                    <td><b>Distro</b></td>
-                    <td>'.$os_name.'</td>
+                    <td class="w-25"><b>Distro</b></td>
+                    <td class="w-75">'.$os_name.'</td>
                   </tr>
                   <tr>
-                    <td><b>Uptime</b></td>
-                    <td>'.$uptime.'</td>
+                    <td class="w-25"><b>Uptime</b></td>
+                    <td class="w-75">'.$uptime.'</td>
                   </tr>
                   <tr>
-                    <td><b>CPU Load</b></td>
-                    <td>'.$loadav.' ('.$cpu_num.' cpus)</td>
+                    <td class="w-25"><b>CPU Load</b></td>
+                    <td class="w-75">'.$loadav.' ('.$cpu_num.' cpus)</td>
                   </tr>
                   <tr>
-                    <td><b>CPU Model</b></td>
-                    <td>'.$cpu_name.'</td>
+                    <td class="w-25"><b>CPU Model</b></td>
+                    <td class="w-75">'.$cpu_name.'</td>
                   </tr>
                   <tr>
-                    <td><b>Kernel Version</b></td>
-                    <td>'.$kernel.'</td>
+                    <td class="w-25"><b>Kernel Version</b></td>
+                    <td class="w-75">'.$kernel.'</td>
                   </tr>
                 </tbody>
               </table>

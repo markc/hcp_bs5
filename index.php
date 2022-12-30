@@ -62,16 +62,16 @@ echo new Init(new class() {
     ];
     public $nav1 = [
         'non' => [
-            ['Webmail',     '../',              'fas fa-envelope fa-fw'],
+            ['Webmail',     'webmail/',         'fas fa-envelope fa-fw'],
             ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'usr' => [
-            ['Webmail',     '../',              'fas fa-envelope fa-fw'],
+            ['Webmail',     'webmail/',         'fas fa-envelope fa-fw'],
             ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
         ],
         'adm' => [
             ['Menu',        [
-                ['Webmail',     '../',          'fas fa-envelope fa-fw'],
+                ['Webmail',     'webmail/',     'fas fa-envelope fa-fw'],
                 ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
             ], 'fas fa-bars fa-fw'],
             ['Admin',       [
