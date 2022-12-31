@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 class Plugins_Dkim extends Plugin
 {
-    protected $in = [
+    protected array $in = [
         'dnstxt' => '',
         'domain' => '',
         'keylen' => '2048',
@@ -24,6 +24,7 @@ class Plugins_Dkim extends Plugin
             util::exe('dkim add '.$domain.' '.$select.' '.$keylen);
         }
         util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        return 'Redirect'; // workaround to satisy string return type
     }
 
     public function read(): string
@@ -46,9 +47,10 @@ class Plugins_Dkim extends Plugin
 
         //return $this->list(); // override parent update()
         util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        return "Update"; // workaround to satisy string return type
     }
 
-    public function delete(): string
+    public function delete(): void
     {
         elog(__METHOD__);
 

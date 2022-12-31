@@ -6,10 +6,10 @@ declare(strict_types=1);
 
 class Theme
 {
-    private $buf = '';
-    private $in = [];
+    private string $buf = '';
+    private array $in = [];
 
-    public function __construct(object $g)
+    public function __construct(public Object $g)
     {
         elog(__METHOD__);
 

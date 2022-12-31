@@ -6,29 +6,28 @@ declare(strict_types=1);
 
 class Plugins_InfoMail extends Plugin
 {
-    protected $pflog = '/tmp/pflogsumm.log';
+    private const PFLOG = '/tmp/pflogsumm.log';
 
-    public function list(): string
+    protected function list(): string
     {
         elog(__METHOD__);
 
         return $this->t->list([
             'mailq' => shell_exec('mailq'),
-            'pflogs' => is_readable($this->pflog)
-                ? file_get_contents($this->pflog)
+            'pflogs' => is_readable(self::PFLOG)
+                ? file_get_contents(self::PFLOG)
                 : 'none',
-            'pflog_time' => is_readable($this->pflog)
-                ? round(abs(date('U') - filemtime($this->pflog)) / 60, 0).' min.'
+            'pflog_time' => is_readable(self::PFLOG)
+                ? round(abs(date('U') - filemtime(self::PFLOG)) / 60, 0).' min.'
                 : '0 min.',
         ]);
     }
 
-    public function pflog_renew()
+    protected function pflog_renew() : string
     {
         elog(__METHOD__);
 
-        $this->pflogs = shell_exec('sudo pflogs');
-
+        shell_exec('sudo pflogs');
         return $this->list();
     }
 }

@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 class Plugins_Accounts extends Plugin
 {
-    protected $tbl = 'accounts';
-    protected $in = [
+    protected string $tbl = 'accounts';
+    protected array $in = [
         'grp' => 1,
         'acl' => 2,
         'vhosts' => 1,
@@ -53,12 +53,12 @@ class Plugins_Accounts extends Plugin
         return $this->t->read($usr);
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
         if (util::is_post()) {
-            return parent::delete();
+            parent::delete();
         }
     }
 

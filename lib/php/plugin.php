@@ -6,12 +6,13 @@ declare(strict_types=1);
 
 class Plugin
 {
-    protected $buf = '';
-    protected $dbh;
-    protected $tbl = '';
-    protected $in = [];
+    protected string $buf = '';
+    protected mixed $dbh = null;
+    protected string $tbl = '';
+    protected array $in = [];
+    protected Object $g;
 
-    public function __construct(Theme $t)
+    public function __construct(public Theme $t)
     {
         elog(__METHOD__);
 
@@ -89,7 +90,7 @@ class Plugin
         return $this->read();
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
@@ -101,7 +102,7 @@ class Plugin
             }
         }
 
-        return 'Error deleting item';
+        util::log('Error deleting item');
     }
 
     protected function list(): string

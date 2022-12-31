@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 class Plugins_Domains extends Plugin
 {
-    protected $dbh;
-    protected $tbl = 'domains';
-    protected $in = [
+    protected mixed $dbh;
+    protected string $tbl = 'domains';
+    protected array $in = [
         'name' => '',
         'master' => '',
         'last_check' => '',
@@ -22,7 +22,7 @@ class Plugins_Domains extends Plugin
         'ns2' => '',
     ];
 
-    public function __construct(Theme $t)
+    public function __construct(public Theme $t)
     {
         elog(__METHOD__);
 
@@ -261,7 +261,7 @@ class Plugins_Domains extends Plugin
         return 'Error updating item';
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
@@ -277,7 +277,7 @@ class Plugins_Domains extends Plugin
             util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
         }
 
-        return 'Error deleting item';
+        util::log('Error deleting item');
     }
 
     protected function list(): string

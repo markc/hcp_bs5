@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 class Plugins_Vhosts extends Plugin
 {
-    protected $tbl = 'vhosts';
-    protected $in = [
+    protected string $tbl = 'vhosts';
+    protected array $in = [
         'active' => 0,
         'aid' => 0,
         'aliases' => 10,
@@ -127,7 +127,7 @@ class Plugins_Vhosts extends Plugin
         }
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
@@ -142,7 +142,7 @@ class Plugins_Vhosts extends Plugin
             }
         }
 
-        return 'Error deleting item';
+        util::log('Error deleting item');
     }
 
     protected function list(): string

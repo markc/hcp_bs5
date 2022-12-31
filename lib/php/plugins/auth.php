@@ -9,8 +9,8 @@ class Plugins_Auth extends Plugin
     public const OTP_LENGTH = 10;
     public const REMEMBER_ME_EXP = 604800; // 7 days;
 
-    protected $tbl = 'accounts';
-    protected $in = [
+    protected string $tbl = 'accounts';
+    protected array $in = [
         'id' => null,
         'acl' => null,
         'grp' => null,
@@ -148,7 +148,7 @@ class Plugins_Auth extends Plugin
         return $this->t->update(['id' => $i, 'login' => $u]);
     }
 
-    public function delete(): string
+    public function delete(): void
     {
         elog(__METHOD__);
 

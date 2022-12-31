@@ -135,7 +135,7 @@ class Util
         return isset($_SESSION['adm']);
     }
 
-    public static function is_usr(int $id = null): bool
+    public static function is_usr(int|string $id = null): bool
     {
         elog(__METHOD__);
 

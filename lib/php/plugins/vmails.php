@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 class Plugins_Vmails extends Plugin
 {
-    protected $tbl = 'vmails';
-    protected $in = [
+    protected string $tbl = 'vmails';
+    protected array $in = [
         'newpw' => 0,
         'password' => '',
         'shpw' => 0,
@@ -51,7 +51,7 @@ class Plugins_Vmails extends Plugin
         util::relist();
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 

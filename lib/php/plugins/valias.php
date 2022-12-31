@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 class Plugins_Valias extends Plugin
 {
-    protected $tbl = 'valias';
-    protected $in = [
+    protected string $tbl = 'valias';
+    protected array $in = [
         'aid' => 1,
         'hid' => 1,
         'source' => '',
