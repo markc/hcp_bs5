@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 class Plugins_Records extends Plugin
 {
-    protected $tbl = 'records';
-    protected $in = [
+    protected string $tbl = 'records';
+    protected array $in = [
         'content' => '',
         'name' => '',
         'prio' => 0,

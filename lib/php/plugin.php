@@ -90,7 +90,7 @@ class Plugin
         return $this->read();
     }
 
-    protected function delete(): void
+    protected function delete(): string
     {
         elog(__METHOD__);
 
