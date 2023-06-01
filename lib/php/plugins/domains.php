@@ -261,7 +261,7 @@ class Plugins_Domains extends Plugin
         return 'Error updating item';
     }
 
-    protected function delete(): void
+    protected function delete(): string
     {
         elog(__METHOD__);
 
