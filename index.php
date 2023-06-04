@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// index.php 20150101 - 20200807
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__.DS.'lib'.DS.'php'.DS;
@@ -34,7 +34,7 @@ echo new Init(new class() {
         'l' => '',          // Log (message)
         'm' => 'list',      // Method (action)
         'o' => 'home',      // Object (content)
-        't' => 'bootstrap', // Theme
+        't' => 'bootstrap5',// Theme
         'x' => '',          // XHR (request)
     ];
     public $out = [
