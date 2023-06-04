@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/processes.php 20170225 - 20180512
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/processes.php 20170225 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Processes extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
@@ -16,7 +16,7 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
           </div>
           <div class="col-12 col-sm-6">
             <form method="post" class="form-inline">
-              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" id="o" name="o" value="processes">
               <div class="form-group ml-auto">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refresh</button>
@@ -26,8 +26,8 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <h5>Process List <small>('.(count(explode("\n", $in['procs'])) - 1).')</small></h5>
-            <pre><code>'.$in['procs'].'
+            <h5>Process List <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h5>
+            <pre><code>' . $in['procs'] . '
             </code></pre>
           </div>
         </div>';

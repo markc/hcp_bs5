@@ -71,7 +71,7 @@ class Plugins_Accounts extends Plugin
                 ['dt' => null, 'db' => 'id'],
                 ['dt' => 0, 'db' => 'login', 'formatter' => function ($d, $row) {
                     return '
-                    <b><a href="?o=accounts&m=read&i='.$row['id'].'">'.$d.'</a></b>';
+                    <b><a href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
                 }],
                 ['dt' => 1, 'db' => 'fname'],
                 ['dt' => 2, 'db' => 'lname'],
@@ -92,7 +92,7 @@ class Plugins_Accounts extends Plugin
 
         if (util::is_adm() and !is_null($this->g->in['i'])) {
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
-            util::log('Switch to user: '.$_SESSION['usr']['login'], 'success');
+            util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
         } else {
             util::log('Not authorized to switch users');
         }

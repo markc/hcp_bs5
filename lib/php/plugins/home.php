@@ -10,10 +10,10 @@ class Plugins_Home extends Plugin
     {
         elog(__METHOD__);
 
-        if (file_exists(INC.'home.tpl')) {
+        if (file_exists(INC . 'home.tpl')) {
             ob_start();
 
-            include INC.'home.tpl';
+            include INC . 'home.tpl';
 
             return ob_get_clean();
         }

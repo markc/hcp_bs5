@@ -1,13 +1,13 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/theme.php 20150101 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/theme.php 20150101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
 {
     private string $buf = '';
-    private array $in = [];
+    //private array $in = [];
 
     public function __construct(public Object $g)
     {
@@ -25,9 +25,9 @@ class Theme
 
     public function __call(string $name, array $args): string
     {
-        elog(__METHOD__.'() name = '.$name);
+        elog(__METHOD__ . '() name = ' . $name . ' class = ' . __CLASS__);
 
-        return 'Theme::'.$name.'() not implemented';
+        return 'Theme::' . $name . '() not implemented';
     }
 
     public function log(): string
@@ -36,7 +36,7 @@ class Theme
 
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
-            $alts .= $msg ? '<p class="alert '.$lvl.'">'.$msg."</p>\n" : '';
+            $alts .= $msg ? '<p class="alert ' . $lvl . '">' . $msg . "</p>\n" : '';
         }
 
         return $alts;
@@ -46,15 +46,15 @@ class Theme
     {
         elog(__METHOD__);
 
-        $o = '?o='.$this->g->in['o'];
+        $o = '?o=' . $this->g->in['o'];
 
         return '
-      <nav>'.implode('', array_map(function ($n) use ($o) {
+      <nav>' . implode('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' class="active"' : '';
 
             return '
-        <a'.$c.' href="'.$n[1].'">'.$n[0].'</a>';
-        }, $this->g->nav1)).'
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
       </nav>';
     }
 
@@ -65,8 +65,8 @@ class Theme
         return '
     <header>
       <h1>
-        <a href="'.$this->g->cfg['self'].'">'.$this->g->out['head'].'</a>
-      </h1>'.$this->g->out['nav1'].'
+        <a href="' . $this->g->cfg['self'] . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
     </header>';
     }
 
@@ -75,7 +75,7 @@ class Theme
         elog(__METHOD__);
 
         return '
-    <main>'.$this->g->out['log'].$this->g->out['main'].'
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
     </main>';
     }
 
@@ -86,7 +86,7 @@ class Theme
         return '
     <footer class="text-center">
       <br>
-      <p><em><small>'.$this->g->out['foot'].'</small></em></p>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
     </footer>';
     }
 
@@ -95,7 +95,7 @@ class Theme
         elog(__METHOD__);
 
         return '
-    <pre>'.$this->g->out['end'].'
+    <pre>' . $this->g->out['end'] . '
     </pre>';
     }
 
@@ -110,9 +110,9 @@ class Theme
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>'.$doc.'</title>'.$css.$js.'
+    <title>' . $doc . '</title>' . $css . $js . '
   </head>
-  <body>'.$head.$main.$foot.$end.'
+  <body>' . $head . $main . $foot . $end . '
   </body>
 </html>
 ';
@@ -125,23 +125,22 @@ class Theme
         string $label = '',
         string $class = '',
         string $extra = ''
-    ): string
-    {
+    ): string {
         elog(__METHOD__);
 
         $opt = $label ? '
-                <option value="">'.ucfirst($label).'</option>' : '';
+                <option value="">' . ucfirst($label) . '</option>' : '';
         $buf = '';
-        $c = $class ? ' class="'.$class.'"' : '';
+        $c = $class ? ' class="' . $class . '"' : '';
         foreach ($ary as $k => $v) {
             $t = str_replace('?t=', '', (string) $v[1]);
             $s = $sel === $t ? ' selected' : '';
             $buf .= '
-                        <option value="'.$t.'"'.$s.'>'.$v[0].'</option>';
+                        <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
         }
 
         return '
-                      <select'.$c.' name="'.$name.'" id="'.$name.'"'.$extra.'>'.$opt.$buf.'
+                      <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
                       </select>';
     }
 }

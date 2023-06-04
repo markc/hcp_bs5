@@ -11,12 +11,11 @@ class Init
     public function __construct(object $g)
     {
         elog(__METHOD__);
-
         session_start();
 
-        elog('GET='.var_export($_GET, true));
-        elog('POST='.var_export($_POST, true));
-        elog('SESSION='.var_export($_SESSION, true));
+        elog('GET=' . var_export($_GET, true));
+        elog('POST=' . var_export($_POST, true));
+        elog('SESSION=' . var_export($_SESSION, true));
 
         //$_SESSION = []; // to reset session for testing
 
@@ -32,15 +31,17 @@ class Init
         util::ses('o');
         util::ses('m');
         util::ses('l');
+
         $t = util::ses('t', '', $g->in['t']);
+        $t1 = 'themes_' . $t . '_' . $g->in['o'];
+        $t2 = 'themes_' . $t . '_theme';
 
-        $t1 = 'themes_'.$t.'_'.$g->in['o'];
-        $t2 = 'themes_'.$t.'_theme';
-
-        $this->t = $thm = class_exists($t1) ? new $t1($g)
+        $this->t = $thm = class_exists($t1)
+            ? new $t1($g)
             : (class_exists($t2) ? new $t2($g) : new Theme($g));
 
-        $p = 'plugins_'.$g->in['o'];
+        $p = 'plugins_' . $g->in['o'];
+
         if (class_exists($p)) {
             $g->in['a'] ? util::chkapi($g) : util::remember($g);
             $g->out['main'] = (string) new $p($thm);
@@ -58,7 +59,7 @@ class Init
     public function __destruct()
     {
         //error_log('SESSION=' . var_export($_SESSION, true));
-        elog(__FILE__.' '.$_SERVER['REMOTE_ADDR'].' '.round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4)."\n");
+        elog(__FILE__ . ' ' . $_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4) . "\n");
     }
 
     public function __toString(): string
@@ -91,7 +92,10 @@ class Init
 function dbg($var = null): void
 {
     if (is_object($var)) {
-        error_log(ReflectionObject::export($var, true));
+        $refobj = new \ReflectionObject($var);
+        // get all public and protected properties
+        $var = $refobj->getProperties(\ReflectionProperty::IS_PUBLIC);
+        $var = \array_merge($var, $refobj->getProperties(\ReflectionProperty::IS_PROTECTED));
     }
     ob_start();
     print_r($var);

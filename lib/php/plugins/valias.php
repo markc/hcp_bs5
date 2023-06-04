@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/valias.php 20170225 - 20200414
-// Copyright (C) 1995-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/valias.php 20170225 - 20230604
+// Copyright (C) 1995-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
@@ -55,7 +55,7 @@ class Plugins_Valias extends Plugin
                 }
 
                 if (!$domain = idn_to_ascii($rhs)) {
-                    util::log('Invalid source domain: '.$rhs);
+                    util::log('Invalid source domain: ' . $rhs);
                     $_POST = [];
 
                     return $this->t->create($this->in);
@@ -69,7 +69,7 @@ class Plugins_Valias extends Plugin
                 $hid = db::qry($sql, ['domain' => $domain], 'col');
 
                 if (!$hid) {
-                    util::log($domain.' does not exist as a local domain');
+                    util::log($domain . ' does not exist as a local domain');
                     $_POST = [];
 
                     return $this->t->create($this->in);
@@ -86,7 +86,7 @@ class Plugins_Valias extends Plugin
  SELECT 1 FROM `valias`
   WHERE `source` = :catchall';
 
-                $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
+                $catchall = db::qry($sql, ['catchall' => '@' . $domain], 'col');
                 //elog("catchall=$catchall");
 
                 if (1 !== $catchall) {
@@ -98,7 +98,7 @@ class Plugins_Valias extends Plugin
                     $num_results = count(db::qry($sql, ['source' => $s]));
 
                     if ($num_results) {
-                        util::log($s.' already exists as an alias');
+                        util::log($s . ' already exists as an alias');
                         $_POST = [];
 
                         return $this->t->create($this->in);
@@ -113,7 +113,7 @@ class Plugins_Valias extends Plugin
                 $num_results = count(db::qry($sql, ['source' => $s]));
 
                 if ($num_results) {
-                    util::log($s.' already exists as a regular mailbox');
+                    util::log($s . ' already exists as a regular mailbox');
                     $_POST = [];
 
                     return $this->t->create($this->in);
@@ -126,7 +126,7 @@ class Plugins_Valias extends Plugin
                     [$tlhs, $trhs] = explode('@', $t);
 
                     if (!$tdomain = idn_to_ascii($trhs)) {
-                        util::log('Invalid target domain: '.$tdomain);
+                        util::log('Invalid target domain: ' . $tdomain);
                         $_POST = [];
 
                         return $this->t->create($this->in);
@@ -169,7 +169,7 @@ class Plugins_Valias extends Plugin
 )';
                 $s = filter_var($s, FILTER_VALIDATE_EMAIL)
                     ? $s
-                    : '@'.$domain;
+                    : '@' . $domain;
 
                 $result = db::qry($sql, [
                     'active' => $active ? 1 : 0,
@@ -183,7 +183,7 @@ class Plugins_Valias extends Plugin
             }
             util::log('Alias added', 'success');
             util::ses('p', '', '1');
-            util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } else {
             return $this->t->create($this->in);
         }
@@ -233,7 +233,7 @@ class Plugins_Valias extends Plugin
                 }
 
                 if (!$domain = idn_to_ascii($rhs)) {
-                    util::log('Invalid source domain: '.$rhs);
+                    util::log('Invalid source domain: ' . $rhs);
                     $_POST = [];
 
                     return $this->read();
@@ -247,7 +247,7 @@ class Plugins_Valias extends Plugin
                 $hid = db::qry($sql, ['domain' => $domain], 'col');
 
                 if (!$hid) {
-                    util::log($domain.' does not exist as a local domain');
+                    util::log($domain . ' does not exist as a local domain');
                     $_POST = [];
 
                     return $this->read();
@@ -265,7 +265,7 @@ class Plugins_Valias extends Plugin
    FROM `valias`
   WHERE `source` = :catchall';
 
-                $catchall = db::qry($sql, ['catchall' => '@'.$domain], 'col');
+                $catchall = db::qry($sql, ['catchall' => '@' . $domain], 'col');
                 //elog("catchall=$catchall");
 
                 if (1 !== $catchall) {
@@ -277,7 +277,7 @@ class Plugins_Valias extends Plugin
                     $num_results = count(db::qry($sql, ['source' => $s]));
 
                     if ($num_results) {
-                        util::log($s.' already exists as a regular mailbox');
+                        util::log($s . ' already exists as a regular mailbox');
                         $_POST = [];
 
                         return $this->read();
@@ -291,7 +291,7 @@ class Plugins_Valias extends Plugin
                     [$tlhs, $trhs] = explode('@', $t);
 
                     if (!$tdomain = idn_to_ascii($trhs)) {
-                        util::log('Invalid target domain: '.$tdomain);
+                        util::log('Invalid target domain: ' . $tdomain);
                         $_POST = [];
 
                         return $this->read();
@@ -317,7 +317,7 @@ class Plugins_Valias extends Plugin
                 $target = implode(',', $targets);
                 $s = filter_var($s, FILTER_VALIDATE_EMAIL)
                     ? $s
-                    : '@'.$domain;
+                    : '@' . $domain;
 
                 $sql = '
  SELECT `source`
@@ -386,12 +386,12 @@ class Plugins_Valias extends Plugin
             $columns = [
                 ['dt' => 0, 'db' => 'source', 'formatter' => function ($d, $row) {
                     return '
-                    <a href="?o=valias&m=update&i='.$row['id'].'" title="Update entry for '.$d.'">
-                      <b>'.$d.' </b></a>';
+                    <a href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $d . '">
+                      <b>' . $d . ' </b></a>';
                 }],
                 ['dt' => 1, 'db' => 'target', 'formatter' => fn ($d) => str_replace(',', '<br>', $d)],
                 ['dt' => 2, 'db' => 'domain'],
-                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="fas '.($d ? 'fa-check text-success' : 'fa-times text-danger').'"></i>'],
+                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>'],
                 ['dt' => 4, 'db' => 'id'],
                 ['dt' => 5, 'db' => 'updated'],
             ];

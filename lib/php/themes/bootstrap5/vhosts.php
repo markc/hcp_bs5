@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20190320
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Vhosts extends Themes_Bootstrap5_Theme
 {
     public function update(array $in): string
     {
@@ -18,7 +18,7 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
             //            'hidden'  => '
             //                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
             'body' => '
-                  <p class="text-center">Are you sure you want to remove this Vhost?<br><b>'.$in['domain'].'</b></p>',
+                  <p class="text-center">Are you sure you want to remove this Vhost?<br><b>' . $in['domain'] . '</b></p>',
         ]);
 
         return '
@@ -32,37 +32,37 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
             </div><!-- END UPPER ROW -->
             <div class="row">
               <div class="col-12">
-                <form method="post" action="'.$this->g->cfg['self'].'">
-                  <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-                  <input type="hidden" name="o" value="'.$this->g->in['o'].'">
-                  <input type="hidden" name="i" value="'.$this->g->in['i'].'">
+                <form method="post" action="' . $this->g->cfg['self'] . '">
+                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
                   <div class="row">
                     <div class="form-group col-12 col-md-6 col-lg-4">
                       <label for="domain">Domain</label>
-                        <input type="text" class="form-control" value="'.$in['domain'].'" disabled>
+                        <input type="text" class="form-control" value="' . $in['domain'] . '" disabled>
                     </div>
                     <div class="form-group col-6 col-md-3 col-lg-2">
                       <label for="aliases">Max Aliases</label>
-                      <input type="number" class="form-control" name="aliases" id="aliases" value="'.$in['aliases'].'">
+                      <input type="number" class="form-control" name="aliases" id="aliases" value="' . $in['aliases'] . '">
                     </div>
                     <div class="form-group col-6 col-md-3 col-lg-2">
                       <label for="mailboxes">Max Mailboxes</label>
-                      <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="'.$in['mailboxes'].'">
+                      <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $in['mailboxes'] . '">
                     </div>
                     <div class="form-group col-6 col-md-3 col-lg-2">
                       <label for="mailquota">Mail Quota (MB)</label>
-                      <input type="number" class="form-control" name="mailquota" id="mailquota" value="'.intval($in['mailquota'] / 1000000).'">
+                      <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($in['mailquota'] / 1000000) . '">
                     </div>
                     <div class="form-group col-6 col-md-3 col-lg-2">
                       <label for="diskquota">Disk Quota (MB)</label>
-                      <input type="number" class="form-control" name="diskquota" id="diskquota" value="'.intval($in['diskquota'] / 1000000).'">
+                      <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($in['diskquota'] / 1000000) . '">
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-12 col-sm-6">
                       <div class="form-group">
                         <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" name="active" id="active"'.($in['active'] ? ' checked' : '').'>
+                          <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in['active'] ? ' checked' : '') . '>
                           <label class="custom-control-label" for="active">Active</label>
                         </div>
                       </div>
@@ -75,7 +75,7 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
                     </div>
                   </div>
                 </form>
-              </div>'.$remove;
+              </div>' . $remove;
     }
 
     public function list(array $in): string
@@ -159,7 +159,7 @@ class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
             <tfoot>
             </tfoot>
           </table>
-        </div>'.$create.'
+        </div>' . $create . '
         <script>
 $(document).ready(function() {
   $("#vhosts").DataTable({

@@ -35,10 +35,10 @@ class Plugins_Records extends Plugin
                 $in['created'] = $in['updated'];
                 $lid = db::create($in);
                 $this->update_domains($in['domain_id'], $in['updated']);
-                util::log('Created DNS record ID: '.$lid.' for '.$in['name'], 'success');
+                util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect($this->g->cfg['self'].'?o='.$this->g->in['o'].'&m=list&i='.$i);
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
 
         return 'Error creating DNS record';
@@ -55,16 +55,16 @@ class Plugins_Records extends Plugin
                 $in['created'] = $in['updated'];
                 db::update($in, [['id', '=', $this->g->in['i']]]);
                 $this->update_domains($in['domain_id'], $in['updated']);
-                util::log('Updated DNS record ID: '.$this->g->in['i'].' for '.$dom, 'success');
+                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect($this->g->cfg['self'].'?o='.$this->g->in['o'].'&m=list&i='.$i);
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
 
         return 'Error updating DNS record';
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
@@ -75,12 +75,11 @@ class Plugins_Records extends Plugin
 
             db::delete([['id', '=', $this->g->in['i']]]);
             $this->update_domains($did, $now);
-            util::log('Deleted DNS record ID: '.$this->g->in['i'].' from '.$dom, 'success');
+            util::log('Deleted DNS record ID: ' . $this->g->in['i'] . ' from ' . $dom, 'success');
             $i = $did;
-            util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list&i='.$i);
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
         }
-
-        return 'Error deleting DNS record';
+        util::log('Error deleting DNS record');
     }
 
     protected function list(): string
@@ -96,9 +95,9 @@ class Plugins_Records extends Plugin
                 ['dt' => 4,  'db' => 'ttl'],
                 ['dt' => 5,  'db' => 'id', 'formatter' => function ($d) {
                     return '
-                    <a class="update" href="" title="Update DNS record ID: '.$d.'" data-rowid="'.$d.'">
+                    <a class="update" href="" title="Update DNS record ID: ' . $d . '" data-rowid="' . $d . '">
                       <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-                    <a class="delete" href="" title="Delete DNS record ID: '.$d.'" data-rowid="'.$d.'">
+                    <a class="delete" href="" title="Delete DNS record ID: ' . $d . '" data-rowid="' . $d . '">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
                 ['dt' => 6,  'db' => 'active'],
@@ -107,7 +106,7 @@ class Plugins_Records extends Plugin
                 ['dt' => 9,  'db' => 'updated'],
             ];
 
-            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, 'did='.$_GET['did']), JSON_PRETTY_PRINT);
+            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, 'did=' . $_GET['did']), JSON_PRETTY_PRINT);
         }
 
         $domain = db::qry('
@@ -170,7 +169,7 @@ class Plugins_Records extends Plugin
         }
 
         if ('TXT' === $in['type']) {
-            $in['content'] = '"'.trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"').'"';
+            $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
         }
 
         if ('CAA' === $in['type']) {
@@ -179,7 +178,7 @@ class Plugins_Records extends Plugin
 
         $domain = strtolower(util::enc($_POST['domain']));
         $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
-        $in['name'] = $in['name'] ? $in['name'].'.'.$domain : $domain;
+        $in['name'] = $in['name'] ? $in['name'] . '.' . $domain : $domain;
 
         $in['ttl'] = intval($in['ttl']);
         $in['prio'] = intval($in['prio']);

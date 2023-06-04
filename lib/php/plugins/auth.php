@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/auth.php 20150101 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/auth.php 20150101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Auth extends Plugin
 {
@@ -34,16 +34,16 @@ class Plugins_Auth extends Plugin
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
                     if (9 != $usr['acl']) {
                         $newpass = util::genpw(self::OTP_LENGTH);
-                        if ($this->mail_forgotpw($u, $newpass, 'From: '.$this->g->cfg['email'])) {
+                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
                             db::update([
                                 'otp' => $newpass,
                                 'otpttl' => time(),
                             ], [['id', '=', $usr['id']]]);
-                            util::log('Sent reset password key for "'.$u.'" so please check your mailbox and click on the supplied link.', 'success');
+                            util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
                         } else {
-                            util::log('Problem sending message to '.$u, 'danger');
+                            util::log('Problem sending message to ' . $u, 'danger');
                         }
-                        util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+                        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
                     } else {
                         util::log('Account is disabled, contact your System Administrator');
                     }
@@ -77,7 +77,7 @@ class Plugins_Auth extends Plugin
                             util::put_cookie('remember', $uniq, self::REMEMBER_ME_EXP);
                         }
                         $_SESSION['usr'] = $usr;
-                        util::log($login.' is now logged in', 'success');
+                        util::log($login . ' is now logged in', 'success');
                         if (0 === (int) $acl) {
                             $_SESSION['adm'] = $id;
                         }
@@ -123,7 +123,7 @@ class Plugins_Auth extends Plugin
                                 'otpttl' => 0,
                                 'updated' => date('Y-m-d H:i:s'),
                             ], [['id', '=', $i]])) {
-                                util::log('Password reset for '.$usr['login'], 'success');
+                                util::log('Password reset for ' . $usr['login'], 'success');
                                 if (util::is_usr()) {
                                     util::redirect($this->g->cfg['self']);
                                 } else {
@@ -134,7 +134,7 @@ class Plugins_Auth extends Plugin
                                 util::log('Problem updating database');
                             }
                         } else {
-                            util::log($usr['login'].' is not allowed access');
+                            util::log($usr['login'] . ' is not allowed access');
                         }
                     } else {
                         util::log('Your one time password key has expired');
@@ -163,7 +163,7 @@ class Plugins_Auth extends Plugin
                 db::update(['cookie' => ''], [['id', '=', $id]]);
                 $this->setcookie('remember', '', strtotime('-1 hour', 0));
             }
-            util::log($u.' is now logged out', 'success');
+            util::log($u . ' is now logged out', 'success');
         }
         util::redirect($this->g->cfg['self']);
     }
@@ -184,7 +184,7 @@ class Plugins_Auth extends Plugin
 
                         return $this->t->update(['id' => $id, 'login' => $login]);
                     }
-                    util::log($login.' is not allowed access');
+                    util::log($login . ' is not allowed access');
                 } else {
                     util::log('Your one time password key has expired');
                 }
@@ -201,20 +201,20 @@ class Plugins_Auth extends Plugin
     {
         elog(__METHOD__);
 
-        $host = $_SERVER['REQUEST_SCHEME'].'://'
-            .$this->g->cfg['host']
-            .$this->g->cfg['self'];
+        $host = $_SERVER['REQUEST_SCHEME'] . '://'
+            . $this->g->cfg['host']
+            . $this->g->cfg['self'];
 
         return mail(
             "{$email}",
-            'Reset password for '.$this->g->cfg['host'],
+            'Reset password for ' . $this->g->cfg['host'],
             'Here is your new OTP (one time password) key that is valid for one hour.
 
 Please click on the link below and continue with reseting your password.
 
 If you did not request this action then please ignore this message.
 
-'.$host.'?o=auth&m=resetpw&otp='.$newpass,
+' . $host . '?o=auth&m=resetpw&otp=' . $newpass,
             $headers
         );
     }

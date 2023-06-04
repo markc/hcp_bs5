@@ -16,7 +16,8 @@ class Plugins_InfoSys extends Plugin
         $os = 'Unknown OS';
 
         $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        $lav = implode(', ', sys_getloadavg());
+        $loadAvg = sys_getloadavg();
+        $lav = sprintf('1 min: %.2f - 5 min: %.2f - 15 min: %.2f', $loadAvg[0], $loadAvg[1], $loadAvg[2]);
         $stat1 = file('/proc/stat');
         sleep(1);
         $stat2 = file('/proc/stat');
@@ -40,7 +41,7 @@ class Plugins_InfoSys extends Plugin
 
         foreach ($pmi as $line) {
             [$k, $v] = explode(':', $line);
-            [$mem[$k], ] = explode(' ', trim($v));
+            [$mem[$k],] = explode(' ', trim($v));
         }
 
         $info1 = explode(' ', preg_replace('!cpu +!', '', $stat1[0]));
@@ -53,7 +54,7 @@ class Plugins_InfoSys extends Plugin
         foreach ($dif as $x => $y) {
             $cpu[$x] = round($y / $total * 100, 2);
         }
-        $cpu_all = sprintf('User: %01.2f, System: %01.2f, Nice: %01.2f, Idle: %01.2f', $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
+        $cpu_all = sprintf('User: %01.2f - System: %01.2f - Nice: %01.2f - Idle: %01.2f', $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
         $cpu_pcnt = intval(round(100 - $cpu['idle']));
 
         $dt = (float) disk_total_space('/');
@@ -62,8 +63,6 @@ class Plugins_InfoSys extends Plugin
         $dp = floor(($du / $dt) * 100);
 
         $mt = (float) $mem['MemTotal'] * 1000;
-        //$mf  = (float) ($mem['MemFree'] + $mem['Cached'] + $mem['Buffers'] + $mem['SReclaimable']) * 1024;
-        //$mu  = (float) ($mem['MemTotal'] - $mem['MemFree'] - $mem['Cached'] - $mem['SReclaimable'] - $mem['Buffers'] - $mem['Shmem']) * 1024;
         $mu = (float) ($mem['MemTotal'] - $mem['MemFree'] - $mem['Cached'] - $mem['SReclaimable'] - $mem['Buffers']) * 1000;
         $mf = (float) $mt - $mu;
         $mp = floor(($mu / $mt) * 100);
@@ -76,15 +75,15 @@ class Plugins_InfoSys extends Plugin
 
         return $this->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
-            'dsk_free' => util::numfmtsi($df),
+            'dsk_free' => util::numfmt($df),
             'dsk_pcnt' => $dp,
-            'dsk_text' => $dp > 5 ? $dp.'%' : '',
-            'dsk_total' => util::numfmtsi($dt),
-            'dsk_used' => util::numfmtsi($du),
+            'dsk_text' => $dp > 5 ? $dp . '%' : '',
+            'dsk_total' => util::numfmt($dt),
+            'dsk_used' => util::numfmt($du),
             'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
             'mem_free' => util::numfmt($mf),
             'mem_pcnt' => $mp,
-            'mem_text' => $mp > 5 ? $mp.'%' : '',
+            'mem_text' => $mp > 5 ? $mp . '%' : '',
             'mem_total' => util::numfmt($mt),
             'mem_used' => util::numfmt($mu),
             'os_name' => $os,
@@ -98,7 +97,7 @@ class Plugins_InfoSys extends Plugin
             'cpu_num' => $cpu_num,
             'cpu_color' => $cpu_pcnt > 90 ? 'danger' : ($cpu_pcnt > 80 ? 'warning' : 'default'),
             'cpu_pcnt' => $cpu_pcnt,
-            'cpu_text' => $cpu_pcnt > 5 ? $cpu_pcnt.'%' : '',
+            'cpu_text' => $cpu_pcnt > 5 ? $cpu_pcnt . '%' : '',
         ]);
     }
 }

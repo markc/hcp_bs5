@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20200413
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Vmails extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
@@ -74,7 +74,7 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
             <tbody>
             </tbody>
           </table>
-        </div>'.$create.$remove.$update.'
+        </div>' . $create . $remove . $update . '
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({

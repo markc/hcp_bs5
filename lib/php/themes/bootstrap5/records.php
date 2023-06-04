@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/records.php 20180714
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/records.php 20180714 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Records extends Themes_Bootstrap5_Theme
 {
     private $types = [
         ['A',          'A'],
@@ -50,12 +50,12 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
     {
         elog(__METHOD__);
 
-        elog('in='.var_export($in, true));
+        elog('in=' . var_export($in, true));
 
         return '
         <div class="col-12">
           <h3>
-            <a href="?o=domains&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a>'.$in['domain'].'
+            <a href="?o=domains&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a>' . $in['domain'] . '
             <a class="create" href="" title="Create new DNS record">
               <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
           </h3>
@@ -63,12 +63,12 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
       </div>
       <div class="row">
         <div class=col-12>
-        <form class="form-inline" method="post" action="'.$this->g->cfg['self'].'">
-          <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-          <input type="hidden" name="o" value="'.$this->g->in['o'].'">
+        <form class="form-inline" method="post" action="' . $this->g->cfg['self'] . '">
+          <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+          <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
           <input type="hidden" name="i" id="i" value="0">
-          <input type="hidden" name="did" value="'.$in['did'].'">
-          <input type="hidden" name="domain" value="'.$in['domain'].'">
+          <input type="hidden" name="did" value="' . $in['did'] . '">
+          <input type="hidden" name="domain" value="' . $in['domain'] . '">
           <div class="col-xl-3 col-md-6 col-12 my-2">
             <div class="input-group">
               <input type="text" class="form-control" id="name" name="name" data-regex="^([^.]+\.)*[^.]*$" value="">
@@ -80,7 +80,7 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
             </div>
           </div>
           <div class="col-xl-2 col-md-4 col-8 my-2">
-            <div class="input-group">'.($this->dropdown($this->types, 'type', 'A', '', 'custom-select')).'
+            <div class="input-group">' . ($this->dropdown($this->types, 'type', 'A', '', 'custom-select')) . '
             </div>
           </div>
           <div class="col-xl-1 col-md-2 col-4 my-2">
@@ -124,7 +124,7 @@ $(document).ready(function() {
   $("#records").DataTable({
     "processing": true,
     "serverSide": true,
-    "ajax": "?x=json&o=records&m=list&did='.$in['did'].'",
+    "ajax": "?x=json&o=records&m=list&did=' . $in['did'] . '",
     "order": [[ 9, "desc" ]],
     "scrollX": true,
     "columnDefs": [

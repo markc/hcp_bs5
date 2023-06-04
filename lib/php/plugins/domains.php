@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/domains.php 20150101 - 20190320
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/domains.php 20150101 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
 {
@@ -39,15 +39,15 @@ class Plugins_Domains extends Plugin
         if (util::is_post()) {
             extract($_POST);
 
-//            $err = var_export($_POST, true);
+            //            $err = var_export($_POST, true);
             //util::log('<pre>'.$err.'</pre>');
-//            $cms = ($cms === 'on') ? 'wp' : 'none';
-//            $ssl = ($ssl === 'on') ? 'self' : 'le';
-//            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+            //            $cms = ($cms === 'on') ? 'wp' : 'none';
+            //            $ssl = ($ssl === 'on') ? 'self' : 'le';
+            //            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
             // wtf, we are not creating a new vhost!!!
-//            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
-//            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
-//            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            //            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
+            //            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
+            //            util::redirect($this->g->cfg['self'] . '?o=vhosts');
 
             // Usage: addpdns domain ip ns1 ns2 [mx] [spfip] [sshkey]
 
@@ -67,13 +67,13 @@ class Plugins_Domains extends Plugin
             $created = date('Y-m-d H:i:s');
             $disable = 0;
             $soa_buf =
-              $soa['primary'].$domain.' '.
-              $soa['email'].$domain.'. '.
-              date('Ymd').'00'.' '.
-              $soa['refresh'].' '.
-              $soa['retry'].' '.
-              $soa['expire'].' '.
-              $soa['ttl'];
+                $soa['primary'] . $domain . ' ' .
+                $soa['email'] . $domain . '. ' .
+                date('Ymd') . '00' . ' ' .
+                $soa['refresh'] . ' ' .
+                $soa['retry'] . ' ' .
+                $soa['expire'] . ' ' .
+                $soa['ttl'];
             $did = db::create([
                 'name' => $domain,
                 'master' => 'SLAVE' === $type ? $master : '',
@@ -83,8 +83,8 @@ class Plugins_Domains extends Plugin
             ]);
 
             if ('SLAVE' === $type) {
-                util::log('Created DNS Zone: '.$domain, 'success');
-                util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+                util::log('Created DNS Zone: ' . $domain, 'success');
+                util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
 
             $sql = '
@@ -105,7 +105,7 @@ class Plugins_Domains extends Plugin
                 'updated' => $created,
             ]);
             db::qry($sql, [
-                'content' => $ns1.$domain,
+                'content' => $ns1 . $domain,
                 'created' => $created,
                 'did' => $did,
                 'disabled' => $disable,
@@ -116,7 +116,7 @@ class Plugins_Domains extends Plugin
                 'updated' => $created,
             ]);
             db::qry($sql, [
-                'content' => $ns2.$domain,
+                'content' => $ns2 . $domain,
                 'created' => $created,
                 'did' => $did,
                 'disabled' => $disable,
@@ -142,7 +142,7 @@ class Plugins_Domains extends Plugin
                 'created' => $created,
                 'did' => $did,
                 'disabled' => $disable,
-                'domain' => 'cdn.'.$domain,
+                'domain' => 'cdn.' . $domain,
                 'prio' => $prio,
                 'ttl' => $ttl,
                 'type' => 'A',
@@ -153,14 +153,14 @@ class Plugins_Domains extends Plugin
                 'created' => $created,
                 'did' => $did,
                 'disabled' => $disable,
-                'domain' => 'www.'.$domain,
+                'domain' => 'www.' . $domain,
                 'prio' => $prio,
                 'ttl' => $ttl,
                 'type' => 'A',
                 'updated' => $created,
             ]);
             db::qry($sql, [
-                'content' => $mx.$domain,
+                'content' => $mx . $domain,
                 'created' => $created,
                 'did' => $did,
                 'disabled' => $disable,
@@ -170,8 +170,8 @@ class Plugins_Domains extends Plugin
                 'type' => 'MX',
                 'updated' => $created,
             ]);
-            util::log('Created DNS Zone: '.$domain, 'success');
-            util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+            util::log('Created DNS Zone: ' . $domain, 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
 
         return $this->t->create($this->in);
@@ -182,7 +182,7 @@ class Plugins_Domains extends Plugin
         elog(__METHOD__);
 
         if ($this->in['increment']) {
-//            if ($this->in['increment']) {
+            //            if ($this->in['increment']) {
             $sql = "
  SELECT content as soa
    FROM records
@@ -197,26 +197,26 @@ class Plugins_Domains extends Plugin
             $retry = $oldsoa[4];
             $expire = $oldsoa[5];
             $ttl = $oldsoa[6];
-//            } else {
-//                extract($_POST);
-//            }
+            //            } else {
+            //                extract($_POST);
+            //            }
 
             $today = date('Ymd');
             $serial_day = substr($serial, 0, 8);
             $serial_rev = substr($serial, -2);
 
             $serial = ($serial_day == $today)
-                ? "{$today}".sprintf('%02d', $serial_rev + 1)
-                : "{$today}".'00';
+                ? "{$today}" . sprintf('%02d', $serial_rev + 1)
+                : "{$today}" . '00';
 
             $soa =
-              $primary.' '.
-              $email.' '.
-              $serial.' '.
-              $refresh.' '.
-              $retry.' '.
-              $expire.' '.
-              $ttl;
+                $primary . ' ' .
+                $email . ' ' .
+                $serial . ' ' .
+                $refresh . ' ' .
+                $retry . ' ' .
+                $expire . ' ' .
+                $ttl;
 
             $sql = "
  UPDATE records SET
@@ -238,8 +238,8 @@ class Plugins_Domains extends Plugin
             }
 
             // TODO check $res ???
-            util::log('Updated DNS domain ID '.$this->g->in['i'], 'success');
-            util::redirect($this->g->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+            util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } elseif (util::is_post() && $this->g->in['i']) {
             extract($_POST);
 
@@ -261,7 +261,7 @@ class Plugins_Domains extends Plugin
         return 'Error updating item';
     }
 
-    protected function delete(): string
+    protected function delete(): void
     {
         elog(__METHOD__);
 
@@ -273,8 +273,8 @@ class Plugins_Domains extends Plugin
             $res1 = db::qry($sql, ['id' => $this->g->in['i']]);
             $res2 = db::delete([['id', '=', $this->g->in['i']]]);
             // TODO check $res1 and $res2 ???
-            util::log('Deleted DNS zone ID: '.$this->g->in['i'], 'success');
-            util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+            util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
 
         util::log('Error deleting item');
@@ -288,8 +288,8 @@ class Plugins_Domains extends Plugin
             $columns = [
                 ['dt' => 0,   'db' => 'name',       'formatter' => function ($d, $row) {
                     return ('SLAVE' !== $row['type']) ? '
-                    <a href="?o=records&m=list&i='.$row['id'].'" title="Update Domain SOA">
-                      <b>'.$d.'</b></a>' : '<b>'.$d.'</b>';
+                    <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
+                      <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
                 }],
                 ['dt' => 1,   'db' => 'type'],
                 ['dt' => 2,   'db' => 'records'],
@@ -297,13 +297,13 @@ class Plugins_Domains extends Plugin
                     $soa = explode(' ', $row['soa']);
 
                     return ('SLAVE' !== $row['type']) ? '
-        <a class="serial" href="?o=domains&m=update&i='.$row['id'].'" title="Update Serial">'.$soa[2].'</a>' : $soa[2];
+        <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
                 }],
                 ['dt' => 4,  'db' => 'id', 'formatter' => function ($d, $row) {
                     return '
-                    <a href="" class="shwho" data-toggle="modal" data-target="#shwhomodal" title="Show Domain Info" data-rowid="'.$d.'" data-rowname="'.$row['name'].'">
+                    <a href="" class="shwho" data-toggle="modal" data-target="#shwhomodal" title="Show Domain Info" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
                       <i class="fas fa-info-circle fa-fw cursor-pointer"></i></a>
-                    <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: '.$d.'" data-rowid="'.$d.'" data-rowname="'.$row['name'].'">
+                    <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
                       <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
                 }],
                 ['dt' => 5,   'db' => 'updated'],
@@ -319,13 +319,13 @@ class Plugins_Domains extends Plugin
     {
         elog(__METHOD__);
 
-        return shell_exec('sudo shwho '.$this->in['name']);
+        return shell_exec('sudo shwho ' . $this->in['name']);
     }
 
     protected function incsoa(): string
     {
         elog(__METHOD__);
 
-        return shell_exec('sudo incsoa '.$this->in['name']);
+        return shell_exec('sudo incsoa ' . $this->in['name']);
     }
 }

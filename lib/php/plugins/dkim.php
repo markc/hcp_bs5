@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/dkim.php 20180511 - 20180529
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/dkim.php 20180511 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Dkim extends Plugin
 {
@@ -21,9 +21,9 @@ class Plugins_Dkim extends Plugin
             $domain = escapeshellarg($this->in['domain']);
             $select = escapeshellarg($this->in['select']);
             $keylen = escapeshellarg($this->in['keylen']);
-            util::exe('dkim add '.$domain.' '.$select.' '.$keylen);
+            util::exe('dkim add ' . $domain . ' ' . $select . ' ' . $keylen);
         }
-        util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         return 'Redirect'; // workaround to satisy string return type
     }
 
@@ -35,8 +35,8 @@ class Plugins_Dkim extends Plugin
         $domain_esc = escapeshellarg($domain);
         exec("sudo dkim show {$domain_esc} 2>&1", $retArr, $retVal);
         $buf = '
-        <b>'.$retArr[0].'</b><br>
-        <div style="word-break:break-all;font-family:monospace;width:100%;">'.$retArr[1].'</div>';
+        <b>' . $retArr[0] . '</b><br>
+        <div style="word-break:break-all;font-family:monospace;width:100%;">' . $retArr[1] . '</div>';
 
         return $this->t->read(['buf' => $buf, 'domain' => $domain]);
     }
@@ -46,7 +46,7 @@ class Plugins_Dkim extends Plugin
         elog(__METHOD__);
 
         //return $this->list(); // override parent update()
-        util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         return "Update"; // workaround to satisy string return type
     }
 
@@ -56,9 +56,9 @@ class Plugins_Dkim extends Plugin
 
         if (util::is_post()) {
             $domain = escapeshellarg($this->in['domain']);
-            util::exe('dkim del '.$domain);
+            util::exe('dkim del ' . $domain);
         }
-        util::redirect($this->cfg['self'].'?o='.$this->g->in['o'].'&m=list');
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
     }
 
     public function list(): string
@@ -69,9 +69,9 @@ class Plugins_Dkim extends Plugin
         exec('sudo dkim list 2>&1', $retArr, $retVal);
         foreach ($retArr as $line) {
             $buf .= '
-            <a href="?o=dkim&m=read&dnstxt='.$line.'"><b>'.$line.'</b></a>';
+            <a href="?o=dkim&m=read&dnstxt=' . $line . '"><b>' . $line . '</b></a>';
         }
 
-        return $this->t->list(['buf' => $buf.'</p>']);
+        return $this->t->list(['buf' => $buf . '</p>']);
     }
 }

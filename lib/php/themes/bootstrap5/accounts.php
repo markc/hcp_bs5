@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
@@ -29,7 +29,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
-        elog(__METHOD__.' '.var_export($in, true));
+        elog(__METHOD__ . ' ' . var_export($in, true));
 
         extract($in);
         $aclgrp_buf = '';
@@ -56,12 +56,12 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
                   <div class="row">
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="acl" class="form-control-label">ACL</label>'.$acl_buf.'
+                        <label for="acl" class="form-control-label">ACL</label>' . $acl_buf . '
                       </div>
                     </div>
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="grp" class="form-control-label">Group</label>'.$grp_buf.'
+                        <label for="grp" class="form-control-label">Group</label>' . $grp_buf . '
                       </div>
                     </div>
                   </div>';
@@ -88,7 +88,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
                   <div class="form-group">
                     <label for="altemail" class="form-control-label">Alt Email</label>
                     <input type="text" class="form-control" id="altemail" name="altemail" value="">
-                  </div>'.$aclgrp_buf,
+                  </div>' . $aclgrp_buf,
         ]);
 
         return '
@@ -117,7 +117,7 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
             <tbody>
             </tbody>
           </table>
-        </div>'.$createmodal.'
+        </div>' . $createmodal . '
         <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
@@ -147,9 +147,9 @@ $(document).ready(function() {
             'action' => 'delete',
             'footer' => 'Remove',
             'hidden' => '
-                <input type="hidden" name="i" value="'.$in['id'].'">',
+                <input type="hidden" name="i" value="' . $in['id'] . '">',
             'body' => '
-                <p class="text-center">Are you sure you want to remove this user?<br><b>'.$in['login'].'</b></p>',
+                <p class="text-center">Are you sure you want to remove this user?<br><b>' . $in['login'] . '</b></p>',
         ]);
 
         if ('create' === $this->g->in['m']) {
@@ -161,7 +161,7 @@ $(document).ready(function() {
         } else {
             $header = 'Update Account';
             $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
-                <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i='.$id.'">Switch to '.$login.'</a>' : '';
+                <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
             $submit = '
                 <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
                 <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
@@ -184,10 +184,10 @@ $(document).ready(function() {
             $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'custom-select');
             $aclgrp_buf = '
                 <div class="form-group">
-                  <label for="acl">ACL</label><br>'.$acl_buf.'
+                  <label for="acl">ACL</label><br>' . $acl_buf . '
                 </div>
                 <div class="form-group">
-                  <label for="grp">Group</label><br>'.$grp_buf.'
+                  <label for="grp">Group</label><br>' . $grp_buf . '
                 </div>';
         } else {
             $aclgrp_buf = '';
@@ -205,43 +205,43 @@ $(document).ready(function() {
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <form method="post" action="'.$this->g->cfg['self'].'">
-              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-              <input type="hidden" name="o" value="'.$this->g->in['o'].'">
-              <input type="hidden" name="i" value="'.$id.'">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $id . '">
               <div class="row">
                 <div class="col-12 col-sm-6 col-lg-4">
                   <div class="form-group">
                     <label for="login">UserID</label>
-                    <input type="email" class="form-control" id="login" name="login" value="'.$login.'" required>
+                    <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
                   </div>
                   <div class="form-group">
                     <label for="altemail">Alt Email</label>
-                    <input type="text" class="form-control" id="altemail" name="altemail" value="'.$altemail.'">
+                    <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                   </div>
                 </div>
                 <div class="col-12 col-sm-6 col-lg-4">
                   <div class="form-group">
                     <label for="fname">First Name</label>
-                    <input type="text" class="form-control" id="fname" name="fname" value="'.$fname.'" required>
+                    <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
                   </div>
                   <div class="form-group">
                     <label for="lname">Last Name</label>
-                    <input type="text" class="form-control" id="lname" name="lname" value="'.$lname.'" required>
+                    <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
                   </div>
                 </div>
-                <div class="col-12 col-sm-6 col-lg-4">'.$aclgrp_buf.'
+                <div class="col-12 col-sm-6 col-lg-4">' . $aclgrp_buf . '
                 </div>
               </div>
               <div class="row">
-                <div class="col-12 col-sm-6">'.$switch.'
+                <div class="col-12 col-sm-6">' . $switch . '
                 </div>
                 <div class="col-12 col-sm-6 text-right">
-                  <div class="btn-group">'.$submit.'
+                  <div class="btn-group">' . $submit . '
                   </div>
                 </div>
               </div>
             </form>
-          </div>'.$removemodal;
+          </div>' . $removemodal;
     }
 }

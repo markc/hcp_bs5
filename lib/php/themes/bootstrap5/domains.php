@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/domains.php 20170225 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/domains.php 20170225 - 20230604
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Domains extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
@@ -114,7 +114,7 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
               <tbody>
               </tbody>
             </table>
-          </div>'.$create.$remove.$shwho.'
+          </div>' . $create . $remove . $shwho . '
         <script>
 $(document).ready(function() {
   $("#domains").DataTable({
@@ -173,19 +173,19 @@ $("#domains").show();
                 <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
                 <button type="submit" id="m" name="m" value="create" class="btn btn-primary">Add Domain</button>';
         } else {
-            $serial = '&nbsp;&nbsp;<small>Serial: '.$soa[2].'</small>';
+            $serial = '&nbsp;&nbsp;<small>Serial: ' . $soa[2] . '</small>';
             $header = $domain;
             $submit = '
                 <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
                 <button type="submit" id="m" name="m" value="update" class="btn btn-primary">Update</button>';
             $hidden = '
-            <input type="hidden" name="serial" value="'.$soa[2].'">';
+            <input type="hidden" name="serial" value="' . $soa[2] . '">';
         }
 
         return '
           <div class="col-12">
           <h3>
-            <i class="fa fa-globe fa-fw"></i>  '.$header.$serial.'
+            <i class="fa fa-globe fa-fw"></i>  ' . $header . $serial . '
             <a href="" title="Add new domain" data-toggle="modal" data-target="#createmodal">
               <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
           </h3>
@@ -193,51 +193,51 @@ $("#domains").show();
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
-            <form method="post" action="'.$this->g->cfg['self'].'">
-              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-              <input type="hidden" name="o" value="'.$this->g->in['o'].'">
-              <input type="hidden" name="i" value="'.$this->g->in['i'].'">'.$hidden.'
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
               <div class="row">
                 <div class="col-3">
                   <div class="form-group">
                     <label for="primary">Primary</label>
-                    <input type="text" class="form-control" id="primary" name="primary" value="'.$soa[0].'" required>
+                    <input type="text" class="form-control" id="primary" name="primary" value="' . $soa[0] . '" required>
                   </div>
                 </div>
                 <div class="col-3">
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" class="form-control" id="email" name="email" value="'.$soa[1].'" required>
+                    <input type="text" class="form-control" id="email" name="email" value="' . $soa[1] . '" required>
                   </div>
                 </div>
                 <div class="col-1">
                   <div class="form-group">
                     <label for="refresh">Refresh</label>
-                    <input type="text" class="form-control" id="refresh" name="refresh" value="'.$soa[3].'" required>
+                    <input type="text" class="form-control" id="refresh" name="refresh" value="' . $soa[3] . '" required>
                   </div>
                 </div>
                 <div class="col-1">
                   <div class="form-group">
                     <label for="retry">Retry</label>
-                    <input type="text" class="form-control" id="retry" name="retry" value="'.$soa[4].'" required>
+                    <input type="text" class="form-control" id="retry" name="retry" value="' . $soa[4] . '" required>
                   </div>
                 </div>
                 <div class="col-2">
                   <div class="form-group">
                     <label for="expire">Expire</label>
-                    <input type="text" class="form-control" id="expire" name="expire" value="'.$soa[5].'" required>
+                    <input type="text" class="form-control" id="expire" name="expire" value="' . $soa[5] . '" required>
                   </div>
                 </div>
                 <div class="col-2">
                   <div class="form-group">
                     <label for="ttl">TTL</label>
-                    <input type="text" class="form-control" id="ttl" name="ttl" value="'.$soa[6].'" required>
+                    <input type="text" class="form-control" id="ttl" name="ttl" value="' . $soa[6] . '" required>
                   </div>
                 </div>
               </div>
               <div class="row">
                 <div class="col-12 text-right">
-                  <div class="btn-group">'.$submit.'
+                  <div class="btn-group">' . $submit . '
                   </div>
                 </div>
               </div>
