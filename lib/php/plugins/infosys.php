@@ -54,7 +54,7 @@ class Plugins_InfoSys extends Plugin
         foreach ($dif as $x => $y) {
             $cpu[$x] = round($y / $total * 100, 2);
         }
-        $cpu_all = sprintf('User: %01.2f - System: %01.2f - Nice: %01.2f - Idle: %01.2f', $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
+        $cpu_all = sprintf('User: %01.1f - System: %01.1f - Nice: %01.1f - Idle: %01.1f', $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
         $cpu_pcnt = intval(round(100 - $cpu['idle']));
 
         $dt = (float) disk_total_space('/');
@@ -75,17 +75,17 @@ class Plugins_InfoSys extends Plugin
 
         return $this->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
-            'dsk_free' => util::numfmt($df),
+            'dsk_free' => util::numfmt($df, 1),
             'dsk_pcnt' => $dp,
             'dsk_text' => $dp > 5 ? $dp . '%' : '',
-            'dsk_total' => util::numfmt($dt),
-            'dsk_used' => util::numfmt($du),
+            'dsk_total' => util::numfmt($dt, 1),
+            'dsk_used' => util::numfmt($du, 1),
             'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
             'mem_free' => util::numfmt($mf),
             'mem_pcnt' => $mp,
             'mem_text' => $mp > 5 ? $mp . '%' : '',
-            'mem_total' => util::numfmt($mt),
-            'mem_used' => util::numfmt($mu),
+            'mem_total' => util::numfmt($mt, 1),
+            'mem_used' => util::numfmt($mu, 1),
             'os_name' => $os,
             'uptime' => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
             'loadav' => $lav,

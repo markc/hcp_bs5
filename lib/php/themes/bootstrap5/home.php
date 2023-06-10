@@ -27,8 +27,8 @@ a dozen lightly loaded hosts so it is ideal for LXD and Proxmox virtual machines
                 </a>
             </div>
             <div class="row align-items-md-stretch">
-                <div class="col-md-6 mb-4">
-                    <div class="h-100 p-md-5 p-2 border rounded-3 order-md-0 order-last">
+                <div class="col-md-6 mb-4 order-md-0 order-last">
+                    <div class="h-100 p-md-5 p-2 border rounded-3">
                         <h2 class="text-md-start text-center">Features</h2>
                         <ul>
                             <li><b>NetServa HCP</b> does not reqire Python or Ruby, just PHP and Bash</li>
@@ -41,7 +41,7 @@ a dozen lightly loaded hosts so it is ideal for LXD and Proxmox virtual machines
                          <h2 class="text-md-start text-center">Software</h2>
                         <ul>
 <li>nginx and PHP8+ FPM for web services</li>
-<li>Postfix for SMTP email delivery</li> 
+<li>Postfix for SMTP email delivery</li>
 <li>Dovecot and Spamprobe spam filtered IMAP email</li>
 <li>Acme.sh and LetsEncrypt SSL for SSL certificates</li>
 <li>PowerDNS for DNS</li>

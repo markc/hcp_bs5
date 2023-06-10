@@ -11,7 +11,7 @@ class Util
         elog(__METHOD__);
 
         if ($msg) {
-            $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl].'<br>'.$msg;
+            $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
         } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
             $l = $_SESSION['log'];
             $_SESSION['log'] = [];
@@ -24,7 +24,7 @@ class Util
 
     public static function enc(string $v): string
     {
-        elog(__METHOD__."({$v})");
+        elog(__METHOD__ . "({$v})");
 
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
@@ -44,12 +44,11 @@ class Util
     // TODO please document what $k, $v and $x are for?
     public static function ses(string $k, string $v = '', string $x = null): string
     {
-        elog(__METHOD__."({$k}, {$v}, {$x})");
+        elog(__METHOD__ . "({$k}, {$v}, {$x})");
 
         return $_SESSION[$k] =
-            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x :
-                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
-                    || (isset($_REQUEST[$k], $_SESSION[$k])
+            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                || (isset($_REQUEST[$k], $_SESSION[$k])
                     && ($_REQUEST[$k] != $_SESSION[$k])))
                 ? self::enc($_REQUEST[$k])
                 : ($_SESSION[$k] ?? $v));
@@ -68,19 +67,19 @@ class Util
 
     public static function exe(string $cmd, bool $ret = false): bool
     {
-        elog(__METHOD__."({$cmd})");
+        elog(__METHOD__ . "({$cmd})");
 
-        exec('sudo '.escapeshellcmd($cmd).' 2>&1', $retArr, $retVal);
-        util::log('<pre>'.trim(implode("\n", $retArr)).'</pre>', $retVal ? 'danger' : 'success');
+        exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
+        util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
 
         return (boolval($retVal) ? true : false);
     }
 
     public static function run(string $cmd): string
     {
-        elog(__METHOD__."({$cmd})");
+        elog(__METHOD__ . "({$cmd})");
 
-        return exec('sudo '.escapeshellcmd($cmd).' 2>&1');
+        return exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1');
     }
 
     public static function now(string $date1, string $date2 = null): string
@@ -119,13 +118,13 @@ class Util
             if ($diff / $block['v'] >= 1) {
                 $amount = floor($diff / $block['v']);
                 $plural = ($amount > 1) ? 's' : '';
-                $result[] = $amount.' '.$block['k'].$plural;
+                $result[] = $amount . ' ' . $block['k'] . $plural;
                 $diff -= $amount * $block['v'];
                 ++$current_level;
             }
         }
 
-        return implode(' ', $result).' ago';
+        return implode(' ', $result) . ' ago';
     }
 
     public static function is_adm(): bool
@@ -278,7 +277,7 @@ class Util
                     if (0 == $acl) {
                         $_SESSION['adm'] = $id;
                     }
-                    self::log($login.' is remembered and logged back in', 'success');
+                    self::log($login . ' is remembered and logged back in', 'success');
                     self::ses('o', '', $g->in['o']);
                     self::ses('m', '', $g->in['m']);
                 }
@@ -288,16 +287,16 @@ class Util
 
     public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = ''): void
     {
-        elog(__METHOD__."({$url})");
+        elog(__METHOD__ . "({$url})");
 
         if ('refresh' == $method) {
-            header('refresh:'.$ttl.'; url='.$url);
+            header('refresh:' . $ttl . '; url=' . $url);
             echo '<!DOCTYPE html>
 <title>Redirect...</title>
-<h2 style="text-align:center">Redirecting in '.$ttl.' seconds...</h2>
-<pre style="width:50em;margin:0 auto;">'.$msg.'</pre>';
+<h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
+<pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
         } else {
-            header('Location:'.$url);
+            header('Location:' . $url);
         }
 
         exit;
@@ -307,7 +306,7 @@ class Util
     {
         elog(__METHOD__);
 
-        self::redirect('?o='.$_SESSION['o'].'&m=list');
+        self::redirect('?o=' . $_SESSION['o'] . '&m=list');
     }
 
     public static function numfmt(float $size, int $precision = null): string
@@ -318,19 +317,19 @@ class Util
             return '0';
         }
         if ($size >= 1000000000000) {
-            return round(($size / 1000000000000), $precision ?? 3).' TB';
+            return round(($size / 1000000000000), $precision ?? 3) . ' TB';
         }
         if ($size >= 1000000000) {
-            return round(($size / 1000000000), $precision ?? 2).' GB';
+            return round(($size / 1000000000), $precision ?? 2) . ' GB';
         }
         if ($size >= 1000000) {
-            return round(($size / 1000000), $precision ?? 1).' MB';
+            return round(($size / 1000000), $precision ?? 1) . ' MB';
         }
         if ($size >= 1000) {
-            return round(($size / 1000), $precision ?? 0).' KB';
+            return round(($size / 1000), $precision ?? 0) . ' KB';
         }
 
-        return $size.' Bytes';
+        return $size . ' Bytes';
     }
 
     // numfmt() was wrong, we want MB not MiB
@@ -344,7 +343,7 @@ class Util
         $base = log($size, 1024);
         $suffixes = [' Bytes', ' KiB', ' MiB', ' GiB', ' TiB'];
 
-        return round(1024 ** ($base - floor($base)), $precision).$suffixes[floor($base)];
+        return round(1024 ** ($base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
     public static function is_valid_domain_name(string $domainname): bool
@@ -354,8 +353,8 @@ class Util
         $domainname = idn_to_ascii($domainname);
 
         return preg_match('/^([a-z\\d](-*[a-z\\d])*)(\\.([a-z\\d](-*[a-z\\d])*))*$/i', $domainname)
-              && preg_match('/^.{1,253}$/', $domainname)
-              && preg_match('/^[^\\.]{1,63}(\\.[^\\.]{1,63})*$/', $domainname);
+            && preg_match('/^.{1,253}$/', $domainname)
+            && preg_match('/^[^\\.]{1,63}(\\.[^\\.]{1,63})*$/', $domainname);
     }
 
     public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT'): string
@@ -365,8 +364,8 @@ class Util
         $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
 
         return 'SHA512-CRYPT' === $hash
-            ? '{SHA512-CRYPT}'.crypt($pw, '$6$'.$salt_str.'$')
-            : '{SSHA256}'.base64_encode(hash('sha256', $pw.$salt_str, true).$salt_str);
+            ? '{SHA512-CRYPT}' . crypt($pw, '$6$' . $salt_str . '$')
+            : '{SSHA256}' . base64_encode(hash('sha256', $pw . $salt_str, true) . $salt_str);
     }
 
     public static function sec2time(int $seconds): string
@@ -386,7 +385,7 @@ class Util
         if ('POST' === $_SERVER['REQUEST_METHOD']) {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 self::log('Possible CSRF attack');
-                self::redirect('?o='.$_SESSION['o'].'&m=list');
+                self::redirect('?o=' . $_SESSION['o'] . '&m=list');
             }
 
             return true;
@@ -404,8 +403,8 @@ class Util
         $day = substr($ary[2], 0, 8);
         $rev = substr($ary[2], -2);
         $ary[2] = ($day == $ymd)
-            ? "{$ymd}".sprintf('%02d', $rev + 1)
-            : "{$ymd}".'00';
+            ? "{$ymd}" . sprintf('%02d', $rev + 1)
+            : "{$ymd}" . '00';
 
         return implode(' ', $ary);
     }

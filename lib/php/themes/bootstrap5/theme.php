@@ -22,24 +22,20 @@ class Themes_Bootstrap5_Theme extends Theme
         body {
             min-height: 75rem;
             padding-top: 5rem;
-            /*
-            font-size: 18px;
-            line-height: 1.6;
-            */
         }
+
         .bi {
-            /* vertical-align: .125em; */
             margin-left: .25rem;
             margin-right: .25rem;
         }
+
         .navbar-brand {
             padding-top: 0;
         }
+
         .navbar-toggler {
             font-size: 1rem;
         }
-
-
 
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -71,7 +67,7 @@ class Themes_Bootstrap5_Theme extends Theme
         }
 
         .bi {
-            vertical-align: -.125em;
+            /* vertical-align: 0.01em; */
             fill: currentColor;
         }
 
@@ -119,7 +115,7 @@ class Themes_Bootstrap5_Theme extends Theme
             padding-bottom: 0.25rem !important;
         }
     </style>
-    
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"
 		integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
 		crossorigin="anonymous">
@@ -284,7 +280,7 @@ class Themes_Bootstrap5_Theme extends Theme
         elog(__METHOD__);
 
         return '
-        <script src="lib/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/js/bootstrap.bundle.min.js"></script>
     <script>
         var nav = document.getElementById("navbar");
         window.addEventListener("scroll", function () {
@@ -327,7 +323,7 @@ class Themes_Bootstrap5_Theme extends Theme
             $alts .= $msg ? '
             <div class="col-12">
               <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>' . $msg . '
               </div>
