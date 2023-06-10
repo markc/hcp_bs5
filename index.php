@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// index.php 20150101 - 20230604
+// index.php 20150101 - 20230605
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -38,7 +38,7 @@ echo new Init(new class()
         'l' => '',           // Log (message)
         'm' => 'list',       // Method (action)
         'o' => 'home',       // Object (content)
-        't' => 'bootstrap5', // Theme
+        't' => 'bootstrap5', // Theme (bootstrap, bootstrap5, mazer)
         'x' => '',           // XHR (request)
     ];
     public $out = [
@@ -66,32 +66,32 @@ echo new Init(new class()
     ];
     public $nav1 = [
         'non' => [
-            ['Webmail',     'webmail/',         'fas fa-envelope fa-fw'],
-            ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
+            ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
+            ['Phpmyadmin',  'phpmyadmin/',      'bi bi-globe'],
         ],
         'usr' => [
-            ['Webmail',     'webmail/',         'fas fa-envelope fa-fw'],
-            ['Phpmyadmin',  'phpmyadmin/',      'fas fa-globe fa-fw'],
+            ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
+            ['Phpmyadmin',  'phpmyadmin/',      'bi bi-globe'],
         ],
         'adm' => [
-            ['Menu',        [
-                ['Webmail',     'webmail/',     'fas fa-envelope fa-fw'],
-                ['Phpmyadmin',  'phpmyadmin/',  'fas fa-globe fa-fw'],
-            ], 'fas fa-bars fa-fw'],
-            ['Admin',       [
-                ['Accounts',    '?o=accounts',  'fas fa-users fa-fw'],
-                ['Vhosts',      '?o=vhosts',    'fas fa-globe fa-fw'],
-                ['Mailboxes',   '?o=vmails',    'fas fa-envelope fa-fw'],
-                ['Aliases',     '?o=valias',    'fas fa-envelope-square fa-fw'],
-                ['DKIM',        '?o=dkim',      'fas fa-address-card fa-fw'],
-                ['Domains',     '?o=domains',   'fas fa-server fa-fw'],
-            ], 'fas fa-user-cog fa-fw'],
+            ['Manage',       [
+                ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
+                ['Vhosts',      '?o=vhosts',    'bi bi-globe2'],
+                ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
+                ['Aliases',     '?o=valias',    'bi bi-envelope-paper-fill'],
+                ['DKIM',        '?o=dkim',      'bi bi-person-vcard-fill'],
+                ['Domains',     '?o=domains',   'bi bi-globe-americas'],
+            ], 'bi bi-stack'],
             ['Stats',       [
-                ['Sys Info',    '?o=infosys',   'fas fa-tachometer-alt fa-fw'],
-                ['Processes',   '?o=processes', 'fas fa-code-branch fa-fw'],
-                ['Mail Info',   '?o=infomail',  'fas fa-envelope-square fa-fw'],
-                ['Mail Graph',  '?o=mailgraph', 'fas fa-envelope fa-fw'],
-            ], 'fas fa-chart-line fa-fw'],
+                ['Sys Info',    '?o=infosys',   'bi bi-speedometer2'],
+                ['Processes',   '?o=processes', 'bi bi-bezier2'],
+                ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
+                ['Mail Graph',  '?o=mailgraph', 'bi bi-bar-chart'],
+            ], 'bi bi-graph-up-arrow'],
+            ['Links',        [
+                ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
+                ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+            ], 'bi bi-list'],
         ],
     ];
     public $nav2 = [];

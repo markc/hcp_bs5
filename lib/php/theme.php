@@ -106,13 +106,14 @@ class Theme
         extract($this->g->out, EXTR_SKIP);
 
         return '<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="auto">
   <head>
+    <script src="lib/js/color-modes.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>' . $doc . '</title>' . $css . $js . '
+    <title>' . $doc . '</title>' . $css . '
   </head>
-  <body>' . $head . $main . $foot . $end . '
+  <body>' . $head . $main . $foot . $end . $js . '
   </body>
 </html>
 ';
