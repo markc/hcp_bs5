@@ -11,21 +11,21 @@ class Themes_Bootstrap5_Home extends Themes_Bootstrap5_Theme
         elog(__METHOD__);
 
         return '
-            <div class="p-md-5 p-2 mb-4 bg-body-tertiary rounded-3 text-center">
-                <h1 class="display-5 fw-bold mt-3"><i class="bi bi-boxes"></i> NetServa HCP</h1>
-                <p class="col col-md-8 fs-5 ms-auto me-auto py-md-3">
+        <div class="p-md-5 p-2 mb-4 bg-body-tertiary rounded-3 text-center">
+          <h1 class="display-5 fw-bold mt-3"><i class="bi bi-boxes"></i> NetServa HCP</h1>
+          <p class="col col-md-8 fs-5 ms-auto me-auto py-md-3">
 This is a lightweight Web, Mail and DNS server with a PHP based <b>Hosting Control Panel</b>
 for servicing multiple virtually hosted domains. The operating system is based on
 the latest Debian or Ubuntu packages and can use either SQLite or MySQL as a backend database.
 The entire server can run in as little as 256 MB of ram when paired with SQLite and still serve
 a dozen lightly loaded hosts so it is ideal for LXD and Proxmox virtual machines and containers.
-                </p>
-                <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp">
-                    <i class="bi bi-github"></i> Project Page
-                <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp/issues">
-                    <i class="bi bi-github"></i> Issue Tracker
-                </a>
-            </div>
+          </p>
+          <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp">
+            <i class="bi bi-github"></i> Project Page
+          <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp/issues">
+            <i class="bi bi-github"></i> Issue Tracker
+          </a>
+        </div>
             <div class="row align-items-md-stretch">
                 <div class="col-md-6 mb-4 order-md-0 order-last">
                     <div class="h-100 p-md-5 p-2 border rounded-3">

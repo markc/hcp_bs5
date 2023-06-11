@@ -323,8 +323,7 @@ class Themes_Bootstrap5_Theme extends Theme
             $alts .= $msg ? '
             <div class="col-12">
               <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-                <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                 </button>' . $msg . '
               </div>
             </div>' : '';
@@ -341,18 +340,17 @@ class Themes_Bootstrap5_Theme extends Theme
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $footer = $footer ? '
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-primary">' . $footer . '</button>
                 </div>' : '';
 
         return '
         <div class="modal fade" id="' . $id . '" tabindex="-1" role="dialog" aria-labelledby="' . $id . '" aria-hidden="true">
-          <div class="modal-dialog" role="document">
+          <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title">' . $title . '</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 </button>
               </div>
               <form method="post" action="' . $this->g->cfg['self'] . '">
