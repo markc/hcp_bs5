@@ -70,7 +70,8 @@ class Util
         elog(__METHOD__ . "({$cmd})");
 
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
-        util::log('<pre>' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
+        // class="mb-0" tweak for Bootstrap5 should not be here
+        util::log('<pre class="mb-0">' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
 
         return (boolval($retVal) ? true : false);
     }

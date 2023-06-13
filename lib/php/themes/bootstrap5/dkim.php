@@ -55,6 +55,20 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
         </div>' . $this->delete($in);
     }
 
+    public function delete(array $in): string
+    {
+        return $this->modal([
+            'id' => 'removemodal',
+            'title' => 'Remove DKIM Record',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'hidden' => '
+                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
+            'body' => '
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
+        ]);
+    }
+
     public function list(array $in): string
     {
         elog(__METHOD__);
@@ -69,19 +83,5 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
         </div>
         <div class="row">' . $in['buf'] . '
         </div>' . $this->create();
-    }
-
-    public function delete(array $in): string
-    {
-        return $this->modal([
-            'id' => 'removemodal',
-            'title' => 'Remove DKIM Record',
-            'action' => 'delete',
-            'footer' => 'Remove',
-            'hidden' => '
-                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
-            'body' => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
-        ]);
     }
 }

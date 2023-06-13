@@ -50,18 +50,18 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
             foreach ($res as $k => $v) {
                 $grp_ary[] = [$v['login'], $v['id']];
             }
-            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'custom-select');
+            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
 
             $aclgrp_buf = '
                   <div class="row">
                     <div class="col-6">
-                      <div class="form-group">
-                        <label for="acl" class="form-control-label">ACL</label>' . $acl_buf . '
+                      <div class="mb-4">
+                        <label for="acl" class="form-label">ACL</label>' . $acl_buf . '
                       </div>
                     </div>
-                    <div class="col-6">
+                    <div class="mb-4">
                       <div class="form-group">
-                        <label for="grp" class="form-control-label">Group</label>' . $grp_buf . '
+                        <label for="grp" class="form-label">Group</label>' . $grp_buf . '
                       </div>
                     </div>
                   </div>';
@@ -74,42 +74,40 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
             'footer' => 'Create',
             'body' => '
                   <div class="form-group">
-                    <label for="login" class="form-control-label">Email ID</label>
+                    <label for="login" class="form-label">Email ID</label>
                     <input type="email" class="form-control" id="login" name="login" value="" required>
                   </div>
                   <div class="form-group">
-                    <label for="fname" class="form-control-label">First Name</label>
+                    <label for="fname" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="fname" name="fname" value="" required>
                   </div>
                   <div class="form-group">
-                    <label for="lname" class="form-control-label">Last Name</label>
+                    <label for="lname" class="form-label">Last Name</label>
                     <input type="text" class="form-control" id="lname" name="lname" value="" required>
                   </div>
                   <div class="form-group">
-                    <label for="altemail" class="form-control-label">Alt Email</label>
+                    <label for="altemail" class="form-label">Alt Email</label>
                     <input type="text" class="form-control" id="altemail" name="altemail" value="">
                   </div>' . $aclgrp_buf,
         ]);
 
         return '
-        <div class="col-12">
+        <div class="row">
           <h3>
-            <i class="fas fa-users fa-fw"></i> Accounts
-            <a href="" title="Add new account" data-toggle="modal" data-target="#createmodal">
-              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            <i class="bi bi-people-fill"></i> Accounts
+            <a href="" title="Add new account" data-bs-toggle="modal" data-bs-target="#createmodal">
+              <small><i class="bi bi-plus-circle"></i></small>
             </a>
           </h3>
         </div>
-      </div><!-- END UPPER ROW -->
-      <div class="row">
-        <div class=col-12>
-          <table id=accounts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-            <thead class="nowrap">
+        <div class="table-responsive small">
+          <table id="accounts" class="table table-sm w-100">
+            <thead>
               <tr>
-                <th class="w-25">User ID</th>
+                <th>User ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
-                <th class="w-25">Alt Email</th>
+                <th>Alt Email</th>
                 <th>ACL</th>
                 <th>Grp</th>
               </tr>
@@ -172,7 +170,7 @@ $(document).ready(function() {
             foreach ($this->g->acl as $k => $v) {
                 $acl_ary[] = [$v, $k];
             }
-            $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'custom-select');
+            $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'form-select');
             $res = db::qry('
  SELECT login,id
    FROM `accounts`
@@ -181,13 +179,13 @@ $(document).ready(function() {
             foreach ($res as $k => $v) {
                 $grp_ary[] = [$v['login'], $v['id']];
             }
-            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'custom-select');
+            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
             $aclgrp_buf = '
-                <div class="form-group">
-                  <label for="acl">ACL</label><br>' . $acl_buf . '
+                <div class="mb-4">
+                  <label for="acl" class="form-label">ACL</label><br>' . $acl_buf . '
                 </div>
-                <div class="form-group">
-                  <label for="grp">Group</label><br>' . $grp_buf . '
+                <div class="mb-4">
+                  <label for="grp" class="form-label">Group</label><br>' . $grp_buf . '
                 </div>';
         } else {
             $aclgrp_buf = '';
@@ -195,34 +193,33 @@ $(document).ready(function() {
         }
 
         return '
-          <div class="col-12">
-            <h3>
-              <a href="?o=accounts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Accounts
-              <a href="" title="Remove this user" data-toggle="modal" data-target="#removemodal">
-                <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
         <div class="row">
-          <div class="col-12">
+          <h3>
+            <a href="?o=accounts&m=list"><i class="bi bi-chevron-double-left"></i></a> Accounts
+            <a href="" title="Remove this user" data-bs-toggle="modal" data-bs-target="#removemodal">
+              <small><i class="bi bi--trash cursor-pointer text-danger"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="row">
             <form method="post" action="' . $this->g->cfg['self'] . '">
               <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
               <input type="hidden" name="i" value="' . $id . '">
               <div class="row">
-                <div class="col-12 col-sm-6 col-lg-4">
+                <div class="mb-3">
                   <div class="form-group">
-                    <label for="login">UserID</label>
+                    <label for="login" class="form-label">UserID</label>
                     <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
                   </div>
                   <div class="form-group">
-                    <label for="altemail">Alt Email</label>
+                    <label for="altemail" class="form-label">Alt Email</label>
                     <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                   </div>
                 </div>
-                <div class="col-12 col-sm-6 col-lg-4">
+                <div class="col-md-6">
                   <div class="form-group">
-                    <label for="fname">First Name</label>
+                    <label for="fname" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
                   </div>
                   <div class="form-group">
@@ -230,13 +227,13 @@ $(document).ready(function() {
                     <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
                   </div>
                 </div>
-                <div class="col-12 col-sm-6 col-lg-4">' . $aclgrp_buf . '
+                <div class="col-md-6 ">' . $aclgrp_buf . '
                 </div>
               </div>
               <div class="row">
-                <div class="col-12 col-sm-6">' . $switch . '
+                <div class="col-md-6">' . $switch . '
                 </div>
-                <div class="col-12 col-sm-6 text-right">
+                <div class="col-md-6 text-right">
                   <div class="btn-group">' . $submit . '
                   </div>
                 </div>

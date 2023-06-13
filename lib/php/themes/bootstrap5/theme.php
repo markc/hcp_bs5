@@ -21,7 +21,7 @@ class Themes_Bootstrap5_Theme extends Theme
     <style>
         body {
             min-height: 75rem;
-            padding-top: 5rem;
+            /* padding-top: 5rem; */
         }
 
         .bi {
@@ -113,6 +113,7 @@ class Themes_Bootstrap5_Theme extends Theme
         .navbar-scrolled {
             padding-top: 0.25rem !important;
             padding-bottom: 0.25rem !important;
+            /* transition: padding 0.25s; */
         }
     </style>
 
@@ -179,7 +180,7 @@ class Themes_Bootstrap5_Theme extends Theme
       </ul>
     </div>
 
-    <nav id="navbar" class="navbar nav-underline navbar-expand-lg fixed-top">
+    <nav id="navbar" class="navbar mb-4 nav-underline navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="' . $this->g->cfg['self'] . '">
                 <b><i class="bi bi-box"></i> ' . $this->g->out['head'] . '</b>
@@ -286,21 +287,21 @@ class Themes_Bootstrap5_Theme extends Theme
         window.addEventListener("scroll", function () {
             let theme = document.documentElement.getAttribute("data-bs-theme");
             //console.log(theme);
-            if (window.pageYOffset > 10) {
+            if (window.pageYOffset > 24) {
                 if (theme == "dark") {
                     nav.classList.add("bg-dark", "shadow", "navbar-scrolled");
-                    nav.style.transition = "all 0.25s";
+                    nav.style.transition = "padding 0.25s";
                 } else {
                     nav.classList.add("bg-light", "shadow", "navbar-scrolled");
-                    nav.style.transition = "all 0.25s";
+                    nav.style.transition = "padding 0.25s";
                 }
             } else {
                 if (theme == "dark") {
                     nav.classList.remove("bg-dark", "shadow", "navbar-scrolled");
-                    nav.style.transition = "all 0.25s";
+                    nav.style.transition = "padding 0.25s";
                 } else {
                     nav.classList.remove("bg-light", "shadow", "navbar-scrolled");
-                    nav.style.transition = "all 0.25s";
+                    nav.style.transition = "padding 0.25s";
                 }
             }
         });
@@ -318,18 +319,20 @@ class Themes_Bootstrap5_Theme extends Theme
     {
         elog(__METHOD__);
 
-        $alts = '';
+        $logs = '';
         foreach (util::log() as $lvl => $msg) {
-            $alts .= $msg ? '
-            <div class="col-12">
-              <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                </button>' . $msg . '
+            $logs .= $msg ? '
+            <div class="row">
+              <div class="col">
+                <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                  </button>' . rtrim($msg) . '
+                </div>
               </div>
             </div>' : '';
         }
 
-        return $alts;
+        return $logs;
     }
 
     protected function modal(array $ary): string
