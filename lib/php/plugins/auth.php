@@ -148,7 +148,7 @@ class Plugins_Auth extends Plugin
         return $this->t->update(['id' => $i, 'login' => $u]);
     }
 
-    public function delete(): void
+    public function delete(): ?string
     {
         elog(__METHOD__);
 

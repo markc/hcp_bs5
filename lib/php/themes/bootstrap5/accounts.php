@@ -52,7 +52,7 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
      * @param array $in
      * @return string
      */
-    public function delete(array $in): string
+    public function delete(array $in): ?string
     {
         elog(__METHOD__);
 

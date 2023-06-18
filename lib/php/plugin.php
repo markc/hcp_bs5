@@ -147,7 +147,7 @@ class Plugin
      * Summary of delete
      * @return string
      */
-    protected function delete(): string
+    protected function delete(): ?string
     {
         elog(__METHOD__);
 
