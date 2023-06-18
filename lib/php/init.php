@@ -4,13 +4,28 @@ declare(strict_types=1);
 // lib/php/init.php 20150101 - 20200414
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Init
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Init
 {
+    /**
+     * Summary of t
+     * @var
+     */
     private $t;
 
-    public function __construct(object $g)
+    /**
+     * Summary of __construct
+     */
+    public function __construct()
     {
         elog(__METHOD__);
+
+        $g = gbl::getInstance();
+
         session_start();
 
         elog('GET=' . var_export($_GET, true));
@@ -56,12 +71,19 @@ class Init
         }
     }
 
+    /**
+     * Summary of __destruct
+     */
     public function __destruct()
     {
         //error_log('SESSION=' . var_export($_SESSION, true));
         elog(__FILE__ . ' ' . $_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4) . "\n");
     }
 
+    /**
+     * Summary of __toString
+     * @return string
+     */
     public function __toString(): string
     {
         elog(__METHOD__);
@@ -91,19 +113,4 @@ class Init
 
         return $this->t->html();
     }
-}
-
-function dbg($var = null): void
-{
-    if (is_object($var)) {
-        $refobj = new \ReflectionObject($var);
-        // get all public and protected properties
-        $var = $refobj->getProperties(\ReflectionProperty::IS_PUBLIC);
-        $var = \array_merge($var, $refobj->getProperties(\ReflectionProperty::IS_PROTECTED));
-    }
-    ob_start();
-    print_r($var);
-    $ob = ob_get_contents();
-    ob_end_clean();
-    error_log($ob);
 }

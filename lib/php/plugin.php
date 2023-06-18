@@ -151,8 +151,6 @@ class Plugin
     {
         elog(__METHOD__);
 
-        dbg($this->t);
-
         if (util::is_post()) {
             if ($this->g->in['i']) {
                 $res = db::delete([['id', '=', $this->g->in['i']]]);

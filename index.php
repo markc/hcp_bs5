@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// index.php 20150101 - 20230605
+// index.php 20150101 - 20230619
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -20,6 +20,11 @@ spl_autoload_register(function ($c): void {
     }
 });
 
+/**
+ * Summary of elog
+ * @param string $content
+ * @return void
+ */
 function elog(string $content): void
 {
     if (DBG) {
@@ -27,8 +32,42 @@ function elog(string $content): void
     }
 }
 
-echo new Init(new class()
+/**
+ * Summary of gbl
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
+class gbl
 {
+    /**
+     * This holds a single instance of this global object
+     * @var 
+     */
+    private static ?gbl $instance = null;
+
+    /**
+     * Private constructor to prevent direct instantiation
+     */
+    private function __construct()
+    {
+    }
+
+    /**
+     * Return a single instance of this global object
+     * @return gbl
+     */
+    public static function getInstance(): gbl
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * Summary of cfg
+     * @var array
+     */
     public $cfg = [
         'email' => 'markc@renta.net',
         'file' => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // settings override
@@ -37,6 +76,10 @@ echo new Init(new class()
         'perp' => 25,
         'self' => '/hcp/',
     ];
+    /**
+     * Summary of in
+     * @var array
+     */
     public $in = [
         'a' => '',           // API (apiusr:apikey)
         'd' => '',           // Domain (current)
@@ -48,6 +91,10 @@ echo new Init(new class()
         't' => 'bootstrap5', // Theme (bootstrap, bootstrap5, mazer)
         'x' => '',           // XHR (request)
     ];
+    /**
+     * Summary of out
+     * @var array
+     */
     public $out = [
         'doc' => 'NetServa',
         'css' => '',
@@ -57,10 +104,14 @@ echo new Init(new class()
         'nav3' => '',
         'head' => 'NetServa',
         'main' => 'Error: missing page!',
-        'foot' => 'Copyright (C) 2015-2019 Mark Constable (AGPL-3.0)',
+        'foot' => 'Copyright (C) 2015-2023 Mark Constable (AGPL-3.0)',
         'js' => '',
         'end' => '',
     ];
+    /**
+     * Summary of db
+     * @var array
+     */
     public $db = [
         'host' => '127.0.0.1', // DB site
         'name' => 'sysadm',    // DB name
@@ -71,6 +122,10 @@ echo new Init(new class()
         'type' => 'mysql',     // mysql | sqlite
         'user' => 'sysadm',    // DB user
     ];
+    /**
+     * Summary of nav1
+     * @var array
+     */
     public $nav1 = [
         'non' => [
             ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
@@ -101,7 +156,15 @@ echo new Init(new class()
             ], 'bi bi-list'],
         ],
     ];
+    /**
+     * Summary of nav2
+     * @var array
+     */
     public $nav2 = [];
+    /**
+     * Summary of dns
+     * @var array
+     */
     public $dns = [
         'a' => '127.0.0.1',
         'mx' => '',
@@ -128,6 +191,10 @@ echo new Init(new class()
             'user' => 'pdns',      // Alt DNS DB user
         ],
     ];
+    /**
+     * Summary of acl
+     * @var array
+     */
     public $acl = [
         0 => 'SuperAdmin',
         1 => 'Administrator',
@@ -135,4 +202,6 @@ echo new Init(new class()
         3 => 'Suspended',
         9 => 'Anonymous',
     ];
-});
+};
+
+echo new Init();

@@ -36,8 +36,6 @@ class Plugins_Accounts extends Plugin
     {
         elog(__METHOD__);
 
-        dbg($this->t);
-
         return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
 
         //return $this->list();
