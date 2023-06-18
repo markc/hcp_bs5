@@ -13,3 +13,4 @@ rspamd/
 phpliteadmin.*
 .php-cs-fixer.cache
 bs5-*
+.vscode

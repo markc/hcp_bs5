@@ -55,8 +55,15 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
         </div>' . $this->delete($in);
     }
 
+    /**
+     * Summary of delete
+     * @param array $in
+     * @return string
+     */
     public function delete(array $in): string
     {
+        elog(__METHOD__);
+
         return $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove DKIM Record',

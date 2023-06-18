@@ -4,11 +4,28 @@ declare(strict_types=1);
 // lib/php/db.php 20150225 - 20180512
 // Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Db
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Db extends \PDO
 {
+    /**
+     * Summary of dbh
+     * @var
+     */
     public static $dbh;
+    /**
+     * Summary of tbl
+     * @var
+     */
     public static $tbl;
 
+    /**
+     * Summary of __construct
+     * @param array $dbcfg
+     */
     public function __construct(array $dbcfg)
     {
         elog(__METHOD__);
@@ -16,8 +33,8 @@ class Db extends \PDO
         if (is_null(self::$dbh)) {
             extract($dbcfg);
             $dsn = 'mysql' === $type
-                ? 'mysql:'.($sock ? 'unix_socket='.$sock : 'host='.$host.';port='.$port).';dbname='.$name
-                : 'sqlite:'.$path;
+                ? 'mysql:' . ($sock ? 'unix_socket=' . $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
+                : 'sqlite:' . $path;
             $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
 
             try {
@@ -27,11 +44,16 @@ class Db extends \PDO
                     \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
                 ]);
             } catch (\PDOException $e) {
-                exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+                exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
             }
         }
     }
 
+    /**
+     * Summary of create
+     * @param array $ary
+     * @return bool|string
+     */
     public static function create(array $ary)
     {
         elog(__METHOD__);
@@ -47,7 +69,7 @@ class Db extends \PDO
         $values = rtrim($values, ',');
 
         $sql = '
- INSERT INTO `'.self::$tbl."` ({$fields})
+ INSERT INTO `' . self::$tbl . "` ({$fields})
  VALUES ({$values})";
 
         elog("sql={$sql}");
@@ -59,18 +81,26 @@ class Db extends \PDO
 
             return self::$dbh->lastInsertId();
         } catch (\PDOException $e) {
-            exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
+    /**
+     * Summary of read
+     * @param string $field
+     * @param string $where
+     * @param string $wval
+     * @param string $extra
+     * @param string $type
+     * @return mixed
+     */
     public static function read(
         string $field,
         string $where = '',
         string $wval = '',
         string $extra = '',
         string $type = 'all'
-    )
-    {
+    ) {
         elog(__METHOD__);
 
         $w = $where ? "
@@ -80,13 +110,19 @@ class Db extends \PDO
 
         $sql = "
  SELECT {$field}
-   FROM `".self::$tbl."`{$w} {$extra}";
+   FROM `" . self::$tbl . "`{$w} {$extra}";
 
         elog("sql={$sql}");
 
         return self::qry($sql, $a, $type);
     }
 
+    /**
+     * Summary of update
+     * @param array $set
+     * @param array $where
+     * @return bool
+     */
     public static function update(array $set, array $where)
     {
         elog(__METHOD__);
@@ -101,13 +137,13 @@ class Db extends \PDO
         $where_str = '';
         $where_ary = [];
         foreach ($where as $k => $v) {
-            $where_str .= ' '.$v[0].' '.$v[1].' :'.$v[0];
+            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
             $where_ary[$v[0]] = $v[2];
         }
         $ary = array_merge($set, $where_ary);
 
         $sql = '
- UPDATE `'.self::$tbl."` SET{$set_str}
+ UPDATE `' . self::$tbl . "` SET{$set_str}
   WHERE{$where_str}";
 
         elog("sql={$sql}");
@@ -118,10 +154,15 @@ class Db extends \PDO
 
             return $stm->execute();
         } catch (\PDOException $e) {
-            exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
+    /**
+     * Summary of delete
+     * @param array $where
+     * @return bool
+     */
     public static function delete(array $where)
     {
         elog(__METHOD__);
@@ -129,12 +170,12 @@ class Db extends \PDO
         $where_str = '';
         $where_ary = [];
         foreach ($where as $k => $v) {
-            $where_str .= ' '.$v[0].' '.$v[1].' :'.$v[0];
+            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
             $where_ary[$v[0]] = $v[2];
         }
 
         $sql = '
- DELETE FROM `'.self::$tbl."`
+ DELETE FROM `' . self::$tbl . "`
   WHERE {$where_str}";
 
         elog("sql={$sql}");
@@ -145,10 +186,17 @@ class Db extends \PDO
 
             return $stm->execute();
         } catch (\PDOException $e) {
-            exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
+    /**
+     * Summary of qry
+     * @param string $sql
+     * @param array $ary
+     * @param string $type
+     * @return mixed
+     */
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
         elog(__METHOD__);
@@ -177,11 +225,17 @@ class Db extends \PDO
 
             return false;
         } catch (\PDOException $e) {
-            exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
     // bind value statement
+    /**
+     * Summary of bvs
+     * @param mixed $stm
+     * @param array $ary
+     * @return void
+     */
     public static function bvs($stm, array $ary): void
     {
         elog(__METHOD__);
@@ -208,12 +262,21 @@ class Db extends \PDO
 
     // See http://datatables.net/usage/server-side
 
+    /**
+     * Summary of simple
+     * @param mixed $request
+     * @param mixed $table
+     * @param mixed $primaryKey
+     * @param mixed $columns
+     * @param mixed $extra
+     * @return array
+     */
     public static function simple($request, $table, $primaryKey, $columns, $extra = '')
     {
         elog(__METHOD__);
 
         $db = self::$dbh;
-        $cols = '`'.implode('`, `', self::pluck($columns, 'db')).'`';
+        $cols = '`' . implode('`, `', self::pluck($columns, 'db')) . '`';
         $bind = [];
 
         $limit = self::limit($request, $columns);
@@ -248,6 +311,12 @@ class Db extends \PDO
         ];
     }
 
+    /**
+     * Summary of data_output
+     * @param mixed $columns
+     * @param mixed $data
+     * @return array
+     */
     public static function data_output($columns, $data)
     {
         elog(__METHOD__);
@@ -276,6 +345,12 @@ class Db extends \PDO
         return $out;
     }
 
+    /**
+     * Summary of limit
+     * @param mixed $request
+     * @param mixed $columns
+     * @return string
+     */
     public static function limit($request, $columns)
     {
         elog(__METHOD__);
@@ -283,12 +358,18 @@ class Db extends \PDO
         $limit = '';
 
         if (isset($request['start']) && -1 != $request['length']) {
-            $limit = 'LIMIT '.intval($request['start']).', '.intval($request['length']);
+            $limit = 'LIMIT ' . intval($request['start']) . ', ' . intval($request['length']);
         }
 
         return $limit;
     }
 
+    /**
+     * Summary of order
+     * @param mixed $request
+     * @param mixed $columns
+     * @return string
+     */
     public static function order($request, $columns)
     {
         elog(__METHOD__);
@@ -297,29 +378,36 @@ class Db extends \PDO
 
         if (isset($request['order']) && count($request['order'])) {
             $orderBy = [];
-//            $dtColumns = self::pluck($columns, 'dt');
+            //            $dtColumns = self::pluck($columns, 'dt');
 
             for ($i = 0, $ien = count($request['order']); $i < $ien; ++$i) {
                 $columnIdx = intval($request['order'][$i]['column']);
                 $requestColumn = $request['columns'][$columnIdx];
-//                $columnIdx = array_search($requestColumn['data'], $dtColumns); // don't use $dtColumns
+                //                $columnIdx = array_search($requestColumn['data'], $dtColumns); // don't use $dtColumns
                 $columnIdx = array_search($requestColumn['data'], array_column($columns, 'dt'));
                 $column = $columns[$columnIdx];
 
                 if ('true' == $requestColumn['orderable']) {
                     $dir = 'asc' === $request['order'][$i]['dir'] ? 'ASC' : 'DESC';
-                    $orderBy[] = '`'.$column['db'].'` '.$dir;
+                    $orderBy[] = '`' . $column['db'] . '` ' . $dir;
                 }
             }
 
             if (count($orderBy)) {
-                $order = 'ORDER BY '.implode(', ', $orderBy);
+                $order = 'ORDER BY ' . implode(', ', $orderBy);
             }
         }
 
         return $order;
     }
 
+    /**
+     * Summary of filter
+     * @param mixed $request
+     * @param mixed $columns
+     * @param mixed $bindings
+     * @return string
+     */
     public static function filter($request, $columns, &$bindings)
     {
         elog(__METHOD__);
@@ -336,8 +424,8 @@ class Db extends \PDO
                 $column = $columns[$columnIdx];
 
                 if ('true' == $requestColumn['searchable'] && $column['db']) {
-                    $binding = self::bind($bindings, '%'.$str.'%', PDO::PARAM_STR);
-                    $globalSearch[] = '`'.$column['db'].'` LIKE '.$binding;
+                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
+                    $globalSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                 }
             }
         }
@@ -352,9 +440,9 @@ class Db extends \PDO
                 $str = $requestColumn['search']['value'];
 
                 if ('true' == $requestColumn['searchable'] && '' != $str && null !== $column['db']) {
-                    $binding = self::bind($bindings, '%'.$str.'%', PDO::PARAM_STR);
+                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
                     if ($column['db']) {
-                        $columnSearch[] = '`'.$column['db'].'` LIKE '.$binding;
+                        $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
                     }
                 }
             }
@@ -364,22 +452,30 @@ class Db extends \PDO
         $where = '';
 
         if (count($globalSearch)) {
-            $where = '('.implode(' OR ', $globalSearch).')';
+            $where = '(' . implode(' OR ', $globalSearch) . ')';
         }
 
         if (count($columnSearch)) {
             $where = '' === $where ?
                 implode(' AND ', $columnSearch) :
-                $where.' AND '.implode(' AND ', $columnSearch);
+                $where . ' AND ' . implode(' AND ', $columnSearch);
         }
 
         if ('' !== $where) {
-            $where = 'WHERE '.$where;
+            $where = 'WHERE ' . $where;
         }
 
         return $where;
     }
 
+    /**
+     * Summary of sql_exec
+     * @param mixed $db
+     * @param mixed $bindings
+     * @param mixed $sql
+     * @param string $type
+     * @return mixed
+     */
     public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
         elog(__METHOD__);
@@ -405,7 +501,7 @@ class Db extends \PDO
         try {
             $stmt->execute();
         } catch (PDOException $e) {
-            self::fatal('An SQL error occurred: '.$e->getMessage());
+            self::fatal('An SQL error occurred: ' . $e->getMessage());
         }
 
         if ('all' === $type) {
@@ -422,6 +518,11 @@ class Db extends \PDO
         }
     }
 
+    /**
+     * Summary of fatal
+     * @param mixed $msg
+     * @return void
+     */
     private static function fatal($msg): void
     {
         elog(__METHOD__);
@@ -431,16 +532,29 @@ class Db extends \PDO
         exit(0);
     }
 
+    /**
+     * Summary of bind
+     * @param mixed $a
+     * @param mixed $val
+     * @param mixed $type
+     * @return string
+     */
     private static function bind(&$a, $val, $type)
     {
         elog(__METHOD__);
 
-        $key = ':binding_'.count($a);
+        $key = ':binding_' . count($a);
         $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
 
         return $key;
     }
 
+    /**
+     * Summary of pluck
+     * @param mixed $a
+     * @param mixed $prop
+     * @return array
+     */
     private static function pluck($a, $prop)
     {
         elog(__METHOD__);
@@ -455,6 +569,12 @@ class Db extends \PDO
         return $out;
     }
 
+    /**
+     * Summary of _flatten
+     * @param mixed $a
+     * @param mixed $join
+     * @return mixed
+     */
     private static function _flatten($a, $join = ' AND ')
     {
         elog(__METHOD__);

@@ -68,6 +68,10 @@ class Init
 
         $g = $this->t->g;
         $x = $g->in['x'];
+        if ('html' === $x) {
+            elog($g->out['main']);
+            return $g->out['main'];
+        }
         if ('text' === $x) {
             return preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main']));
         }
@@ -102,11 +106,4 @@ function dbg($var = null): void
     $ob = ob_get_contents();
     ob_end_clean();
     error_log($ob);
-}
-
-function elog(string $content): void
-{
-    if (DBG) {
-        error_log($content);
-    }
 }

@@ -391,7 +391,7 @@ class Plugins_Valias extends Plugin
                 }],
                 ['dt' => 1, 'db' => 'target', 'formatter' => fn ($d) => str_replace(',', '<br>', $d)],
                 ['dt' => 2, 'db' => 'domain'],
-                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>'],
+                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="' . ($d ? 'bi-check-lg text-success' : 'bi-x-lg text-danger') . '"></i>'],
                 ['dt' => 4, 'db' => 'id'],
                 ['dt' => 5, 'db' => 'updated'],
             ];

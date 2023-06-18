@@ -17,8 +17,14 @@ class Plugins_Accounts extends Plugin
         'altemail' => '',
     ];
 
+    /**
+     * Summary of create
+     * @return string
+     */
     protected function create(): string
     {
+        elog(__METHOD__);
+
         if (util::is_adm()) {
             return parent::create();
         }
@@ -27,6 +33,17 @@ class Plugins_Accounts extends Plugin
     }
 
     protected function read(): string
+    {
+        elog(__METHOD__);
+
+        dbg($this->t);
+
+        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+
+        //return $this->list();
+    }
+
+    protected function read_orig(): string
     {
         elog(__METHOD__);
 
@@ -53,14 +70,22 @@ class Plugins_Accounts extends Plugin
         return $this->t->read($usr);
     }
 
-    protected function delete(): void
+    protected function delete(): string
     {
         elog(__METHOD__);
 
+        //       dbg($this->t);
+        //       return $this->t->delete($this->in);
+
         if (util::is_post()) {
             parent::delete();
+        } else {
+            $tmp = $this->t->delete($this->g->in);
+            elog("tmp = $tmp");
+            return $tmp;
         }
     }
+
 
     protected function list(): string
     {
@@ -71,7 +96,7 @@ class Plugins_Accounts extends Plugin
                 ['dt' => null, 'db' => 'id'],
                 ['dt' => 0, 'db' => 'login', 'formatter' => function ($d, $row) {
                     return '
-                    <b><a href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
+                    <b><a class="bslink" href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
                 }],
                 ['dt' => 1, 'db' => 'fname'],
                 ['dt' => 2, 'db' => 'lname'],

@@ -339,17 +339,31 @@ class Themes_Bootstrap5_Theme extends Theme
     {
         elog(__METHOD__);
 
+        return '
+        <div class="modal fade" id="' . $ary['id'] . '" tabindex="-1" role="dialog" aria-labelledby="' . $ary['id'] . '" aria-hidden="true">
+          <div class="modal-dialog">' . $this->modal_content($ary) . '
+          </div>
+        </div>';
+    }
+
+    protected function modal_content(array $ary): string
+    {
+        elog(__METHOD__);
+
         extract($ary);
+
         $hidden = isset($hidden) && $hidden ? $hidden : '';
-        $footer = $footer ? '
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">' . $footer . '</button>
+        $lhs_cmd = $lhs_cmd ? '
+                    <a class="btn btn-danger bslink" href="?o=accounts&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>
+                    ' : '';
+
+        $footer = $rhs_cmd ? '
+                <div class="modal-footer d-flex justify-content-between">' . $lhs_cmd . '
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">' . $rhs_cmd . '</button>
                 </div>' : '';
 
         return '
-        <div class="modal fade" id="' . $id . '" tabindex="-1" role="dialog" aria-labelledby="' . $id . '" aria-hidden="true">
-          <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title">' . $title . '</h5>
@@ -364,8 +378,6 @@ class Themes_Bootstrap5_Theme extends Theme
                 <div class="modal-body">' . $body . '
                 </div>' . $footer . '
               </form>
-            </div>
-          </div>
-        </div>';
+            </div>';
     }
 }

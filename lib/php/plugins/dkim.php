@@ -50,7 +50,7 @@ class Plugins_Dkim extends Plugin
         return "Update"; // workaround to satisy string return type
     }
 
-    public function delete(): void
+    public function delete(): string
     {
         elog(__METHOD__);
 
@@ -59,6 +59,7 @@ class Plugins_Dkim extends Plugin
             util::exe('dkim del ' . $domain);
         }
         util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        return ''; // to make compatible with parent::delete()
     }
 
     public function list(): string

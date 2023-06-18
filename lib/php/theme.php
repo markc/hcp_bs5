@@ -4,11 +4,24 @@ declare(strict_types=1);
 // lib/php/theme.php 20150101 - 20230604
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Theme
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Theme
 {
+    /**
+     * Summary of buf
+     * @var string
+     */
     private string $buf = '';
     //private array $in = [];
 
+    /**
+     * Summary of __construct
+     * @param object $g
+     */
     public function __construct(public Object $g)
     {
         elog(__METHOD__);
@@ -16,6 +29,10 @@ class Theme
         $this->g = $g;
     }
 
+    /**
+     * Summary of __toString
+     * @return string
+     */
     public function __toString(): string
     {
         elog(__METHOD__);
@@ -23,6 +40,12 @@ class Theme
         return $this->buf;
     }
 
+    /**
+     * Summary of __call
+     * @param string $name
+     * @param array $args
+     * @return string
+     */
     public function __call(string $name, array $args): string
     {
         elog(__METHOD__ . '() name = ' . $name . ' class = ' . __CLASS__);
@@ -30,6 +53,10 @@ class Theme
         return 'Theme::' . $name . '() not implemented';
     }
 
+    /**
+     * Summary of log
+     * @return string
+     */
     public function log(): string
     {
         elog(__METHOD__);
@@ -42,6 +69,10 @@ class Theme
         return $alts;
     }
 
+    /**
+     * Summary of nav1
+     * @return string
+     */
     public function nav1(): string
     {
         elog(__METHOD__);
@@ -58,6 +89,10 @@ class Theme
       </nav>';
     }
 
+    /**
+     * Summary of head
+     * @return string
+     */
     public function head(): string
     {
         elog(__METHOD__);
@@ -70,6 +105,10 @@ class Theme
     </header>';
     }
 
+    /**
+     * Summary of main
+     * @return string
+     */
     public function main(): string
     {
         elog(__METHOD__);
@@ -79,6 +118,10 @@ class Theme
     </main>';
     }
 
+    /**
+     * Summary of foot
+     * @return string
+     */
     public function foot(): string
     {
         elog(__METHOD__);
@@ -90,6 +133,10 @@ class Theme
     </footer>';
     }
 
+    /**
+     * Summary of end
+     * @return string
+     */
     public function end(): string
     {
         elog(__METHOD__);
@@ -99,6 +146,10 @@ class Theme
     </pre>';
     }
 
+    /**
+     * Summary of html
+     * @return string
+     */
     public function html(): string
     {
         elog(__METHOD__);
@@ -119,6 +170,16 @@ class Theme
 ';
     }
 
+    /**
+     * Summary of dropdown
+     * @param array $ary
+     * @param string $name
+     * @param string $sel
+     * @param string $label
+     * @param string $class
+     * @param string $extra
+     * @return string
+     */
     public static function dropdown(
         array $ary,
         string $name,

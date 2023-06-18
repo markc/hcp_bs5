@@ -1,11 +1,21 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20230604
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20230617
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Themes_Bootstrap5_Accounts
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
 {
+    /**
+     * Summary of create
+     * @param array $in
+     * @return string
+     */
     public function create(array $in): string
     {
         elog(__METHOD__);
@@ -13,6 +23,11 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
         return $this->editor($in);
     }
 
+    /**
+     * Summary of read
+     * @param array $in
+     * @return string
+     */
     public function read(array $in): string
     {
         elog(__METHOD__);
@@ -20,6 +35,11 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
         return $this->editor($in);
     }
 
+    /**
+     * Summary of update
+     * @param array $in
+     * @return string
+     */
     public function update(array $in): string
     {
         elog(__METHOD__);
@@ -27,81 +47,77 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
         return $this->editor($in);
     }
 
+    /**
+     * Summary of delete
+     * @param array $in
+     * @return string
+     */
+    public function delete(array $in): string
+    {
+        elog(__METHOD__);
+
+        //        return $this->editor($in);
+        if (util::is_post()) {
+            return "Themes_Bootstrap5_Accounts goto plugin::delete()";
+        } else {
+            $usr = db::read('login', 'id', $this->g->in['i'], '', 'one');
+            elog(var_export($usr, true));
+            return $this->modal_content([
+                'title' => 'Remove User',
+                'action' => 'delete',
+                'lhs_cmd' => '',
+                'rhs_cmd' => 'Remove',
+                'hidden' => '
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+                'body' => '
+                <p class="text-center">Are you sure you want to remove this user?<br><b>' . $usr['login'] . '</b></p>',
+            ]);
+        }
+    }
+
+    /**
+     * Summary of boo
+     * @param array $in
+     * @return string
+     */
+    private function boo(array $in): string
+    {
+        elog(__METHOD__);
+
+        $login = db::read('login', 'id', $this->g->in['i'], '', 'one');
+
+        return $this->modal_content([
+            'title' => 'Remove User',
+            'action' => 'delete',
+            'lhs_cmd' => '',
+            'rhs_cmd' => 'Remove',
+            'hidden' => '
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+            'body' => '
+                <p class="text-center">Are you sure you want to remove this user?<br><b>' . $login . '</b></p>',
+        ]);
+    }
+
+    /**
+     * Summary of list
+     * @param array $in
+     * @return string
+     */
     public function list(array $in): string
     {
-        elog(__METHOD__ . ' ' . var_export($in, true));
-
-        extract($in);
-        $aclgrp_buf = '';
-
-        if (util::is_adm()) {
-            $acl = $_SESSION['usr']['acl'];
-            $grp = $_SESSION['usr']['grp'];
-            $acl_ary = $grp_ary = [];
-            foreach ($this->g->acl as $k => $v) {
-                $acl_ary[] = [$v, $k];
-            }
-            $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'custom-select');
-            $res = db::qry('
- SELECT login,id
-   FROM `accounts`
-  WHERE acl = :0 OR acl = :1', ['0' => 0, '1' => 1]);
-
-            foreach ($res as $k => $v) {
-                $grp_ary[] = [$v['login'], $v['id']];
-            }
-            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
-
-            $aclgrp_buf = '
-                  <div class="row">
-                    <div class="col-6">
-                      <div class="mb-4">
-                        <label for="acl" class="form-label">ACL</label>' . $acl_buf . '
-                      </div>
-                    </div>
-                    <div class="mb-4">
-                      <div class="form-group">
-                        <label for="grp" class="form-label">Group</label>' . $grp_buf . '
-                      </div>
-                    </div>
-                  </div>';
-        }
-
-        $createmodal = $this->modal([
-            'id' => 'createmodal',
-            'title' => 'Create New Account',
-            'action' => 'create',
-            'footer' => 'Create',
-            'body' => '
-                  <div class="form-group">
-                    <label for="login" class="form-label">Email ID</label>
-                    <input type="email" class="form-control" id="login" name="login" value="" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="fname" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="fname" name="fname" value="" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="lname" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="lname" name="lname" value="" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="altemail" class="form-label">Alt Email</label>
-                    <input type="text" class="form-control" id="altemail" name="altemail" value="">
-                  </div>' . $aclgrp_buf,
-        ]);
+        elog(__METHOD__);
 
         return '
         <div class="row">
           <h3>
             <i class="bi bi-people-fill"></i> Accounts
-            <a href="" title="Add new account" data-bs-toggle="modal" data-bs-target="#createmodal">
+            <a href="?o=accounts&m=create" class="bslink" title="Add new account">
               <small><i class="bi bi-plus-circle"></i></small>
             </a>
           </h3>
         </div>
-        <div class="table-responsive small">
-          <table id="accounts" class="table table-sm w-100">
+        <div class="table-responsive">
+          <table id="accounts" class="table table-borderless table-striped w-100">
             <thead>
               <tr>
                 <th>User ID</th>
@@ -115,130 +131,140 @@ class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
             <tbody>
             </tbody>
           </table>
-        </div>' . $createmodal . '
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" id="createdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="readmodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
+          <div class="modal-dialog" id="readdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="updatemodal" aria-hidden="true">
+          <div class="modal-dialog" id="updatedialog">
+          </div>
+        </div>
+        <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+          <div class="modal-dialog" id="deletedialog">
+          </div>
+        </div>
+        <div class="modal fade" id="listmodal" tabindex="-1" role="dialog" aria-labelledby="listmodal" aria-hidden="true">
+          <div class="modal-dialog" id="listdialog">
+          </div>
+        </div>
         <script>
 $(document).ready(function() {
   $("#accounts").DataTable({
     "processing": true,
     "serverSide": true,
     "ajax": "?x=json&o=accounts&m=list",
-//    "order": [[ 8, "desc" ]],
     "scrollX": true,
     "columnDefs": [
       {"targets":0, "className":"text-truncate"},
       {"targets":3, "className":"text-truncate"},
     ]
   });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
 });
         </script>';
     }
 
+    /**
+     * Summary of editor
+     * @param array $in
+     * @return string
+     */
     private function editor(array $in): string
     {
         elog(__METHOD__);
 
         extract($in);
 
-        $removemodal = $this->modal([
-            'id' => 'removemodal',
-            'title' => 'Remove User',
-            'action' => 'delete',
-            'footer' => 'Remove',
-            'hidden' => '
-                <input type="hidden" name="i" value="' . $in['id'] . '">',
-            'body' => '
-                <p class="text-center">Are you sure you want to remove this user?<br><b>' . $in['login'] . '</b></p>',
-        ]);
+        $aclgrp_buf = '';
 
-        if ('create' === $this->g->in['m']) {
-            $header = 'Add Account';
-            $switch = '';
-            $submit = '
-                <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
-                <button type="submit" name="m" value="create" class="btn btn-primary">Add This Account</button>';
-        } else {
-            $header = 'Update Account';
-            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
-                <a class="btn btn-outline-primary" href="?o=accounts&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
-            $submit = '
-                <a class="btn btn-secondary" href="?o=accounts&m=list">&laquo; Back</a>
-                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
+        //       if (util::is_adm()) {
+        $acl = $_SESSION['usr']['acl'];
+        $grp = $_SESSION['usr']['grp'];
+        $acl_ary = $grp_ary = [];
+        foreach ($this->g->acl as $k => $v) {
+            $acl_ary[] = [$v, $k];
         }
-
-        if (util::is_adm()) {
-            $acl_ary = $grp_ary = [];
-            foreach ($this->g->acl as $k => $v) {
-                $acl_ary[] = [$v, $k];
-            }
-            $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'form-select');
-            $res = db::qry('
+        $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'form-select');
+        $res = db::qry('
  SELECT login,id
    FROM `accounts`
   WHERE acl = :0 OR acl = :1', ['0' => 0, '1' => 1]);
 
-            foreach ($res as $k => $v) {
-                $grp_ary[] = [$v['login'], $v['id']];
-            }
-            $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
-            $aclgrp_buf = '
-                <div class="mb-4">
-                  <label for="acl" class="form-label">ACL</label><br>' . $acl_buf . '
-                </div>
-                <div class="mb-4">
-                  <label for="grp" class="form-label">Group</label><br>' . $grp_buf . '
+        foreach ($res as $k => $v) {
+            $grp_ary[] = [$v['login'], $v['id']];
+        }
+        $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
+
+        $aclgrp_buf = '
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="acl" class="form-label">ACL</label>' . $acl_buf . '
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="grp" class="form-label">Group</label>' . $grp_buf . '
+                    </div>
                 </div>';
-        } else {
-            $aclgrp_buf = '';
-            $anotes_buf = '';
+
+        if ($this->g->in['m'] === 'list') {
+            $login = '';
+            $altemail = '';
+            $fname = '';
+            $lname = '';
         }
 
-        return '
-        <div class="row">
-          <h3>
-            <a href="?o=accounts&m=list"><i class="bi bi-chevron-double-left"></i></a> Accounts
-            <a href="" title="Remove this user" data-bs-toggle="modal" data-bs-target="#removemodal">
-              <small><i class="bi bi--trash cursor-pointer text-danger"></i></small>
-            </a>
-          </h3>
-        </div>
-        <div class="row">
-            <form method="post" action="' . $this->g->cfg['self'] . '">
-              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-              <input type="hidden" name="i" value="' . $id . '">
-              <div class="row">
-                <div class="mb-3">
-                  <div class="form-group">
-                    <label for="login" class="form-label">UserID</label>
+        $body_buf = '
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label for="login" class="form-label">Email ID</label>
                     <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
-                  </div>
-                  <div class="form-group">
+                </div>
+                <div class="col-6 mb-3">
                     <label for="altemail" class="form-label">Alt Email</label>
                     <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
-                  </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-group">
+            </div>
+            <div class="row">
+                <div class="col-6 mb-3">
                     <label for="fname" class="form-label">First Name</label>
                     <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="lname">Last Name</label>
+                </div>
+                <div class="col-6 mb-3">
+                    <label for="lname" class="form-label">Last Name</label>
                     <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
-                  </div>
                 </div>
-                <div class="col-md-6 ">' . $aclgrp_buf . '
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">' . $switch . '
-                </div>
-                <div class="col-md-6 text-right">
-                  <div class="btn-group">' . $submit . '
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>' . $removemodal;
+            </div>' . $aclgrp_buf;
+
+        if ($this->g->in['m'] === 'list' || $this->g->in['m'] === 'create') {
+            return $this->modal_content([
+                //                'id'=>'createmodal',
+                'title' => 'Create new user',
+                'action' => 'create',
+                'lhs_cmd' => '',
+                'rhs_cmd' => 'Create',
+                'body' => $body_buf
+            ]);
+        } elseif ($this->g->in['m'] === 'read') {
+            return $this->modal_content([
+                'title' => 'Update user',
+                'action' => 'update',
+                'lhs_cmd' => 'Delete',
+                'rhs_cmd' => 'Update',
+                'body' => $body_buf
+            ]);
+        }
     }
 }

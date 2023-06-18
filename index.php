@@ -20,6 +20,13 @@ spl_autoload_register(function ($c): void {
     }
 });
 
+function elog(string $content): void
+{
+    if (DBG) {
+        error_log($content);
+    }
+}
+
 echo new Init(new class()
 {
     public $cfg = [

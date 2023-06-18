@@ -25,19 +25,17 @@ class Themes_Bootstrap5_Valias extends Themes_Bootstrap5_Theme
         elog(__METHOD__);
 
         return '
-        <div class="col-12">
+        <div class="row">
           <h3>
             <i class="fa fa-globe"></i> Aliases
             <a href="?o=valias&m=create" title="Add Alias">
-              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+              <small><i class="bi bi-plus-circle"></i></small>
             </a>
           </h3>
         </div>
-      </div><!-- END UPPER ROW -->
-      <div class="row">
-        <div class="col-12">
-          <table id=valias class="table table-sm" style="min-width:1100px;table-layout:fixed">
-            <thead class="nowrap">
+        <div class="table-responsive">
+          <table id="valias" class="table table-borderless table-striped w-100">
+            <thead>
               <tr>
                 <th>Alias</th>
                 <th>Target Address</th>
@@ -45,8 +43,6 @@ class Themes_Bootstrap5_Valias extends Themes_Bootstrap5_Theme
                 <th></th>
               </tr>
             </thead>
-            <tbody>
-            </tbody>
           </table>
         </div>
         <script>
@@ -77,8 +73,9 @@ $(document).ready(function() {
         $active = $active ? 1 : 0;
         $actbuf = $active ? ' checked' : '';
         $header = 'create' === $this->g->in['m'] ? 'Add new Alias' : 'Aliases
-                <a href="" title="Remove this Alias" data-toggle="modal" data-target="#removemodal">
-                  <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>';
+                <a href="#" title="Remove this Alias" data-bs-toggle="modal" data-bs-target="#removemodal">
+                  <small><i class="bi bi-trash cursor-pointer text-danger"></i></small>
+                </a>';
         $tolist = '
                 <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>';
         $submit = 'create' === $this->g->in['m'] ? $tolist . '
@@ -88,22 +85,21 @@ $(document).ready(function() {
             'id' => 'removemodal',
             'title' => 'Remove Alias',
             'action' => 'delete',
-            'footer' => 'Remove',
+            'lhs_cmd' => '',
+            'rhs_cmd' => 'Remove',
             'hidden' => '
                 <input type="hidden" name="i" value="' . $id . '">',
             'body' => '
                   <p class="text-center">Are you sure you want to remove this alias?<br><b>' . $source . '</b></p>',
         ]);
-
+        elog($remove);
         return '
-          <div class="col-12">
+          <div class="row">
             <h3>
-              <a href="?o=valias&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> ' . $header . '
+              <a href="?o=valias&m=list"><i class="bi bi-chevron-double-left"></i></a> ' . $header . '
             </h3>
           </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="col-12">
+          <div class="row">
             <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
             <form method="post" action="' . $this->g->cfg['self'] . '">
               <input type="hidden" name="c" value="' . $_SESSION['c'] . '">

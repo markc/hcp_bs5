@@ -1,17 +1,46 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugin.php 20150101 - 20230604 
+// lib/php/plugin.php 20150101 - 20230604
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Plugin
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Plugin
 {
+    /**
+     * Summary of buf
+     * @var string
+     */
     protected string $buf = '';
+    /**
+     * Summary of dbh
+     * @var mixed
+     */
     protected mixed $dbh = null;
+    /**
+     * Summary of tbl
+     * @var string
+     */
     protected string $tbl = '';
+    /**
+     * Summary of in
+     * @var array
+     */
     protected array $in = [];
+    /**
+     * Summary of g
+     * @var object
+     */
     protected Object $g;
 
+    /**
+     * Summary of __construct
+     * @param Theme $t
+     */
     public function __construct(public Theme $t)
     {
         elog(__METHOD__);
@@ -39,6 +68,10 @@ class Plugin
         $this->buf .= $this->{$t->g->in['m']}();
     }
 
+    /**
+     * Summary of __toString
+     * @return string
+     */
     public function __toString(): string
     {
         elog(__METHOD__);
@@ -46,6 +79,12 @@ class Plugin
         return $this->buf;
     }
 
+    /**
+     * Summary of __call
+     * @param string $name
+     * @param array $args
+     * @return string
+     */
     public function __call(string $name, array $args): string
     {
         elog(__METHOD__ . '() name = ' . $name . ', args = ' . var_export($args, true));
@@ -53,7 +92,11 @@ class Plugin
         return 'Plugin::' . $name . '() not implemented';
     }
 
-    protected function create(): string
+    /**
+     * Summary of create
+     * @return mixed
+     */
+    protected function create(): ?string
     {
         elog(__METHOD__);
 
@@ -68,6 +111,10 @@ class Plugin
         }
     }
 
+    /**
+     * Summary of read
+     * @return string
+     */
     protected function read(): string
     {
         elog(__METHOD__);
@@ -75,6 +122,10 @@ class Plugin
         return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
+    /**
+     * Summary of update
+     * @return string
+     */
     protected function update(): string
     {
         elog(__METHOD__);
@@ -92,9 +143,15 @@ class Plugin
         return $this->read();
     }
 
-    protected function delete(): void
+    /**
+     * Summary of delete
+     * @return string
+     */
+    protected function delete(): string
     {
         elog(__METHOD__);
+
+        dbg($this->t);
 
         if (util::is_post()) {
             if ($this->g->in['i']) {
@@ -102,11 +159,20 @@ class Plugin
                 util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
                 util::relist();
             }
+        } else {
+            $tmp = $this->t->delete($this->g->in['i']);
+            elog("tmp = $tmp");
+            return $tmp;
         }
 
         util::log('Error deleting item');
+        return ''; // was and should be return type void
     }
 
+    /**
+     * Summary of list
+     * @return string
+     */
     protected function list(): string
     {
         elog(__METHOD__);
