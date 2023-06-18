@@ -4,12 +4,25 @@ declare(strict_types=1);
 // lib/php/plugins/auth.php 20150101 - 20230604
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Summary of Plugins_Auth
+ * @author Mark Constable
+ * @copyright (c) 2023
+ */
 class Plugins_Auth extends Plugin
 {
     public const OTP_LENGTH = 10;
     public const REMEMBER_ME_EXP = 604800; // 7 days;
 
+    /**
+     * Summary of tbl
+     * @var string
+     */
     protected string $tbl = 'accounts';
+    /**
+     * Summary of in
+     * @var array
+     */
     protected array $in = [
         'id' => null,
         'acl' => null,
@@ -23,6 +36,10 @@ class Plugins_Auth extends Plugin
     ];
 
     // forgotpw
+    /**
+     * Summary of create
+     * @return string
+     */
     public function create(): string
     {
         elog(__METHOD__);
@@ -59,6 +76,10 @@ class Plugins_Auth extends Plugin
     }
 
     // login
+    /**
+     * Summary of list
+     * @return string
+     */
     public function list(): string
     {
         elog(__METHOD__);
@@ -98,6 +119,10 @@ class Plugins_Auth extends Plugin
     }
 
     // resetpw
+    /**
+     * Summary of update
+     * @return string
+     */
     public function update(): string
     {
         elog(__METHOD__);
@@ -148,6 +173,10 @@ class Plugins_Auth extends Plugin
         return $this->t->update(['id' => $i, 'login' => $u]);
     }
 
+    /**
+     * Summary of delete
+     * @return void
+     */
     public function delete(): ?string
     {
         elog(__METHOD__);
@@ -170,6 +199,10 @@ class Plugins_Auth extends Plugin
 
     // Utilities
 
+    /**
+     * Summary of resetpw
+     * @return string
+     */
     public function resetpw(): string
     {
         elog(__METHOD__);
@@ -197,6 +230,13 @@ class Plugins_Auth extends Plugin
         util::redirect($this->g->cfg['self']);
     }
 
+    /**
+     * Summary of mail_forgotpw
+     * @param string $email
+     * @param string $newpass
+     * @param string $headers
+     * @return bool
+     */
     private function mail_forgotpw(string $email, string $newpass, string $headers = ''): bool
     {
         elog(__METHOD__);
