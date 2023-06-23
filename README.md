@@ -12,7 +12,7 @@ depends on the [NetServa SH] shell scripts being installed first.
 
 This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 
-- [NetServa SH/HCP] does not reqire Python or Ruby, just PHP and Bash
+- [NetServa HCP] does not reqire Python or Ruby, just PHP and Bash
 - Fully functional IMAP/SMTP mailserver with personalised Spam filtering
 - [LetsEncrypt] SSL enabled [nginx] web server with [PHP FPM 7+]
 - Optional [PowerDNS] installation for local LAN or real-world DNS service
@@ -28,7 +28,13 @@ This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 The PHP web interface relies on the [NetServa SH] scripts being installed on the
 primary and target hosts so the first thing to do, as root...
 
-    wget https://raw.githubusercontent.com/markc/sh/main/bin/setup-sh ; . setup-sh
+    # TODO: Needs testing, again (just use the manaul method below for now)
+    # wget https://raw.githubusercontent.com/markc/sh/main/bin/setup-sh ; . setup-sh
+    # Manual method
+    cd # as root
+    git clone https://github.com/markc/sh .sh
+    .sh/bin/shm install
+    . .shrc
 
 _Please first review the very simple script with "cat setup-sh"._
 
@@ -70,6 +76,7 @@ Assuming a LXD container is to be used for the actual server side (recommended
 for initial testing anyway) then use `setup-lxd` to install and setup the basic
 LXD container system...
 
+    # Currently untested
     Usage: setup-lxd [pool size (25) GB] [passwd] [IP] (WIP)
 
 We can now setup the actual NetServa SH/HCP system for testing so, for example,
@@ -77,6 +84,7 @@ if we use something like `c1.netserva.lan`, where `c1` will be the container
 label and `netserva.lan` can either be a real domainname (if the server has a
 public IP) or whatever internal LAN-wide domainname you care to use...
 
+    # Currently untested
     Usage: newlxd FQDN [(small)|medium|large] [distro(bionic)] [(mysql)|sqlite] (WIP)
 
 If the installation procedure can detect an externally available public IP then
