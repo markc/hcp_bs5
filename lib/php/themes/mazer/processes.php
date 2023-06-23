@@ -8,8 +8,6 @@ class Themes_Mazer_Processes extends Themes_Mazer_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
           <div class="col-12 col-sm-6">
             <h3><i class="fas fa-code-branch fa-fw"></i> Processes</h3>

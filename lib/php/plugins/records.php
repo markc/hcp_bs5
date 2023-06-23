@@ -17,8 +17,6 @@ class Plugins_Records extends Plugin
 
     public function __construct(Theme $t)
     {
-        elog(__METHOD__);
-
         if ($t->g->dns['db']['type']) {
             $this->dbh = new db($t->g->dns['db']);
         }
@@ -27,8 +25,6 @@ class Plugins_Records extends Plugin
 
     protected function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             $in = $this->validate($this->in);
             if (!empty($in)) {
@@ -46,8 +42,6 @@ class Plugins_Records extends Plugin
 
     protected function update(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             $in = $this->validate($this->in);
             if (!empty($in)) {
@@ -66,8 +60,6 @@ class Plugins_Records extends Plugin
 
     protected function delete(): void
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             $dom = util::enc($_POST['domain']);
             $did = intval(util::enc($_POST['did']));
@@ -84,8 +76,6 @@ class Plugins_Records extends Plugin
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => 0,  'db' => 'name'],
@@ -113,13 +103,11 @@ class Plugins_Records extends Plugin
  SELECT name FROM domains
   WHERE id = :did', ['did' => $this->g->in['i']], 'col'); // i = domain id at this point
 
-        return $this->t->list(['domain' => $domain, 'did' => $this->g->in['i']]);
+        return $this->g->t->list(['domain' => $domain, 'did' => $this->g->in['i']]);
     }
 
     private function update_domains(int $did, string $now): bool
     {
-        elog(__METHOD__);
-
         if ($did && $now) {
             $sql = "
  SELECT content
@@ -145,8 +133,6 @@ class Plugins_Records extends Plugin
 
     private function validate(array $in): array
     {
-        elog(__METHOD__);
-
         if (empty($in['content'])) {
             util::log('Content must not be empty');
 

@@ -6,18 +6,16 @@ declare(strict_types=1);
 
 class Plugins_Home extends Plugin
 {
+    public array $inp = [];
+
     public function list(): string
     {
-        elog(__METHOD__);
-
         if (file_exists(INC . 'home.tpl')) {
             ob_start();
-
             include INC . 'home.tpl';
-
             return ob_get_clean();
         }
 
-        return $this->t->list([]);
+        return $this->g->t->list([]);
     }
 }

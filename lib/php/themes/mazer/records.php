@@ -48,8 +48,6 @@ class Themes_Mazer_Records extends Themes_Mazer_Theme
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         elog('in=' . var_export($in, true));
 
         return '
@@ -80,7 +78,7 @@ class Themes_Mazer_Records extends Themes_Mazer_Theme
             </div>
           </div>
           <div class="col-xl-2 col-md-4 col-8 my-2">
-            <div class="input-group">' . ($this->dropdown($this->types, 'type', 'A', '', 'custom-select')) . '
+            <div class="input-group">' . ($this->dropdown($this->g->types, 'type', 'A', '', 'custom-select')) . '
             </div>
           </div>
           <div class="col-xl-1 col-md-2 col-4 my-2">

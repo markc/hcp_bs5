@@ -8,8 +8,6 @@ class Themes_Mazer_InfoSys extends Themes_Mazer_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         elog(var_export($in, true));
 
         extract($in);

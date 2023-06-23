@@ -8,8 +8,6 @@ class Themes_Mazer_MailGraph extends Themes_Mazer_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <h3><i class="fa fa-envelope fa-fw" aria-hidden="true"></i> MailServer Graph</h3>
         <div class="row">

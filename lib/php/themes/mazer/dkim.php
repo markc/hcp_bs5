@@ -8,8 +8,6 @@ class Themes_Mazer_Dkim extends Themes_Mazer_Theme
 {
     public function read(array $in): string
     {
-        elog(__METHOD__);
-
         $remove = $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove DKIM Record',
@@ -39,8 +37,6 @@ class Themes_Mazer_Dkim extends Themes_Mazer_Theme
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $keybuf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],

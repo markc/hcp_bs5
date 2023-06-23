@@ -8,8 +8,6 @@ class Themes_Bootstrap5_MailGraph extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <h3><i class="bi bi-bar-chart"></i> MailServer Graph</h3>
         <div class="row">

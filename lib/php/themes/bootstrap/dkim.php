@@ -8,17 +8,15 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
     public function read(array $in): string
     {
-        elog(__METHOD__);
-
         $remove = $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove DKIM Record',
             'action' => 'delete',
             'footer' => 'Remove',
             'hidden' => '
-                <input type="hidden" name="domain" value="'.$in['domain'].'">',
+                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
             'body' => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>'.$in['domain'].'</b></p>',
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
         ]);
 
         return '
@@ -31,16 +29,14 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
             </div>
           </div><!-- END UPPER ROW -->
           <div class="row">
-            <div class="col-12">'.$in['buf'].'
+            <div class="col-12">' . $in['buf'] . '
             </div>
           </div>
-        </div>'.$remove;
+        </div>' . $remove;
     }
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $keybuf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],
@@ -66,7 +62,7 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
                     </div>
                     <div class="col-6">
                       <div class="form-group">
-                        <label for="keylen" class="form-control-label">Key Length</label>'.$keybuf.'
+                        <label for="keylen" class="form-control-label">Key Length</label>' . $keybuf . '
                       </div>
                     </div>
                   </div>',
@@ -82,9 +78,9 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
             </div>
           </div><!-- END UPPER ROW -->
           <div class="row">
-            <div class="col-12">'.$in['buf'].'
+            <div class="col-12">' . $in['buf'] . '
             </div>
           </div>
-        </div>'.$create;
+        </div>' . $create;
     }
 }

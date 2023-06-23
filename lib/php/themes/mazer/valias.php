@@ -8,22 +8,16 @@ class Themes_Mazer_Valias extends Themes_Mazer_Theme
 {
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <div class="col-12">
           <h3>
@@ -70,8 +64,6 @@ $(document).ready(function() {
 
     private function editor(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         $active = $active ? 1 : 0;

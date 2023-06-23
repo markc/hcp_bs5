@@ -8,8 +8,6 @@ class Themes_Bootstrap5_Theme extends Theme
 {
     public function css(): string
     {
-        elog(__METHOD__);
-
         return '
     <meta name="theme-color" content="#712cf9">
 
@@ -40,7 +38,7 @@ class Themes_Bootstrap5_Theme extends Theme
             z-index: 1500;
         }
     </style>
-    
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"
 		integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
 		crossorigin="anonymous"
@@ -50,8 +48,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function head(): string
     {
-        elog(__METHOD__);
-
         return '
      <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="check2" viewBox="0 0 16 16">
@@ -125,8 +121,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function nav1(array $a = []): string
     {
-        elog(__METHOD__);
-
         $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
         $t = '?t=' . util::ses('t');
@@ -145,15 +139,11 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function nav2(): string
     {
-        elog(__METHOD__);
-
         return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
     }
 
     public function nav3(): string
     {
-        elog(__METHOD__);
-
         if (util::is_usr()) {
             $usr[] = ['Change Profile', '?o=accounts&m=read&i=' . $_SESSION['usr']['id'], 'bi bi-person'];
             $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'bi bi-key'];
@@ -172,8 +162,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function nav_dropdown(array $a = []): string
     {
-        elog(__METHOD__);
-
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
 
@@ -193,8 +181,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function main(): string
     {
-        elog(__METHOD__);
-
         return '
     <main class="container">' . $this->g->out['log'] . $this->g->out['main'] . '
     </main>';
@@ -202,8 +188,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function js(): string
     {
-        elog(__METHOD__);
-
         return '
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -216,8 +200,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     public function log(): string
     {
-        elog(__METHOD__);
-
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
             $alts .= $msg ? '
@@ -235,8 +217,6 @@ class Themes_Bootstrap5_Theme extends Theme
 
     protected function modal(array $ary): string
     {
-        elog(__METHOD__);
-
         extract($ary);
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $footer = $footer ? '

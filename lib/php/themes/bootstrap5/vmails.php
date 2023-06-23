@@ -8,8 +8,6 @@ class Themes_Bootstrap5_Vmails extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $create = $this->modal([
             'id' => 'createmodal',
             'title' => 'Create New Mailbox',

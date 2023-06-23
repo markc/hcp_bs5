@@ -8,8 +8,6 @@ class Plugins_Processes extends Plugin
 {
     public function list(): string
     {
-        elog(__METHOD__);
-
-        return $this->t->list(['procs' => shell_exec('sudo processes')]);
+        return $this->g->t->list(['procs' => shell_exec('sudo processes')]);
     }
 }

@@ -8,8 +8,6 @@ class Themes_Mazer_Theme extends Theme
 {
     public function css(): string
     {
-        elog(__METHOD__);
-
         return '
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,8 +28,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function log(): string
     {
-        elog(__METHOD__);
-
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
             $alts .= $msg ? '
@@ -49,15 +45,11 @@ class Themes_Mazer_Theme extends Theme
 
     public function head(): string
     {
-        elog(__METHOD__);
-
         return '';
     }
 
     public function head_orig(): string
     {
-        elog(__METHOD__);
-
         return '
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
       <div class=container>
@@ -79,22 +71,16 @@ class Themes_Mazer_Theme extends Theme
 
     public function nav1(): string
     {
-        elog(__METHOD__);
-
         return $this->sidebar();
     }
 
     public function nav2_orig(): string
     {
-        elog(__METHOD__);
-
         return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
     }
 
     public function nav3_orig(): string
     {
-        elog(__METHOD__);
-
         if (util::is_usr()) {
             $usr[] = ['Change Profile', '?o=accounts&m=read&i=' . $_SESSION['usr']['id'], 'fas fa-user fa-fw'];
             $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fas fa-key fa-fw'];
@@ -113,8 +99,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function nav_dropdown(array $a = []): string
     {
-        elog(__METHOD__);
-
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
 
@@ -134,8 +118,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function sidebar(): string
     {
-        elog(__METHOD__);
-
         $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
         $t = '?t=' . util::ses('t');
@@ -190,8 +172,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function main(): string
     {
-        elog(__METHOD__);
-
         return '
     <script src="lib/js/initTheme.js"></script>
     <div id="app">
@@ -325,14 +305,12 @@ class Themes_Mazer_Theme extends Theme
                 </section>
             </div>
         </div>
-    </div>    
+    </div>
     ';
     }
 
     public function main_orig(): string
     {
-        elog(__METHOD__);
-
         return '
     <main class="container">
       <div class="row">' . $this->g->out['log'] . $this->g->out['main'] . '
@@ -342,8 +320,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function foot(): string
     {
-        elog(__METHOD__);
-
         return '
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
@@ -364,8 +340,6 @@ class Themes_Mazer_Theme extends Theme
 
     public function js(): string
     {
-        elog(__METHOD__);
-
         return '
     <script src="lib/js/dark.js"></script>
     <script src="lib/js/perfect-scrollbar.min.js"></script>
@@ -377,8 +351,6 @@ class Themes_Mazer_Theme extends Theme
 
     protected function modal(array $ary): string
     {
-        elog(__METHOD__);
-
         extract($ary);
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $footer = $footer ? '

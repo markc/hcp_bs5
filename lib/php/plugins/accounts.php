@@ -7,88 +7,27 @@ declare(strict_types=1);
 class Plugins_Accounts extends Plugin
 {
     protected string $tbl = 'accounts';
-    protected array $in = [
-        'grp' => 1,
-        'acl' => 2,
-        'vhosts' => 1,
-        'login' => '',
-        'fname' => '',
-        'lname' => '',
-        'altemail' => '',
+
+    // get/post input parameters
+    public array $inp = [
+        'grp'       => 1,
+        'acl'       => 2,
+        'vhosts'    => 1,
+        'login'     => '',
+        'fname'     => '',
+        'lname'     => '',
+        'altemail'  => '',
     ];
-
-    /**
-     * Summary of create
-     * @return string
-     */
-    protected function create(): string
-    {
-        elog(__METHOD__);
-
-        if (util::is_adm()) {
-            return parent::create();
-        }
-        util::log('You are not authorized to perform this action, please contact your administrator.');
-        util::relist();
-    }
 
     protected function read(): string
     {
-        elog(__METHOD__);
+        return $this->g->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
 
-        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
-
-        //return $this->list();
+        //return $this->list(); // this might work?
     }
-
-    protected function read_orig(): string
-    {
-        elog(__METHOD__);
-
-        $usr = db::read('*', 'id', $this->g->in['i'], '', 'one');
-        if (!$usr) {
-            util::log('User not found.');
-            util::relist();
-        }
-
-        if (util::is_acl(0)) {
-            // superadmin
-        } elseif (util::is_acl(1)) { // normal admin
-            if ($_SESSION['usr']['grp'] != $usr['grp']) {
-                util::log('You are not authorized to perform this action.');
-                util::relist();
-            }
-        } else { // Other users
-            if ($_SESSION['usr']['id'] != $usr['id']) {
-                util::log('You are not authorized to perform this action.');
-                util::relist();
-            }
-        }
-
-        return $this->t->read($usr);
-    }
-
-    protected function delete(): string
-    {
-        elog(__METHOD__);
-
-        //       dbg($this->t);
-        //       return $this->t->delete($this->in);
-
-        if (util::is_post()) {
-            parent::delete();
-        } else {
-            $tmp = $this->t->delete($this->g->in);
-            elog("tmp = $tmp");
-            return $tmp;
-        }
-    }
-
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
@@ -106,13 +45,11 @@ class Plugins_Accounts extends Plugin
             return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
         }
 
-        return $this->t->list($this->in);
+        return $this->g->t->list($this->inp);
     }
 
     protected function switch_user(): void
     {
-        elog(__METHOD__);
-
         if (util::is_adm() and !is_null($this->g->in['i'])) {
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
             util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');

@@ -1,35 +1,17 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/db.php 20150225 - 20180512
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/db.php 20150225 - 20230623
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-/**
- * Summary of Db
- * @author Mark Constable
- * @copyright (c) 2023
- */
 class Db extends \PDO
 {
-    /**
-     * Summary of dbh
-     * @var
-     */
     public static $dbh;
-    /**
-     * Summary of tbl
-     * @var
-     */
+
     public static $tbl;
 
-    /**
-     * Summary of __construct
-     * @param array $dbcfg
-     */
     public function __construct(array $dbcfg)
     {
-        elog(__METHOD__);
-
         if (is_null(self::$dbh)) {
             extract($dbcfg);
             $dsn = 'mysql' === $type
@@ -49,15 +31,8 @@ class Db extends \PDO
         }
     }
 
-    /**
-     * Summary of create
-     * @param array $ary
-     * @return bool|string
-     */
     public static function create(array $ary)
     {
-        elog(__METHOD__);
-
         $fields = $values = '';
         foreach ($ary as $k => $v) {
             $fields .= "
@@ -85,15 +60,6 @@ class Db extends \PDO
         }
     }
 
-    /**
-     * Summary of read
-     * @param string $field
-     * @param string $where
-     * @param string $wval
-     * @param string $extra
-     * @param string $type
-     * @return mixed
-     */
     public static function read(
         string $field,
         string $where = '',
@@ -101,8 +67,6 @@ class Db extends \PDO
         string $extra = '',
         string $type = 'all'
     ) {
-        elog(__METHOD__);
-
         $w = $where ? "
     WHERE {$where} = :wval" : '';
 
@@ -117,16 +81,8 @@ class Db extends \PDO
         return self::qry($sql, $a, $type);
     }
 
-    /**
-     * Summary of update
-     * @param array $set
-     * @param array $where
-     * @return bool
-     */
     public static function update(array $set, array $where)
     {
-        elog(__METHOD__);
-
         $set_str = '';
         foreach ($set as $k => $v) {
             $set_str .= "
@@ -158,15 +114,8 @@ class Db extends \PDO
         }
     }
 
-    /**
-     * Summary of delete
-     * @param array $where
-     * @return bool
-     */
     public static function delete(array $where)
     {
-        elog(__METHOD__);
-
         $where_str = '';
         $where_ary = [];
         foreach ($where as $k => $v) {
@@ -190,17 +139,8 @@ class Db extends \PDO
         }
     }
 
-    /**
-     * Summary of qry
-     * @param string $sql
-     * @param array $ary
-     * @param string $type
-     * @return mixed
-     */
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
-        elog(__METHOD__);
-
         try {
             if ('all' !== $type) {
                 $sql .= ' LIMIT 1';
@@ -230,16 +170,8 @@ class Db extends \PDO
     }
 
     // bind value statement
-    /**
-     * Summary of bvs
-     * @param mixed $stm
-     * @param array $ary
-     * @return void
-     */
     public static function bvs($stm, array $ary): void
     {
-        elog(__METHOD__);
-
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach ($ary as $k => $v) {
                 if (is_numeric($v)) {
@@ -261,20 +193,8 @@ class Db extends \PDO
     }
 
     // See http://datatables.net/usage/server-side
-
-    /**
-     * Summary of simple
-     * @param mixed $request
-     * @param mixed $table
-     * @param mixed $primaryKey
-     * @param mixed $columns
-     * @param mixed $extra
-     * @return array
-     */
     public static function simple($request, $table, $primaryKey, $columns, $extra = '')
     {
-        elog(__METHOD__);
-
         $db = self::$dbh;
         $cols = '`' . implode('`, `', self::pluck($columns, 'db')) . '`';
         $bind = [];
@@ -311,16 +231,8 @@ class Db extends \PDO
         ];
     }
 
-    /**
-     * Summary of data_output
-     * @param mixed $columns
-     * @param mixed $data
-     * @return array
-     */
     public static function data_output($columns, $data)
     {
-        elog(__METHOD__);
-
         $out = [];
 
         for ($i = 0, $ien = count($data); $i < $ien; ++$i) {
@@ -345,16 +257,8 @@ class Db extends \PDO
         return $out;
     }
 
-    /**
-     * Summary of limit
-     * @param mixed $request
-     * @param mixed $columns
-     * @return string
-     */
     public static function limit($request, $columns)
     {
-        elog(__METHOD__);
-
         $limit = '';
 
         if (isset($request['start']) && -1 != $request['length']) {
@@ -364,16 +268,8 @@ class Db extends \PDO
         return $limit;
     }
 
-    /**
-     * Summary of order
-     * @param mixed $request
-     * @param mixed $columns
-     * @return string
-     */
     public static function order($request, $columns)
     {
-        elog(__METHOD__);
-
         $order = '';
 
         if (isset($request['order']) && count($request['order'])) {
@@ -401,17 +297,8 @@ class Db extends \PDO
         return $order;
     }
 
-    /**
-     * Summary of filter
-     * @param mixed $request
-     * @param mixed $columns
-     * @param mixed $bindings
-     * @return string
-     */
     public static function filter($request, $columns, &$bindings)
     {
-        elog(__METHOD__);
-
         $globalSearch = $columnSearch = [];
         $dtColumns = self::pluck($columns, 'dt');
 
@@ -468,18 +355,8 @@ class Db extends \PDO
         return $where;
     }
 
-    /**
-     * Summary of sql_exec
-     * @param mixed $db
-     * @param mixed $bindings
-     * @param mixed $sql
-     * @param string $type
-     * @return mixed
-     */
     public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
-        elog(__METHOD__);
-
         elog("sql={$sql}");
 
         // Argument shifting
@@ -518,47 +395,23 @@ class Db extends \PDO
         }
     }
 
-    /**
-     * Summary of fatal
-     * @param mixed $msg
-     * @return void
-     */
     private static function fatal($msg): void
     {
-        elog(__METHOD__);
-
         echo json_encode(['error' => $msg]);
 
         exit(0);
     }
 
-    /**
-     * Summary of bind
-     * @param mixed $a
-     * @param mixed $val
-     * @param mixed $type
-     * @return string
-     */
     private static function bind(&$a, $val, $type)
     {
-        elog(__METHOD__);
-
         $key = ':binding_' . count($a);
         $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
 
         return $key;
     }
 
-    /**
-     * Summary of pluck
-     * @param mixed $a
-     * @param mixed $prop
-     * @return array
-     */
     private static function pluck($a, $prop)
     {
-        elog(__METHOD__);
-
         $out = [];
         for ($i = 0, $len = count($a); $i < $len; ++$i) {
             if ($a[$i][$prop]) {
@@ -569,16 +422,8 @@ class Db extends \PDO
         return $out;
     }
 
-    /**
-     * Summary of _flatten
-     * @param mixed $a
-     * @param mixed $join
-     * @return mixed
-     */
     private static function _flatten($a, $join = ' AND ')
     {
-        elog(__METHOD__);
-
         if (!$a) {
             return '';
         }

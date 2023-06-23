@@ -1,15 +1,13 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/vhosts.php 20170101 - 20230604
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20230623
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap5_Vhosts extends Themes_Bootstrap5_Theme
 {
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         $remove = $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove Vhost',
@@ -22,77 +20,99 @@ class Themes_Bootstrap5_Vhosts extends Themes_Bootstrap5_Theme
         ]);
 
         return '
-              <div class="col-12">
-                <h3>
-                  <a href="?o=vhosts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Vhosts
-                  <a href="" title="Remove this VHOST" data-toggle="modal" data-target="#removemodal">
-                    <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>
-                </h3>
+        <div class="row">
+          <h3>
+            <a href="?o=vhosts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Vhosts
+            <a href="" title="Remove this VHOST" data-bs-toggle="modal" data-bs-target="#removemodal">
+              <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+              <div class="row">
+                <div class="form-group col-12 col-md-6 col-lg-4">
+                  <label for="domain">Domain</label>
+                  <input type="text" class="form-control" value="' . $in['domain'] . '" disabled>
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="aliases">Max Aliases</label>
+                  <input type="number" class="form-control" name="aliases" id="aliases" value="' . $in['aliases'] . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="mailboxes">Max Mailboxes</label>
+                  <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $in['mailboxes'] . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="mailquota">Mail Quota (MB)</label>
+                  <input type="number" class="form-control" name="mailquota" id="mailquota"
+                    value="' . intval($in['mailquota'] / 1000000) . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="diskquota">Disk Quota (MB)</label>
+                  <input type="number" class="form-control" name="diskquota" id="diskquota"
+                    value="' . intval($in['diskquota'] / 1000000) . '">
+                </div>
               </div>
-            </div><!-- END UPPER ROW -->
-            <div class="row">
-              <div class="col-12">
-                <form method="post" action="' . $this->g->cfg['self'] . '">
-                  <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                  <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                  <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-                  <div class="row">
-                    <div class="form-group col-12 col-md-6 col-lg-4">
-                      <label for="domain">Domain</label>
-                        <input type="text" class="form-control" value="' . $in['domain'] . '" disabled>
-                    </div>
-                    <div class="form-group col-6 col-md-3 col-lg-2">
-                      <label for="aliases">Max Aliases</label>
-                      <input type="number" class="form-control" name="aliases" id="aliases" value="' . $in['aliases'] . '">
-                    </div>
-                    <div class="form-group col-6 col-md-3 col-lg-2">
-                      <label for="mailboxes">Max Mailboxes</label>
-                      <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $in['mailboxes'] . '">
-                    </div>
-                    <div class="form-group col-6 col-md-3 col-lg-2">
-                      <label for="mailquota">Mail Quota (MB)</label>
-                      <input type="number" class="form-control" name="mailquota" id="mailquota" value="' . intval($in['mailquota'] / 1000000) . '">
-                    </div>
-                    <div class="form-group col-6 col-md-3 col-lg-2">
-                      <label for="diskquota">Disk Quota (MB)</label>
-                      <input type="number" class="form-control" name="diskquota" id="diskquota" value="' . intval($in['diskquota'] / 1000000) . '">
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12 col-sm-6">
-                      <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in['active'] ? ' checked' : '') . '>
-                          <label class="custom-control-label" for="active">Active</label>
-                        </div>
+              <div class="row">
+                <div class="col-12 col-sm-6">
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in[' active']
+            ? ' checked' : '') . '>
+                                  <label class="custom-control-label" for="active">Active</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-12 col-sm-6 text-right">
+                              <div class="btn-group">
+                                <a class="btn btn-secondary" href="?o=vhosts&m=list">&laquo; Back</a>
+                                <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
                       </div>
-                    </div>
-                    <div class="col-12 col-sm-6 text-right">
-                      <div class="btn-group">
-                        <a class="btn btn-secondary" href="?o=vhosts&m=list">&laquo; Back</a>
-                        <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>
-                      </div>
-                    </div>
+                <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+                  <div class="modal-dialog" id="createdialog">
                   </div>
-                </form>
-              </div>' . $remove;
+                </div>
+                <div class="modal fade" id="readmodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
+                  <div class="modal-dialog" id="readdialog">
+                  </div>
+                </div>
+                <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="updatemodal" aria-hidden="true">
+                  <div class="modal-dialog" id="updatedialog">
+                  </div>
+                </div>
+                <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+                  <div class="modal-dialog" id="deletedialog">
+                  </div>
+                </div>
+                <div class="modal fade" id="listmodal" tabindex="-1" role="dialog" aria-labelledby="listmodal" aria-hidden="true">
+                  <div class="modal-dialog" id="listdialog">
+                  </div>
+                </div>
+              ' . $remove;
     }
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $create = $this->modal([
-            'id' => 'createmodal',
-            'title' => 'Create New Vhost',
-            'action' => 'create',
-            'footer' => 'Create',
-            'body' => '
-                  <div class="form-group">
-                    <label for="domain" class="form-control-label">Vhost</label>
+            'id'        => 'createmodal',
+            'title'     => 'Create New Vhost',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => '
+                  <div class="mb-3">
+                    <label for="domain" class="form-label">Vhost</label>
                     <input type="text" class="form-control" id="domain" name="domain">
                   </div>
-                  <div class="row">
+                  <div class="row mb-3">
                     <div class="col-12 col-sm-6">
                       <div class="form-group">
                         <div class="custom-control custom-checkbox">
@@ -110,35 +130,30 @@ class Themes_Bootstrap5_Vhosts extends Themes_Bootstrap5_Theme
                       </div>
                     </div>
                   </div>
-                  <div class="row">
+                  <div class="row mb-3">
                     <div class="col-12 col-sm-6">
-                      <div class="form-group">
-                        <label for="ip" class="form-control-label">IP (optional)</label>
-                        <input type="text" class="form-control" id="ip" name="ip">
-                      </div>
+                      <label for="ip" class="form-label">IP (optional)</label>
+                      <input type="text" class="form-control" id="ip" name="ip">
                     </div>
                     <div class="col-12 col-sm-6">
-                      <div class="form-group">
-                        <label for="uuser" class="form-control-label">Custom User</label>
-                        <input type="text" class="form-control" id="uuser" name="uuser">
-                      </div>
+                      <label for="uuser" class="form-label">Custom User</label>
+                      <input type="text" class="form-control" id="uuser" name="uuser">
                     </div>
                   </div>',
         ]);
 
         return '
-        <div class="col-12">
+        <div class="row">
           <h3>
-            <i class="fa fa-globe fa-fw"></i> Vhosts
-            <a href="#" title="Add new vhost" data-toggle="modal" data-target="#createmodal">
-              <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
+            <i class="bi bi-globe"></i> Vhosts
+            <a href="#" class="bslink" title="Add new vhost" data-bs-toggle="modal" data-bs-target="#createmodal">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
           </h3>
         </div>
-      </div><!-- END UPPER ROW -->
-      <div class="row">
-        <div class="col-12">
-          <table id=vhosts class="table table-sm" style="min-width:1100px;table-layout:fixed">
-            <thead class="nowrap">
+        <div class="table-responsive">
+          <table id=vhosts class="table table-borderless table-striped w-100">
+            <thead>
               <tr>
                 <th>Domain</th>
                 <th>Alias&nbsp;</th>

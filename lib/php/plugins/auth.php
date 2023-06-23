@@ -1,50 +1,32 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/auth.php 20150101 - 20230604
+// lib/php/plugins/auth.php 20150101 - 20230622
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-/**
- * Summary of Plugins_Auth
- * @author Mark Constable
- * @copyright (c) 2023
- */
 class Plugins_Auth extends Plugin
 {
     public const OTP_LENGTH = 10;
     public const REMEMBER_ME_EXP = 604800; // 7 days;
 
-    /**
-     * Summary of tbl
-     * @var string
-     */
     protected string $tbl = 'accounts';
-    /**
-     * Summary of in
-     * @var array
-     */
-    protected array $in = [
-        'id' => null,
-        'acl' => null,
-        'grp' => null,
-        'login' => '',
-        'webpw' => '',
-        'remember' => '',
-        'otp' => '',
-        'passwd1' => '',
-        'passwd2' => '',
+
+    public array $inp = [
+        'acl'       => null,
+        'grp'       => null,
+        'id'        => null,
+        'login'     => '',
+        'otp'       => '',
+        'passwd1'   => '',
+        'passwd2'   => '',
+        'remember'  => '',
+        'webpw'     => '',
     ];
 
-    // forgotpw
-    /**
-     * Summary of create
-     * @return string
-     */
+    // alias for forgotpw
     public function create(): string
     {
-        elog(__METHOD__);
-
-        $u = $this->in['login'];
+        $u = $this->inp['login']; // user login email ID
 
         if (util::is_post()) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
@@ -72,27 +54,21 @@ class Plugins_Auth extends Plugin
             }
         }
 
-        return $this->t->create(['login' => $u]);
+        return $this->g->t->create(['login' => $u]);
     }
 
-    // login
-    /**
-     * Summary of list
-     * @return string
-     */
+    // alias for login
     public function list(): string
     {
-        elog(__METHOD__);
-
-        $u = $this->in['login'];
-        $p = $this->in['webpw'];
+        $u = $this->inp['login'];
+        $p = $this->inp['webpw'];
 
         if ($u) {
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
                 extract($usr);
                 if (9 !== $acl) {
                     if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
-                        if ($this->in['remember']) {
+                        if ($this->inp['remember']) {
                             $uniq = util::random_token(32);
                             db::update(['cookie' => $uniq], [['id', '=', $id]]);
                             util::put_cookie('remember', $uniq, self::REMEMBER_ME_EXP);
@@ -115,18 +91,12 @@ class Plugins_Auth extends Plugin
             }
         }
 
-        return $this->t->list(['login' => $u]);
+        return $this->g->t->list(['login' => $u]);
     }
 
-    // resetpw
-    /**
-     * Summary of update
-     * @return string
-     */
+    // alias for resetpw
     public function update(): string
     {
-        elog(__METHOD__);
-
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please login and try again.');
             util::relist();
@@ -137,8 +107,8 @@ class Plugins_Auth extends Plugin
 
         if (util::is_post()) {
             if ($usr = db::read('login,acl,otpttl', 'id', $i, '', 'one')) {
-                $p1 = html_entity_decode($this->in['passwd1'], ENT_QUOTES, 'UTF-8');
-                $p2 = html_entity_decode($this->in['passwd2'], ENT_QUOTES, 'UTF-8');
+                $p1 = html_entity_decode($this->inp['passwd1'], ENT_QUOTES, 'UTF-8');
+                $p2 = html_entity_decode($this->inp['passwd2'], ENT_QUOTES, 'UTF-8');
                 if (util::chkpw($p1, $p2)) {
                     if (util::is_usr() or ($usr['otpttl'] && (($usr['otpttl'] + 3600) > time()))) {
                         if (!is_null($usr['acl'])) {
@@ -170,17 +140,11 @@ class Plugins_Auth extends Plugin
             }
         }
 
-        return $this->t->update(['id' => $i, 'login' => $u]);
+        return $this->g->t->update(['id' => $i, 'login' => $u]);
     }
 
-    /**
-     * Summary of delete
-     * @return void
-     */
     public function delete(): ?string
     {
-        elog(__METHOD__);
-
         if (util::is_usr()) {
             $u = $_SESSION['usr']['login'];
             $id = $_SESSION['usr']['id'];
@@ -195,19 +159,13 @@ class Plugins_Auth extends Plugin
             util::log($u . ' is now logged out', 'success');
         }
         util::redirect($this->g->cfg['self']);
+        return ''; // unused, just to satisfy ?string
     }
 
     // Utilities
-
-    /**
-     * Summary of resetpw
-     * @return string
-     */
-    public function resetpw(): string
+    public function resetpw(): ?string
     {
-        elog(__METHOD__);
-
-        $otp = html_entity_decode($this->in['otp']);
+        $otp = html_entity_decode($this->inp['otp']);
         if (self::OTP_LENGTH === strlen($otp)) {
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
                 extract($usr);
@@ -215,7 +173,7 @@ class Plugins_Auth extends Plugin
                     if (3 != $acl) { // suspended
                         $_SESSION['resetpw'] = ['usr' => $usr];
 
-                        return $this->t->update(['id' => $id, 'login' => $login]);
+                        return $this->g->t->update(['id' => $id, 'login' => $login]);
                     }
                     util::log($login . ' is not allowed access');
                 } else {
@@ -230,17 +188,8 @@ class Plugins_Auth extends Plugin
         util::redirect($this->g->cfg['self']);
     }
 
-    /**
-     * Summary of mail_forgotpw
-     * @param string $email
-     * @param string $newpass
-     * @param string $headers
-     * @return bool
-     */
     private function mail_forgotpw(string $email, string $newpass, string $headers = ''): bool
     {
-        elog(__METHOD__);
-
         $host = $_SERVER['REQUEST_SCHEME'] . '://'
             . $this->g->cfg['host']
             . $this->g->cfg['self'];

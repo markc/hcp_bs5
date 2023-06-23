@@ -24,8 +24,6 @@ class Plugins_Domains extends Plugin
 
     public function __construct(public Theme $t)
     {
-        elog(__METHOD__);
-
         if ($t->g->dns['db']['type']) {
             $this->dbh = new db($t->g->dns['db']);
         }
@@ -34,8 +32,6 @@ class Plugins_Domains extends Plugin
 
     protected function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             extract($_POST);
 
@@ -53,14 +49,12 @@ class Plugins_Domains extends Plugin
 
             util::exe("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} {$spfip}");
 
-            return $this->t->create($this->in);
+            return $this->g->t->create($this->in);
         }
     }
 
     protected function create2(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             extract($_POST);
             extract($this->g->dns);
@@ -174,13 +168,11 @@ class Plugins_Domains extends Plugin
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
 
-        return $this->t->create($this->in);
+        return $this->g->t->create($this->in);
     }
 
     protected function update(): string
     {
-        elog(__METHOD__);
-
         if ($this->in['increment']) {
             //            if ($this->in['increment']) {
             $sql = "
@@ -245,7 +237,7 @@ class Plugins_Domains extends Plugin
 
             $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
             if ('SLAVE' === $dom['type']) {
-                return $this->t->update($dom);
+                return $this->g->t->update($dom);
             }
             $sql = "
  SELECT content as soa
@@ -255,7 +247,7 @@ class Plugins_Domains extends Plugin
 
             $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
 
-            return $this->t->update(array_merge($dom, $soa));
+            return $this->g->t->update(array_merge($dom, $soa));
         }
 
         return 'Error updating item';
@@ -263,8 +255,6 @@ class Plugins_Domains extends Plugin
 
     protected function delete(): void
     {
-        elog(__METHOD__);
-
         if ($this->g->in['i']) {
             $sql = '
  DELETE FROM `records`
@@ -282,8 +272,6 @@ class Plugins_Domains extends Plugin
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => 0,   'db' => 'name',       'formatter' => function ($d, $row) {
@@ -312,20 +300,16 @@ class Plugins_Domains extends Plugin
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
 
-        return $this->t->list([]);
+        return $this->g->t->list([]);
     }
 
     protected function shwho(): string
     {
-        elog(__METHOD__);
-
         return shell_exec('sudo shwho ' . $this->in['name']);
     }
 
     protected function incsoa(): string
     {
-        elog(__METHOD__);
-
         return shell_exec('sudo incsoa ' . $this->in['name']);
     }
 }

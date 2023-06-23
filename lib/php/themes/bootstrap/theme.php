@@ -8,8 +8,6 @@ class Themes_Bootstrap_Theme extends Theme
 {
     public function css(): string
     {
-        elog(__METHOD__);
-
         return '
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
@@ -84,8 +82,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function log(): string
     {
-        elog(__METHOD__);
-
         $alts = '';
         foreach (util::log() as $lvl => $msg) {
             $alts .= $msg ? '
@@ -103,8 +99,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function head(): string
     {
-        elog(__METHOD__);
-
         return '
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
       <div class=container>
@@ -126,8 +120,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function nav1(array $a = []): string
     {
-        elog(__METHOD__);
-
         $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
         $t = '?t=' . util::ses('t');
@@ -146,15 +138,11 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function nav2(): string
     {
-        elog(__METHOD__);
-
         return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
     }
 
     public function nav3(): string
     {
-        elog(__METHOD__);
-
         if (util::is_usr()) {
             $usr[] = ['Change Profile', '?o=accounts&m=read&i=' . $_SESSION['usr']['id'], 'fas fa-user fa-fw'];
             $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fas fa-key fa-fw'];
@@ -173,8 +161,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function nav_dropdown(array $a = []): string
     {
-        elog(__METHOD__);
-
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
 
@@ -194,8 +180,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function main(): string
     {
-        elog(__METHOD__);
-
         return '
     <main class="container">
       <div class="row">' . $this->g->out['log'] . $this->g->out['main'] . '
@@ -205,8 +189,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     public function js(): string
     {
-        elog(__METHOD__);
-
         return '
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
@@ -218,8 +200,6 @@ table.dataTable{border-collapse: collapse !important;}
 
     protected function modal(array $ary): string
     {
-        elog(__METHOD__);
-
         extract($ary);
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $footer = $footer ? '

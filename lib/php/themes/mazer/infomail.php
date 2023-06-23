@@ -8,8 +8,6 @@ class Themes_Mazer_InfoMail extends Themes_Mazer_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         return '

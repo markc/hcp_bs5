@@ -9,8 +9,6 @@ class Themes_Mazer_Auth extends Themes_Mazer_Theme
     // forgotpw (create new pw)
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         return '

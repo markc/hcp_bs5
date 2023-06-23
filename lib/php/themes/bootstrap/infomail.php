@@ -8,8 +8,6 @@ class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         return '
@@ -18,10 +16,10 @@ class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
           </div>
           <div class="col-6">
             <form method="post" class="form-inline">
-              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
               <input type="hidden" name="m" value="pflog_renew">
               <div class="form-group ml-auto">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refreshed '.$pflog_time.' ago</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sync-alt fa-fw" aria-hidden="true"></i> Refreshed ' . $pflog_time . ' ago</button>
               </div>
             </form>
           </div>
@@ -29,12 +27,12 @@ class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
         <div class="row">
           <div class="col-12">
             <h5>Mail Queue</h5>
-            <pre>'.$mailq.'</pre>
+            <pre>' . $mailq . '</pre>
           </div>
         </div>
         <div class="row">
           <div class="col-12">
-            <pre>'.$pflogs.'
+            <pre>' . $pflogs . '
             </pre>
           </div>
         </div>';

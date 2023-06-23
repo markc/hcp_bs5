@@ -9,21 +9,19 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
     // forgotpw (create new pw)
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         return '
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Forgot password</h3>
-          <form action="'.$this->g->cfg['self'].'" method="post">
-            <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-            <input type="hidden" name="o" value="'.$this->g->in['o'].'">
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <div class="input-group mb-2 mr-sm-2">
             <div class="input-group-prepend">
               <div class="input-group-text"><i class="fas fa-envelope fa-fw"></i></div>
             </div>
-              <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="'.$login.'" autofocus required>
+              <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="' . $login . '" autofocus required>
             </div>
             <small class="form-text text-muted text-center">
               You will receive an email with further instructions and please note that this only resets the password for this website interface.
@@ -50,15 +48,15 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
         return '
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-sign-in-alt fa-fw"></i> Sign in</h3>
-          <form action="'.$this->g->cfg['self'].'" method="post">
-            <input type="hidden" name="c" value="'.$_SESSION['c'].'">
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
             <label class="sr-only" for="login">Username</label>
             <div class="input-group mb-2 mr-sm-2">
               <div class="input-group-prepend">
                 <div class="input-group-text"><i class="fas fa-user fa-fw"></i></div>
               </div>
-              <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="'.$login.'" required>
+              <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="' . $login . '" required>
             </div>
             <label class="sr-only" for="webpw">Password</label>
             <div class="input-group mb-2 mr-sm-2">
@@ -94,12 +92,12 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
         return '
         <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
           <h3><i class="fas fa-key fa-fw"></i> Update Password</h3>
-          <form action="'.$this->g->cfg['self'].'" method="post">
-            <input type="hidden" name="c" value="'.$_SESSION['c'].'">
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
             <input type="hidden" name="o" value="auth">
-            <input type="hidden" name="id" value="'.$id.'">
-            <input type="hidden" name="login" value="'.$login.'">
-            <p class="text-center"><b>For '.$login.'</b></p>
+            <input type="hidden" name="id" value="' . $id . '">
+            <input type="hidden" name="login" value="' . $login . '">
+            <p class="text-center"><b>For ' . $login . '</b></p>
             <label class="sr-only" for="passwd1">New Password</label>
             <div class="input-group mb-2 mr-sm-2">
               <div class="input-group-prepend">

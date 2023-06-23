@@ -8,22 +8,16 @@ class Themes_Mazer_Accounts extends Themes_Mazer_Theme
 {
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function read(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
@@ -137,8 +131,6 @@ $(document).ready(function() {
 
     private function editor(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         $removemodal = $this->modal([

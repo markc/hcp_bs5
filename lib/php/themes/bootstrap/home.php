@@ -8,8 +8,6 @@ class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
     <div class="col-12">
       <h3>

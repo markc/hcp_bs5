@@ -8,15 +8,11 @@ class Themes_Bootstrap5_Domains extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
@@ -159,8 +155,6 @@ $("#domains").show();
 
     private function editor(array $in): string
     {
-        elog(__METHOD__);
-
         $domain = $in['name'];
         $soa = isset($in['soa'])
             ? explode(' ', $in['soa'])

@@ -20,8 +20,6 @@ class Plugins_Valias extends Plugin
 
     protected function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
@@ -32,14 +30,14 @@ class Plugins_Valias extends Plugin
                 util::log('Alias source address is empty');
                 $_POST = [];
 
-                return $this->t->create($this->in);
+                return $this->g->t->create($this->in);
             }
 
             if (empty($targets[0])) {
                 util::log('Alias target address is empty');
                 $_POST = [];
 
-                return $this->t->create($this->in);
+                return $this->g->t->create($this->in);
             }
 
             foreach ($sources as $s) {
@@ -58,7 +56,7 @@ class Plugins_Valias extends Plugin
                     util::log('Invalid source domain: ' . $rhs);
                     $_POST = [];
 
-                    return $this->t->create($this->in);
+                    return $this->g->t->create($this->in);
                 }
 
                 $sql = '
@@ -72,14 +70,14 @@ class Plugins_Valias extends Plugin
                     util::log($domain . ' does not exist as a local domain');
                     $_POST = [];
 
-                    return $this->t->create($this->in);
+                    return $this->g->t->create($this->in);
                 }
 
                 if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
                     util::log('Alias source address is invalid');
                     $_POST = [];
 
-                    return $this->t->create($this->in);
+                    return $this->g->t->create($this->in);
                 }
 
                 $sql = '
@@ -101,7 +99,7 @@ class Plugins_Valias extends Plugin
                         util::log($s . ' already exists as an alias');
                         $_POST = [];
 
-                        return $this->t->create($this->in);
+                        return $this->g->t->create($this->in);
                     }
                 }
 
@@ -116,7 +114,7 @@ class Plugins_Valias extends Plugin
                     util::log($s . ' already exists as a regular mailbox');
                     $_POST = [];
 
-                    return $this->t->create($this->in);
+                    return $this->g->t->create($this->in);
                 }
 
                 foreach ($targets as $t) {
@@ -129,14 +127,14 @@ class Plugins_Valias extends Plugin
                         util::log('Invalid target domain: ' . $tdomain);
                         $_POST = [];
 
-                        return $this->t->create($this->in);
+                        return $this->g->t->create($this->in);
                     }
 
                     if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
                         util::log('Alias target address is invalid');
                         $_POST = [];
 
-                        return $this->t->create($this->in);
+                        return $this->g->t->create($this->in);
                     }
 
                     if (1 !== $catchall) {
@@ -144,7 +142,7 @@ class Plugins_Valias extends Plugin
                             util::log('Alias source and target addresses must not be the same');
                             $_POST = [];
 
-                            return $this->t->create($this->in);
+                            return $this->g->t->create($this->in);
                         }
                     }
                 }
@@ -185,21 +183,17 @@ class Plugins_Valias extends Plugin
             util::ses('p', '', '1');
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } else {
-            return $this->t->create($this->in);
+            return $this->g->t->create($this->in);
         }
     }
 
     protected function read(): string
     {
-        elog(__METHOD__);
-
-        return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+        return $this->g->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
     protected function update(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             extract($this->in);
             $active = $active ? 1 : 0;
@@ -380,8 +374,6 @@ class Plugins_Valias extends Plugin
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => 0, 'db' => 'source', 'formatter' => function ($d, $row) {
@@ -399,6 +391,6 @@ class Plugins_Valias extends Plugin
             return json_encode(db::simple($_GET, 'valias_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
 
-        return $this->t->list([]);
+        return $this->g->t->list([]);
     }
 }

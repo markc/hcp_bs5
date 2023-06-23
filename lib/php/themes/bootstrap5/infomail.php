@@ -8,8 +8,6 @@ class Themes_Bootstrap5_InfoMail extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         return '

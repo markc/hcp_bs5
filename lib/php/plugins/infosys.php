@@ -8,8 +8,6 @@ class Plugins_InfoSys extends Plugin
 {
     public function list(): string
     {
-        elog(__METHOD__);
-
         $mem = $dif = $cpu = [];
         $cpu_name = $procs = '';
         $cpu_num = 0;
@@ -73,7 +71,7 @@ class Plugins_InfoSys extends Plugin
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
 
-        return $this->t->list([
+        return $this->g->t->list([
             'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
             'dsk_free' => util::numfmt($df, 1),
             'dsk_pcnt' => $dp,

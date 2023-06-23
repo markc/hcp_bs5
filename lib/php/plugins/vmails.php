@@ -16,24 +16,20 @@ class Plugins_Vmails extends Plugin
 
     protected function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             if (!filter_var($this->in['user'], FILTER_VALIDATE_EMAIL)) {
-                util::log('Email address ('.$this->in['user'].') is invalid');
+                util::log('Email address (' . $this->in['user'] . ') is invalid');
                 $_POST = [];
 
                 return $this->read();
             }
-            util::exe('addvmail '.$this->in['user']);
+            util::exe('addvmail ' . $this->in['user']);
         }
         util::relist();
     }
 
     protected function update(): string
     {
-        elog(__METHOD__);
-
         extract($this->in);
 
         if ($shpw) {
@@ -53,30 +49,26 @@ class Plugins_Vmails extends Plugin
 
     protected function delete(): void
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
-            util::exe('delvmail '.$this->in['user']);
+            util::exe('delvmail ' . $this->in['user']);
         }
         util::relist();
     }
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => null, 'db' => 'id'],
                 ['dt' => 0, 'db' => 'user', 'formatter' => function ($d, $row) {
                     return '
-                    <a href="" title="Change password for '.$d.'" data-id="'.$row['id'].'" data-user="'.$d.'" data-toggle="modal" data-target="#updatemodal">
-                      <b>'.$d.' </b></a>';
+                    <a href="" title="Change password for ' . $d . '" data-id="' . $row['id'] . '" data-user="' . $d . '" data-toggle="modal" data-target="#updatemodal">
+                      <b>' . $d . ' </b></a>';
                 }],
                 ['dt' => 1, 'db' => 'size_mail', 'formatter' => fn ($d) => util::numfmt(intval($d))],
                 ['dt' => 2, 'db' => 'num_total', 'formatter' => fn ($d) => number_format(intval($d))],
                 ['dt' => 3, 'db' => null, 'formatter' => function ($d, $row) {
-                    return '<a href="" title="Remove this Mailbox" data-removeuser="'.$row['user'].'" data-toggle="modal" data-target="#removemodal">
+                    return '<a href="" title="Remove this Mailbox" data-removeuser="' . $row['user'] . '" data-toggle="modal" data-target="#removemodal">
                     <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
                   </a>';
                 }],
@@ -86,6 +78,6 @@ class Plugins_Vmails extends Plugin
             return json_encode(db::simple($_GET, 'vmails_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
 
-        return $this->t->list([]);
+        return $this->g->t->list([]);
     }
 }

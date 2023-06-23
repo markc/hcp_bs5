@@ -8,8 +8,6 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
 {
     public function create(): string
     {
-        elog(__METHOD__);
-
         $keybuf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],
@@ -40,8 +38,6 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
 
     public function read(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <div class="row">
           <h3>
@@ -62,8 +58,6 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
      */
     public function delete(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove DKIM Record',
@@ -78,8 +72,6 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <div class="row">
           <h3>

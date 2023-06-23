@@ -1,15 +1,13 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/util.php 20150225 - 20220324
-// Copyright (C) 2015-2022 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/util.php 20150225 - 2022023
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
     public static function log(string $msg = '', string $lvl = 'danger'): array
     {
-        elog(__METHOD__);
-
         if ($msg) {
             $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
         } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
@@ -31,7 +29,8 @@ class Util
 
     public static function esc(array $in): array
     {
-        elog(__METHOD__);
+        elog(__METHOD__ . " in = " . var_export($in, true));
+        elog('REQUEST inside esc=' . var_export($_REQUEST, true));
 
         foreach ($in as $k => $v) {
             $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
@@ -54,10 +53,8 @@ class Util
                 : ($_SESSION[$k] ?? $v));
     }
 
-    public static function cfg(object $g): void
+    public static function cfg(gbl $g): void
     {
-        elog(__METHOD__);
-
         if (file_exists($g->cfg['file'])) {
             foreach (include $g->cfg['file'] as $k => $v) {
                 $g->{$k} = array_merge($g->{$k}, $v);
@@ -70,7 +67,7 @@ class Util
         elog(__METHOD__ . "({$cmd})");
 
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
-        // class="mb-0" tweak for Bootstrap5 should not be here
+        // class="mb-0" appearance tweak for Bootstrap5 should not be here
         util::log('<pre class="mb-0">' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
 
         return (boolval($retVal) ? true : false);
@@ -85,8 +82,6 @@ class Util
 
     public static function now(string $date1, string $date2 = null): string
     {
-        elog(__METHOD__);
-
         if (!is_numeric($date1)) {
             $date1 = strtotime($date1);
         }
@@ -130,15 +125,11 @@ class Util
 
     public static function is_adm(): bool
     {
-        elog(__METHOD__);
-
         return isset($_SESSION['adm']);
     }
 
     public static function is_usr(int|string $id = null): bool
     {
-        elog(__METHOD__);
-
         return (is_null($id))
             ? isset($_SESSION['usr'])
             : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
@@ -146,15 +137,11 @@ class Util
 
     public static function is_acl(int $acl): bool
     {
-        elog(__METHOD__);
-
         return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
 
     public static function genpw(int $length = 10): string
     {
-        elog(__METHOD__);
-
         return str_replace(
             '.',
             '_',
@@ -168,8 +155,6 @@ class Util
 
     public static function get_nav(array $nav = []): array
     {
-        elog(__METHOD__);
-
         return isset($_SESSION['usr'])
             ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
             : $nav['non'];
@@ -177,29 +162,21 @@ class Util
 
     public static function get_cookie(string $name, string $default = ''): string
     {
-        elog(__METHOD__);
-
         return $_COOKIE[$name] ?? $default;
     }
 
     public static function put_cookie(string $name, string $value, int $expiry = 604800): string
     {
-        elog(__METHOD__);
-
         return setcookie($name, $value, time() + $expiry) ? $value : '';
     }
 
     public static function del_cookie(string $name): string
     {
-        elog(__METHOD__);
-
         return self::put_cookie($name, '', -1);
     }
 
     public static function chkpw(string $pw, string $pw2 = ''): bool
     {
-        elog(__METHOD__);
-
         if (strlen($pw) > 11) {
             if (preg_match('/[0-9]+/', $pw)) {
                 if (preg_match('/[A-Z]+/', $pw)) {
@@ -230,8 +207,6 @@ class Util
 
     public static function chkapi(object $g): void
     {
-        elog(__METHOD__);
-
         [$apiusr, $apikey] = explode(':', $g->in['a'], 2);
 
         if (!self::is_usr($apiusr)) { // if this user has already logged in then avoid extra DB lookup
@@ -262,10 +237,8 @@ class Util
         }
     }
 
-    public static function remember(object $g): void
+    public static function remember(gbl $g): void
     {
-        elog(__METHOD__);
-
         if (!self::is_usr()) {
             if ($c = self::get_cookie('remember')) {
                 if (is_null(db::$dbh)) {
@@ -305,15 +278,11 @@ class Util
 
     public static function relist(): void
     {
-        elog(__METHOD__);
-
         self::redirect('?o=' . $_SESSION['o'] . '&m=list');
     }
 
     public static function numfmt(float $size, int $precision = null): string
     {
-        elog(__METHOD__);
-
         if (0 == $size) {
             return '0';
         }
@@ -333,11 +302,9 @@ class Util
         return $size . ' Bytes';
     }
 
-    // numfmt() was wrong, we want MB not MiB
+    // numfmt() was wrong, we want MiB, not MB
     public static function numfmtsi(float $size, int $precision = 2): string
     {
-        elog(__METHOD__);
-
         if (0 == $size) {
             return '0';
         }
@@ -349,8 +316,6 @@ class Util
 
     public static function is_valid_domain_name(string $domainname): bool
     {
-        elog(__METHOD__);
-
         $domainname = idn_to_ascii($domainname);
 
         return preg_match('/^([a-z\\d](-*[a-z\\d])*)(\\.([a-z\\d](-*[a-z\\d])*))*$/i', $domainname)
@@ -360,8 +325,6 @@ class Util
 
     public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT'): string
     {
-        elog(__METHOD__);
-
         $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
 
         return 'SHA512-CRYPT' === $hash
@@ -371,8 +334,6 @@ class Util
 
     public static function sec2time(int $seconds): string
     {
-        elog(__METHOD__);
-
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@{$seconds}");
 
@@ -381,8 +342,6 @@ class Util
 
     public static function is_post(): bool
     {
-        elog(__METHOD__);
-
         if ('POST' === $_SERVER['REQUEST_METHOD']) {
             if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
                 self::log('Possible CSRF attack');
@@ -397,8 +356,6 @@ class Util
 
     public static function inc_soa(string $soa): string
     {
-        elog(__METHOD__);
-
         $ary = explode(' ', $soa);
         $ymd = date('Ymd');
         $day = substr($ary[2], 0, 8);
@@ -412,8 +369,6 @@ class Util
 
     public static function random_token(int $length = 32): string
     {
-        elog(__METHOD__);
-
         $random_base64 = base64_encode(random_bytes($length));
         $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
 

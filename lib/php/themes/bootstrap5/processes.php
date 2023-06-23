@@ -8,8 +8,6 @@ class Themes_Bootstrap5_Processes extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <div class="d-flex justify-content-between mb-4">
           <h3 class="mb-0"><i class="bi bi-envelope"></i> Processes <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h3>

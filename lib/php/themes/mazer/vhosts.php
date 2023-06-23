@@ -8,8 +8,6 @@ class Themes_Mazer_Vhosts extends Themes_Mazer_Theme
 {
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         $remove = $this->modal([
             'id' => 'removemodal',
             'title' => 'Remove Vhost',
@@ -80,8 +78,6 @@ class Themes_Mazer_Vhosts extends Themes_Mazer_Theme
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $create = $this->modal([
             'id' => 'createmodal',
             'title' => 'Create New Vhost',

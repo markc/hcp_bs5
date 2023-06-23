@@ -20,11 +20,6 @@ spl_autoload_register(function ($c): void {
     }
 });
 
-/**
- * Summary of elog
- * @param string $content
- * @return void
- */
 function elog(string $content): void
 {
     if (DBG) {
@@ -32,30 +27,14 @@ function elog(string $content): void
     }
 }
 
-/**
- * Summary of gbl
- * @author Mark Constable
- * @copyright (c) 2023
- */
 class gbl
 {
-    /**
-     * This holds a single instance of this global object
-     * @var 
-     */
     private static ?gbl $instance = null;
 
-    /**
-     * Private constructor to prevent direct instantiation
-     */
     private function __construct()
     {
     }
 
-    /**
-     * Return a single instance of this global object
-     * @return gbl
-     */
     public static function getInstance(): gbl
     {
         if (self::$instance === null) {
@@ -64,10 +43,9 @@ class gbl
         return self::$instance;
     }
 
-    /**
-     * Summary of cfg
-     * @var array
-     */
+    public Object $p; // plugin object
+    public Object $t; // theme object
+
     public $cfg = [
         'email' => 'markc@renta.net',
         'file' => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // settings override
@@ -76,10 +54,7 @@ class gbl
         'perp' => 25,
         'self' => '/hcp/',
     ];
-    /**
-     * Summary of in
-     * @var array
-     */
+
     public $in = [
         'a' => '',           // API (apiusr:apikey)
         'd' => '',           // Domain (current)
@@ -91,10 +66,7 @@ class gbl
         't' => 'bootstrap5', // Theme (bootstrap, bootstrap5, mazer)
         'x' => '',           // XHR (request)
     ];
-    /**
-     * Summary of out
-     * @var array
-     */
+
     public $out = [
         'doc' => 'NetServa',
         'css' => '',
@@ -108,10 +80,7 @@ class gbl
         'js' => '',
         'end' => '',
     ];
-    /**
-     * Summary of db
-     * @var array
-     */
+
     public $db = [
         'host' => '127.0.0.1', // DB site
         'name' => 'sysadm',    // DB name
@@ -122,10 +91,7 @@ class gbl
         'type' => 'mysql',     // mysql | sqlite
         'user' => 'sysadm',    // DB user
     ];
-    /**
-     * Summary of nav1
-     * @var array
-     */
+
     public $nav1 = [
         'non' => [
             ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
@@ -156,15 +122,9 @@ class gbl
             ], 'bi bi-list'],
         ],
     ];
-    /**
-     * Summary of nav2
-     * @var array
-     */
+
     public $nav2 = [];
-    /**
-     * Summary of dns
-     * @var array
-     */
+
     public $dns = [
         'a' => '127.0.0.1',
         'mx' => '',
@@ -191,10 +151,7 @@ class gbl
             'user' => 'pdns',      // Alt DNS DB user
         ],
     ];
-    /**
-     * Summary of acl
-     * @var array
-     */
+
     public $acl = [
         0 => 'SuperAdmin',
         1 => 'Administrator',

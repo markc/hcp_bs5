@@ -15,8 +15,6 @@ class Plugins_Dkim extends Plugin
 
     public function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             $domain = escapeshellarg($this->in['domain']);
             $select = escapeshellarg($this->in['select']);
@@ -29,8 +27,6 @@ class Plugins_Dkim extends Plugin
 
     public function read(): string
     {
-        elog(__METHOD__);
-
         $domain = explode('._domainkey.', $this->in['dnstxt'])[1]; // too fragile?
         $domain_esc = escapeshellarg($domain);
         exec("sudo dkim show {$domain_esc} 2>&1", $retArr, $retVal);
@@ -38,13 +34,11 @@ class Plugins_Dkim extends Plugin
         <b>' . $retArr[0] . '</b><br>
         <div style="word-break:break-all;font-family:monospace;width:100%;">' . $retArr[1] . '</div>';
 
-        return $this->t->read(['buf' => $buf, 'domain' => $domain]);
+        return $this->g->t->read(['buf' => $buf, 'domain' => $domain]);
     }
 
     public function update(): string
     {
-        elog(__METHOD__);
-
         //return $this->list(); // override parent update()
         util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         return "Update"; // workaround to satisy string return type
@@ -52,8 +46,6 @@ class Plugins_Dkim extends Plugin
 
     public function delete(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
             $domain = escapeshellarg($this->in['domain']);
             util::exe('dkim del ' . $domain);
@@ -64,8 +56,6 @@ class Plugins_Dkim extends Plugin
 
     public function list(): string
     {
-        elog(__METHOD__);
-
         $buf = '<p style="columns:350px 3;column-rule: 1px dotted #ddd;text-align:center;">';
         exec('sudo dkim list 2>&1', $retArr, $retVal);
         foreach ($retArr as $line) {
@@ -73,6 +63,6 @@ class Plugins_Dkim extends Plugin
             <a href="?o=dkim&m=read&dnstxt=' . $line . '"><b>' . $line . '</b></a>';
         }
 
-        return $this->t->list(['buf' => $buf . '</p>']);
+        return $this->g->t->list(['buf' => $buf . '</p>']);
     }
 }

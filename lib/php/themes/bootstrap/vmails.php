@@ -8,8 +8,6 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         $create = $this->modal([
             'id' => 'createmodal',
             'title' => 'Create New Mailbox',
@@ -74,7 +72,7 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
             <tbody>
             </tbody>
           </table>
-        </div>'.$create.$remove.$update.'
+        </div>' . $create . $remove . $update . '
         <script>
 $(document).ready(function() {
   $("#vmails").DataTable({

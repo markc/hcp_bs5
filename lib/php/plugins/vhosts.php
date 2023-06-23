@@ -1,35 +1,34 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/vhosts.php 20230604
+// lib/php/plugins/vhosts.php 20230623
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Vhosts extends Plugin
 {
     protected string $tbl = 'vhosts';
-    protected array $in = [
-        'active' => 0,
-        'aid' => 0,
-        'aliases' => 10,
+
+    public array $inp = [
+        'active'    => 0,
+        'aid'       => 0,
+        'aliases'   => 10,
         'diskquota' => 1000000000,
-        'domain' => '',
-        'gid' => 1000,
+        'domain'    => '',
+        'gid'       => 1000,
         'mailboxes' => 1,
         'mailquota' => 500000000,
-        'uid' => 1000,
-        'uname' => '',
-        'cms' => '',
-        'ssl' => '',
-        'ip' => '',
-        'uuser' => '',
+        'uid'       => 1000,
+        'uname'     => '',
+        'cms'       => '',
+        'ssl'       => '',
+        'ip'        => '',
+        'uuser'     => '',
     ];
 
     protected function create(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
-            extract($this->in);
+            extract($this->inp);
             //            $active = $active ? 1 : 0;
 
             //            if(!util::is_valid_plan($plan)){
@@ -41,12 +40,12 @@ class Plugins_Vhosts extends Plugin
                 util::log('/home/u/' . $domain . ' already exists', 'warning');
                 $_POST = [];
 
-                return $this->t->create($this->in);
+                return $this->g->t->create($this->inp);
             }
 
             //            if ($mailquota > $diskquota) {
             //                util::log('Mailbox quota exceeds domain disk quota');
-            //                $_POST = []; return $this->t->create($this->in);
+            //                $_POST = []; return $this->g->t->create($this->in);
             //            }
 
             $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
@@ -55,7 +54,7 @@ class Plugins_Vhosts extends Plugin
                 util::log('Domain already exists');
                 $_POST = [];
 
-                return $this->t->create($this->in);
+                return $this->g->t->create($this->inp);
             }
 
             $cms = ('on' === $cms) ? 'wp' : 'none';
@@ -67,22 +66,18 @@ class Plugins_Vhosts extends Plugin
             util::redirect($this->g->cfg['self'] . '?o=vhosts');
         }
 
-        return $this->t->create($this->in);
+        return $this->g->t->create($this->inp);
     }
 
     protected function read(): string
     {
-        elog(__METHOD__);
-
-        return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+        return $this->g->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
     protected function update(): string
     {
-        elog(__METHOD__);
-
         if (util::is_post()) {
-            extract($this->in);
+            extract($this->inp);
             $diskquota *= 1000000;
             $mailquota *= 1000000;
             $active = $active ? 1 : 0;
@@ -108,14 +103,14 @@ class Plugins_Vhosts extends Plugin
   WHERE `id` = :id';
 
             $res = db::qry($sql, [
-                'id' => $this->g->in['i'],
-                'active' => $active,
-                'aliases' => $aliases,
+                'id'        => $this->g->in['i'],
+                'active'    => $active,
+                'aliases'   => $aliases,
                 'diskquota' => $diskquota,
-                'domain' => $domain,
+                'domain'    => $domain,
                 'mailboxes' => $mailboxes,
                 'mailquota' => $mailquota,
-                'updated' => date('Y-m-d H:i:s'),
+                'updated'   => date('Y-m-d H:i:s'),
             ]);
 
             util::log('Vhost ID ' . $this->g->in['i'] . ' updated', 'success');
@@ -127,10 +122,8 @@ class Plugins_Vhosts extends Plugin
         }
     }
 
-    protected function delete(): void
+    protected function delete(): ?string
     {
-        elog(__METHOD__);
-
         if (util::is_post() && $this->g->in['i']) {
             $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
             if ($domain) {
@@ -143,12 +136,11 @@ class Plugins_Vhosts extends Plugin
         }
 
         util::log('Error deleting item');
+        return ''; // to satisfy ?string return type
     }
 
     protected function list(): string
     {
-        elog(__METHOD__);
-
         if ('json' === $this->g->in['x']) {
             $columns = [
                 ['dt' => 0,  'db' => 'domain',      'formatter' => function ($d, $row) {
@@ -176,6 +168,6 @@ class Plugins_Vhosts extends Plugin
             return json_encode(db::simple($_GET, 'vhosts_view', 'id', $columns), JSON_PRETTY_PRINT);
         }
 
-        return $this->t->list([]);
+        return $this->g->t->list([]);
     }
 }

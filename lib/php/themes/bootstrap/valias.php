@@ -8,22 +8,16 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 {
     public function create(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function update(array $in): string
     {
-        elog(__METHOD__);
-
         return $this->editor($in);
     }
 
     public function list(array $in): string
     {
-        elog(__METHOD__);
-
         return '
         <div class="col-12">
           <h3>
@@ -70,8 +64,6 @@ $(document).ready(function() {
 
     private function editor(array $in): string
     {
-        elog(__METHOD__);
-
         extract($in);
 
         $active = $active ? 1 : 0;
@@ -81,8 +73,8 @@ $(document).ready(function() {
                   <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small></a>';
         $tolist = '
                 <a class="btn btn-secondary" href="?o=valias&m=list">&laquo; Back</a>';
-        $submit = 'create' === $this->g->in['m'] ? $tolist.'
-                <button type="submit" name="m" value="create" class="btn btn-primary">Add this Alias</button>' : $tolist.'
+        $submit = 'create' === $this->g->in['m'] ? $tolist . '
+                <button type="submit" name="m" value="create" class="btn btn-primary">Add this Alias</button>' : $tolist . '
                 <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>';
         $remove = 'create' === $this->g->in['m'] ? '' : $this->modal([
             'id' => 'removemodal',
@@ -90,34 +82,34 @@ $(document).ready(function() {
             'action' => 'delete',
             'footer' => 'Remove',
             'hidden' => '
-                <input type="hidden" name="i" value="'.$id.'">',
+                <input type="hidden" name="i" value="' . $id . '">',
             'body' => '
-                  <p class="text-center">Are you sure you want to remove this alias?<br><b>'.$source.'</b></p>',
+                  <p class="text-center">Are you sure you want to remove this alias?<br><b>' . $source . '</b></p>',
         ]);
 
         return '
           <div class="col-12">
             <h3>
-              <a href="?o=valias&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> '.$header.'
+              <a href="?o=valias&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> ' . $header . '
             </h3>
           </div>
         </div><!-- END UPPER ROW -->
         <div class="row">
           <div class="col-12">
             <p><b>Note:</b> If your chosen destination address is an external mailbox, the <b>receiving mailserver</b> may reject your message due to an SPF failure.</p>
-            <form method="post" action="'.$this->g->cfg['self'].'">
-              <input type="hidden" name="c" value="'.$_SESSION['c'].'">
-              <input type="hidden" name="o" value="'.$this->g->in['o'].'">
-              <input type="hidden" name="i" value="'.$this->g->in['i'].'">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
               <div class="row">
                 <div class="form-group col-6">
                   <label class="control-label" for="source">Alias Address(es)</label>
-                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source" id="source">'.$source.'</textarea>
+                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source" id="source">' . $source . '</textarea>
                   <p>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>Locally hosted domains only</b>.</p>
                 </div>
                 <div class="form-group col-6">
                   <label class="control-label" for="target">Target Address(es)</label>
-                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target" name="target">'.$target.'</textarea>
+                  <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target" name="target">' . $target . '</textarea>
                   <p>Full email address/es (comma-separated).</p>
                 </div>
               </div>
@@ -125,17 +117,17 @@ $(document).ready(function() {
                 <div class="col-2 offset-md-6">
                   <div class="form-group">
                     <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" name="active" id="active"'.$actbuf.'>
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . $actbuf . '>
                       <label class="custom-control-label" for="active">Active</label>
                     </div>
                   </div>
                 </div>
                 <div class="col-4 text-right">
-                  <div class="btn-group">'.$submit.'
+                  <div class="btn-group">' . $submit . '
                   </div>
                 </div>
               </div>
             </form>
-          </div>'.$remove;
+          </div>' . $remove;
     }
 }
