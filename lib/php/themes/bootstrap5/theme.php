@@ -332,7 +332,7 @@ class Themes_Bootstrap5_Theme extends Theme
 
         $hidden = isset($hidden) && $hidden ? $hidden : '';
         $lhs_cmd = $lhs_cmd ? '
-                    <a class="btn btn-danger bslink" href="?o=accounts&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>
+                    <a class="btn btn-danger bslink" href="?o=' . $this->g->in['o'] . '&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>
                     ' : '';
 
         $footer = $rhs_cmd ? '

@@ -9,9 +9,9 @@ class Init
 {
     public $g;
 
-    public function __construct()
+    public function __construct($g)
     {
-        $this->g = gbl::getInstance();
+        $this->g = $g; //gbl::getInstance();
 
         session_start();
 

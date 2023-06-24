@@ -126,7 +126,16 @@ $(document).ready(function() {
     ],
   });
 
-$("#domains").show();
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+  $("#domains").show();
 
   $(document).on("click", ".serial", {}, (function() {
     var a = $(this);

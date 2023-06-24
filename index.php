@@ -27,23 +27,8 @@ function elog(string $content): void
     }
 }
 
-class gbl
+echo new Init(new class()
 {
-    private static ?gbl $instance = null;
-
-    private function __construct()
-    {
-    }
-
-    public static function getInstance(): gbl
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    public Object $p; // plugin object
     public Object $t; // theme object
 
     public $cfg = [
@@ -68,17 +53,17 @@ class gbl
     ];
 
     public $out = [
-        'doc' => 'NetServa',
-        'css' => '',
-        'log' => '',
+        'doc'  => 'NetServa',
+        'css'  => '',
+        'log'  => '',
         'nav1' => '',
         'nav2' => '',
         'nav3' => '',
         'head' => 'NetServa',
         'main' => 'Error: missing page!',
         'foot' => 'Copyright (C) 2015-2023 Mark Constable (AGPL-3.0)',
-        'js' => '',
-        'end' => '',
+        'js'   => '',
+        'end'  => '',
     ];
 
     public $db = [
@@ -126,19 +111,19 @@ class gbl
     public $nav2 = [];
 
     public $dns = [
-        'a' => '127.0.0.1',
-        'mx' => '',
-        'ns1' => 'ns1.',
-        'ns2' => 'ns2.',
+        'a'    => '127.0.0.1',
+        'mx'   => '',
+        'ns1'  => 'ns1.',
+        'ns2'  => 'ns2.',
         'prio' => 0,
-        'ttl' => 300,
-        'soa' => [
+        'ttl'  => 300,
+        'soa'  => [
             'primary' => 'ns1.',
-            'email' => 'admin.',
+            'email'   => 'admin.',
             'refresh' => 7200,
-            'retry' => 540,
-            'expire' => 604800,
-            'ttl' => 3600,
+            'retry'   => 540,
+            'expire'  => 604800,
+            'ttl'     => 3600,
         ],
         'db' => [
             'host' => '127.0.0.1', // Alt DNS DB site
@@ -159,6 +144,6 @@ class gbl
         3 => 'Suspended',
         9 => 'Anonymous',
     ];
-};
+});
 
-echo new Init();
+//echo new Init();

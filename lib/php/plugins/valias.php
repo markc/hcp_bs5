@@ -1,27 +1,28 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/valias.php 20170225 - 20230604
+// lib/php/plugins/valias.php 20170225 - 20230624
 // Copyright (C) 1995-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Valias extends Plugin
 {
     protected string $tbl = 'valias';
-    protected array $in = [
-        'aid' => 1,
-        'hid' => 1,
+
+    public array $inp = [
+        'aid'    => 1,
+        'hid'    => 1,
         'source' => '',
         'target' => '',
         'active' => 0,
     ];
 
-    // TODO recfactor common parts of create() and update() into private methods
-    // yep, as of 20170704 this is still a medium to high priority TODO
+    // TODO: recfactor common parts of create() and update() into private methods
+    // yep, as of 20170704 this is still a low to medium priority TODO
 
     protected function create(): string
     {
         if (util::is_post()) {
-            extract($this->in);
+            extract($this->inp);
             $active = $active ? 1 : 0;
             $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));
             $targets = array_map('trim', preg_split("/( |,|;|\n)/", $target));
@@ -30,14 +31,14 @@ class Plugins_Valias extends Plugin
                 util::log('Alias source address is empty');
                 $_POST = [];
 
-                return $this->g->t->create($this->in);
+                return $this->g->t->list($this->inp);
             }
 
             if (empty($targets[0])) {
                 util::log('Alias target address is empty');
                 $_POST = [];
 
-                return $this->g->t->create($this->in);
+                return $this->g->t->list($this->inp);
             }
 
             foreach ($sources as $s) {
@@ -56,7 +57,7 @@ class Plugins_Valias extends Plugin
                     util::log('Invalid source domain: ' . $rhs);
                     $_POST = [];
 
-                    return $this->g->t->create($this->in);
+                    return $this->g->t->create($this->inp);
                 }
 
                 $sql = '
@@ -70,14 +71,14 @@ class Plugins_Valias extends Plugin
                     util::log($domain . ' does not exist as a local domain');
                     $_POST = [];
 
-                    return $this->g->t->create($this->in);
+                    return $this->g->t->create($this->inp);
                 }
 
                 if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
                     util::log('Alias source address is invalid');
                     $_POST = [];
 
-                    return $this->g->t->create($this->in);
+                    return $this->g->t->create($this->inp);
                 }
 
                 $sql = '
@@ -99,7 +100,7 @@ class Plugins_Valias extends Plugin
                         util::log($s . ' already exists as an alias');
                         $_POST = [];
 
-                        return $this->g->t->create($this->in);
+                        return $this->g->t->create($this->inp);
                     }
                 }
 
@@ -114,7 +115,7 @@ class Plugins_Valias extends Plugin
                     util::log($s . ' already exists as a regular mailbox');
                     $_POST = [];
 
-                    return $this->g->t->create($this->in);
+                    return $this->g->t->create($this->inp);
                 }
 
                 foreach ($targets as $t) {
@@ -127,14 +128,14 @@ class Plugins_Valias extends Plugin
                         util::log('Invalid target domain: ' . $tdomain);
                         $_POST = [];
 
-                        return $this->g->t->create($this->in);
+                        return $this->g->t->create($this->inp);
                     }
 
                     if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
                         util::log('Alias target address is invalid');
                         $_POST = [];
 
-                        return $this->g->t->create($this->in);
+                        return $this->g->t->create($this->inp);
                     }
 
                     if (1 !== $catchall) {
@@ -142,7 +143,7 @@ class Plugins_Valias extends Plugin
                             util::log('Alias source and target addresses must not be the same');
                             $_POST = [];
 
-                            return $this->g->t->create($this->in);
+                            return $this->g->t->create($this->inp);
                         }
                     }
                 }
@@ -170,10 +171,10 @@ class Plugins_Valias extends Plugin
                     : '@' . $domain;
 
                 $result = db::qry($sql, [
-                    'active' => $active ? 1 : 0,
-                    'hid' => $hid,
-                    'source' => $s,
-                    'target' => $target,
+                    'active'  => $active ? 1 : 0,
+                    'hid'     => $hid,
+                    'source'  => $s,
+                    'target'  => $target,
                     'updated' => date('Y-m-d H:i:s'),
                     'created' => date('Y-m-d H:i:s'),
                 ]);
@@ -183,7 +184,7 @@ class Plugins_Valias extends Plugin
             util::ses('p', '', '1');
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         } else {
-            return $this->g->t->create($this->in);
+            return $this->g->t->create($this->inp);
         }
     }
 
@@ -195,7 +196,7 @@ class Plugins_Valias extends Plugin
     protected function update(): string
     {
         if (util::is_post()) {
-            extract($this->in);
+            extract($this->inp);
             $active = $active ? 1 : 0;
             $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));
             $targets = array_map('trim', preg_split("/( |,|;|\n)/", $target));
@@ -378,7 +379,7 @@ class Plugins_Valias extends Plugin
             $columns = [
                 ['dt' => 0, 'db' => 'source', 'formatter' => function ($d, $row) {
                     return '
-                    <a href="?o=valias&m=update&i=' . $row['id'] . '" title="Update entry for ' . $d . '">
+                    <a href="?o=valias&m=update&i=' . $row['id'] . '" class="bslink" title="Update entry for ' . $d . '">
                       <b>' . $d . ' </b></a>';
                 }],
                 ['dt' => 1, 'db' => 'target', 'formatter' => fn ($d) => str_replace(',', '<br>', $d)],

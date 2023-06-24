@@ -202,6 +202,16 @@ $(document).ready(function() {
       {"targets":15,  "visible":false, "sortable": true},
     ]
   });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
 });
         </script>';
     }

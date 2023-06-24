@@ -6,11 +6,11 @@ declare(strict_types=1);
 
 class Theme
 {
-    public gbl $g;
+    public $g;
 
     private string $buf = '';
 
-    public function __construct(gbl $g)
+    public function __construct($g)
     {
         $this->g = &$g;
     }

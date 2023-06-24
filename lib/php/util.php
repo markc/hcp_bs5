@@ -237,7 +237,7 @@ class Util
         }
     }
 
-    public static function remember(gbl $g): void
+    public static function remember($g): void
     {
         if (!self::is_usr()) {
             if ($c = self::get_cookie('remember')) {

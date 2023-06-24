@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 class Plugin
 {
-    public gbl $g;
+    public $g;
 
     public array $inp = [];
 
@@ -16,9 +16,9 @@ class Plugin
 
     protected string $tbl = '';
 
-    public function __construct(gbl &$g)
+    public function __construct($g)
     {
-        $this->g = $g;
+        $this->g =& $g;
 
         $this->inp = util::esc($this->inp);
 

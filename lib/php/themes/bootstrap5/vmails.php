@@ -90,6 +90,15 @@ $(document).ready(function() {
     ]
   });
 
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
   $("#removemodal").on("show.bs.modal", function (event) {
     var link = $(event.relatedTarget)
     var user = link.data("removeuser")
