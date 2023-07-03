@@ -15,11 +15,12 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
         ], 'keylen', '2048', '', 'form-select');
 
         return $this->modal([
-            'id' => 'createmodal',
-            'title' => 'Create DKIM Record',
-            'action' => 'create',
-            'footer' => 'Create',
-            'body' => '
+            'id'        => 'createmodal',
+            'title'     => 'Create SSH Host',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => '
                   <div class="mb-3">
                     <label for="domain" class="form-label">Domain</label>
                     <input type="text" class="form-control" id="domain" name="domain">
@@ -54,19 +55,21 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
     public function delete(array $in): string
     {
         return $this->modal([
-            'id' => 'removemodal',
-            'title' => 'Remove DKIM Record',
-            'action' => 'delete',
-            'footer' => 'Remove',
-            'hidden' => '
+            'id'        => 'removemodal',
+            'title'     => 'Remove DKIM Record',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
                 <input type="hidden" name="domain" value="' . $in['domain'] . '">',
-            'body' => '
+            'body'      => '
                   <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
         ]);
     }
 
     public function list(array $in): string
     {
+        elog(var_export($in, true));
         return '
         <div class="row">
           <h3>

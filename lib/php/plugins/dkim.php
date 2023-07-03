@@ -59,8 +59,12 @@ class Plugins_Dkim extends Plugin
         $buf = '<p style="columns:350px 3;column-rule: 1px dotted #ddd;text-align:center;">';
         exec('sudo dkim list 2>&1', $retArr, $retVal);
         foreach ($retArr as $line) {
-            $buf .= '
+            if ($retVal === 0) {
+                $buf .= '
             <a href="?o=dkim&m=read&dnstxt=' . $line . '"><b>' . $line . '</b></a>';
+            } else {
+                $buf .= '<b>' . $line . '</b><br>';
+            }
         }
 
         return $this->g->t->list(['buf' => $buf . '</p>']);
