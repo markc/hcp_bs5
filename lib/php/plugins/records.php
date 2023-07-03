@@ -7,26 +7,27 @@ declare(strict_types=1);
 class Plugins_Records extends Plugin
 {
     protected string $tbl = 'records';
-    protected array $in = [
-        'content' => '',
-        'name' => '',
-        'prio' => 0,
-        'ttl' => 300,
-        'type' => '',
+
+    public array $inp = [
+        'content'   => '',
+        'name'      => '',
+        'prio'      => 0,
+        'ttl'       => 300,
+        'type'      => '',
     ];
 
-    public function __construct(Theme $t)
+    public function __construct($g)
     {
-        if ($t->g->dns['db']['type']) {
-            $this->dbh = new db($t->g->dns['db']);
+        if ($g->dns['db']['type']) {
+            $this->dbh = new db($g->dns['db']);
         }
-        parent::__construct($t);
+        parent::__construct($g);
     }
 
     protected function create(): string
     {
         if (util::is_post()) {
-            $in = $this->validate($this->in);
+            $in = $this->validate($this->inp);
             if (!empty($in)) {
                 $in['created'] = $in['updated'];
                 $lid = db::create($in);
@@ -43,7 +44,7 @@ class Plugins_Records extends Plugin
     protected function update(): string
     {
         if (util::is_post()) {
-            $in = $this->validate($this->in);
+            $in = $this->validate($this->inp);
             if (!empty($in)) {
                 $dom = util::enc($_POST['domain']);
                 $in['created'] = $in['updated'];
@@ -58,7 +59,7 @@ class Plugins_Records extends Plugin
         return 'Error updating DNS record';
     }
 
-    protected function delete(): void
+    protected function delete(): ?string
     {
         if (util::is_post()) {
             $dom = util::enc($_POST['domain']);

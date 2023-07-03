@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/theme.php 20150101 - 20230623
+// lib/php/theme.php 20150101 - 20230627
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
@@ -12,7 +12,7 @@ class Theme
 
     public function __construct($g)
     {
-        $this->g = &$g;
+        $this->g = $g;
     }
 
     public function __toString(): string

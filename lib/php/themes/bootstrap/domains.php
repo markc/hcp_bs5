@@ -1,14 +1,22 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/domains.php 20170225 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/domains.php 20170225 - 20230625
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 {
     public function create(array $in): string
     {
-        return $this->editor($in);
+        elog(__METHOD__);
+
+        return $this->modal_content([
+            'title'     => 'Create DNS Zone',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => $this->modal_body($in)
+        ]);
     }
 
     public function update(array $in): string
@@ -19,7 +27,106 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
     public function list(array $in): string
     {
         elog(__METHOD__);
-        var_export($in, true);
+
+        elog(var_export($in, true));
+
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-globe"></i> Domains
+            <a href="?o=domains&m=create" class="bslink" title="Add new domain">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="table-responsive">
+            <table id="domains" class="table table-borderless table-striped w-100">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Serial</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" id="createdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="shwhomodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
+          <div class="modal-dialog" id="shwhodialog">
+          </div>
+        </div>
+        <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+          <div class="modal-dialog" id="deletedialog">
+          </div>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#domains").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": { "url": "?x=json&o=domains&m=list", "deferLoading": 10 },
+    "order": [[ 5, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0, "className":"text-truncate", "width":"40%"},
+      {"targets":4, "width":"3rem", "className":"text-right", "sortable": false},
+      {"targets":5, "visible":false},
+    ],
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+  $(document).on("click", ".serial", {}, (function() {
+    var a = $(this);
+    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
+      $(a).text(data);
+    });
+    return false;
+  }));
+
+});
+        </script>';
+    }
+
+    /*
+  $("#domains").show();
+
+  $(document).on("click", ".serial", {}, (function() {
+    var a = $(this);
+    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
+      $(a).text(data);
+    });
+    return false;
+  }));
+
+  $(document).on("click", ".delete", {}, function() {
+    $("#removemodalid").val($(this).attr("data-rowid"));
+    $("#removemodalname").text($(this).attr("data-rowname"));
+  });
+
+  $(document).on("click", ".shwho", {}, function() {
+    var $this = $(this);
+    $("#shwho-name").text($this.attr("data-rowname"));
+    $.post("?x=text&o=domains&m=shwho&name=" + $this.attr("data-rowname"), function(data) {
+      $("#shwho-info").text(data);
+    });
+    return false;
+  });
+
 
         $create = $this->modal([
             'id' => 'createmodal',
@@ -85,74 +192,9 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
             <pre id="shwho-info"></pre>',
         ]);
 
-        return '
-          <div class="col-12">
-            <h3>
-              <i class="fas fa-globe fa-fw"></i> Domains
-              <a href="#" title="Add new domain" data-toggle="modal" data-target="#createmodal">
-                <small><i class="fas fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h3>
-          </div>
-        </div><!-- END UPPER ROW -->
-        <div class="row">
-          <div class="col-12">
-            <table id="domains" class="table table-sm" style="display:none;min-width:1100px;table-layout:fixed">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Records</th>
-                  <th>Serial</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>' . $create . $remove . $shwho . '
-        <script>
-$(document).ready(function() {
-  $("#domains").DataTable({
-    "processing": true,
-    "serverSide": true,
-    "ajax": { "url": "?x=json&o=domains&m=list", "deferLoading": 10 },
-    "order": [[ 5, "desc" ]],
-    "scrollX": true,
-    "columnDefs": [
-      {"targets":0, "className":"text-truncate", "width":"40%"},
-      {"targets":4, "width":"2rem", "className":"text-right", "sortable": false},
-      {"targets":5, "visible":false},
-    ],
-  });
 
-$("#domains").show();
 
-  $(document).on("click", ".serial", {}, (function() {
-    var a = $(this);
-    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
-      $(a).text(data);
-    });
-    return false;
-  }));
-
-  $(document).on("click", ".delete", {}, function() {
-    $("#removemodalid").val($(this).attr("data-rowid"));
-    $("#removemodalname").text($(this).attr("data-rowname"));
-  });
-
-  $(document).on("click", ".shwho", {}, function() {
-    var $this = $(this);
-    $("#shwho-name").text($this.attr("data-rowname"));
-    $.post("?x=text&o=domains&m=shwho&name=" + $this.attr("data-rowname"), function(data) {
-      $("#shwho-info").text(data);
-    });
-    return false;
-  });
-});
-        </script>';
-    }
-
+*/
     private function editor(array $in): string
     {
         $domain = $in['name'];
@@ -237,5 +279,68 @@ $("#domains").show();
               </div>
             </form>
           </div>';
+    }
+
+    public function delete(): ?string
+    {
+        $tmp = db::read('name', 'id', $this->g->in['i'], '', 'one');
+
+        return $this->modal_content([
+            'title'     => 'Remove Domain',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
+            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+            'body'      => '
+            <p class="text-center">Are you sure you want to remove this domain?<br><b>' . $tmp['name'] . '</b></p>',
+        ]);
+    }
+
+    public function shwho(string $name, string $body): string
+    {
+        return $this->modal_content([
+            'title'     => 'Whois summary: <b>' . $name . '</b>',
+            'action'    => 'shwho',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => '',
+            'body'      => '
+            <pre>' . $body . '</pre>',
+        ]);
+    }
+
+    private function modal_body(array $in): string
+    {
+        return '
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="domain" class="form-label">Domain</label>
+            <input type="text" class="form-control" id="domain" name="domain" value="' . $in['domain'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="ip" class="form-label">IP</label>
+            <input type="text" class="form-control" id="ip" name="ip" value="' . $in['ip'] . '" required>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="ns1" class="form-label">NS1</label>
+            <input type="text" class="form-control" id="ns1" name="ns1" value="' . $in['ns1'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="ns2" class="form-label">NS2</label>
+            <input type="text" class="form-control" id="ns2" name="ns2" value="' . $in['ns2'] . '" required>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="mxhost" class="form-label">MXHost</label>
+            <input type="text" class="form-control" id="mxhost" name="mxhost" value="' . $in['mxhost'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="spfip" class="form-label">SPF IP</label>
+            <input type="text" class="form-control" id="spfip" name="spfip" value="' . $in['spfip'] . '" required>
+          </div>
+        </div>';
     }
 }

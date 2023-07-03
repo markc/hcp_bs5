@@ -7,30 +7,31 @@ declare(strict_types=1);
 class Plugins_Vmails extends Plugin
 {
     protected string $tbl = 'vmails';
-    protected array $in = [
-        'newpw' => 0,
-        'password' => '',
-        'shpw' => 0,
-        'user' => '',
+
+    public array $inp = [
+        'newpw'     => 0,
+        'password'  => '',
+        'shpw'      => 0,
+        'user'      => '',
     ];
 
     protected function create(): string
     {
         if (util::is_post()) {
-            if (!filter_var($this->in['user'], FILTER_VALIDATE_EMAIL)) {
-                util::log('Email address (' . $this->in['user'] . ') is invalid');
+            if (!filter_var($this->inp['user'], FILTER_VALIDATE_EMAIL)) {
+                util::log('Email address (' . $this->inp['user'] . ') is invalid');
                 $_POST = [];
 
                 return $this->read();
             }
-            util::exe('addvmail ' . $this->in['user']);
+            util::exe('addvmail ' . $this->inp['user']);
         }
         util::relist();
     }
 
     protected function update(): string
     {
-        extract($this->in);
+        extract($this->inp);
 
         if ($shpw) {
             return util::run("shpw {$user}");
@@ -47,10 +48,10 @@ class Plugins_Vmails extends Plugin
         util::relist();
     }
 
-    protected function delete(): void
+    protected function delete(): ?string
     {
         if (util::is_post()) {
-            util::exe('delvmail ' . $this->in['user']);
+            util::exe('delvmail ' . $this->inp['user']);
         }
         util::relist();
     }

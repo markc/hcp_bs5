@@ -6,50 +6,41 @@ declare(strict_types=1);
 
 class Plugins_Domains extends Plugin
 {
-    protected mixed $dbh;
+    //    protected mixed $dbh;
+
     protected string $tbl = 'domains';
-    protected array $in = [
-        'name' => '',
-        'master' => '',
-        'last_check' => '',
-        'disabled' => 0,
-        'type' => '',
-        'notified_serial' => '',
-        'account' => '',
-        'increment' => 0,
-        'ip' => '',
-        'ns1' => '',
-        'ns2' => '',
+
+    public array $inp = [
+        'name'              => '',
+        'master'            => '',
+        'last_check'        => '',
+        'type'              => '',
+        'notified_serial'   => '',
+        'account'           => '',
+        'ip'                => '',
+        'ns1'               => '',
+        'ns2'               => '',
     ];
 
-    public function __construct(public Theme $t)
+    public function __construct($g)
     {
-        if ($t->g->dns['db']['type']) {
-            $this->dbh = new db($t->g->dns['db']);
+        if ($g->dns['db']['type']) {
+            $this->dbh = new db($g->dns['db']);
         }
-        parent::__construct($t);
+        parent::__construct($g);
     }
 
-    protected function create(): string
+    public function create(): string
     {
         if (util::is_post()) {
             extract($_POST);
-
-            //            $err = var_export($_POST, true);
-            //util::log('<pre>'.$err.'</pre>');
-            //            $cms = ($cms === 'on') ? 'wp' : 'none';
-            //            $ssl = ($ssl === 'on') ? 'self' : 'le';
-            //            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
-            // wtf, we are not creating a new vhost!!!
-            //            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
-            //            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
-            //            util::redirect($this->g->cfg['self'] . '?o=vhosts');
-
             // Usage: addpdns domain ip ns1 ns2 [mx] [spfip] [sshkey]
-
-            util::exe("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} {$spfip}");
-
-            return $this->g->t->create($this->in);
+            //util::exe("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            util::log("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            elog("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            return "addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"";
+        } else {
+            return $this->g->t->create($this->inp);
         }
     }
 
@@ -168,13 +159,13 @@ class Plugins_Domains extends Plugin
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
 
-        return $this->g->t->create($this->in);
+        return $this->g->t->create($this->inp);
     }
 
     protected function update(): string
     {
-        if ($this->in['increment']) {
-            //            if ($this->in['increment']) {
+        if ($this->inp['increment']) {
+            //            if ($this->inp['increment']) {
             $sql = "
  SELECT content as soa
    FROM records
@@ -225,7 +216,7 @@ class Plugins_Domains extends Plugin
                 'updated' => date('Y-m-d H:i:s'),
             ]);
 
-            if ($this->in['increment']) {
+            if ($this->inp['increment']) {
                 return $serial;
             }
 
@@ -253,9 +244,9 @@ class Plugins_Domains extends Plugin
         return 'Error updating item';
     }
 
-    protected function delete(): void
+    protected function delete(): ?string
     {
-        if ($this->g->in['i']) {
+        if (util::is_post()) {
             $sql = '
  DELETE FROM `records`
   WHERE  domain_id = :id';
@@ -265,36 +256,48 @@ class Plugins_Domains extends Plugin
             // TODO check $res1 and $res2 ???
             util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
             util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        } else {
+            return $this->g->t->delete($this->g->in);
         }
-
-        util::log('Error deleting item');
     }
 
     protected function list(): string
     {
         if ('json' === $this->g->in['x']) {
             $columns = [
-                ['dt' => 0,   'db' => 'name',       'formatter' => function ($d, $row) {
-                    return ('SLAVE' !== $row['type']) ? '
+                [
+                    'dt' => 0,
+                    'db' => 'name',
+                    'formatter' => function ($d, $row) {
+                        return ('SLAVE' !== $row['type']) ? '
                     <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
                       <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
-                }],
-                ['dt' => 1,   'db' => 'type'],
-                ['dt' => 2,   'db' => 'records'],
-                ['dt' => 3,   'db' => 'soa',        'formatter' => function ($d, $row) {
-                    $soa = explode(' ', $row['soa']);
+                    }
+                ],
+                ['dt' => 1, 'db' => 'type'],
+                ['dt' => 2, 'db' => 'records'],
+                [
+                    'dt' => 3,
+                    'db' => 'soa',
+                    'formatter' => function ($d, $row) {
+                        $soa = explode(' ', $row['soa']);
 
-                    return ('SLAVE' !== $row['type']) ? '
-        <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
-                }],
-                ['dt' => 4,  'db' => 'id', 'formatter' => function ($d, $row) {
-                    return '
-                    <a href="" class="shwho" data-toggle="modal" data-target="#shwhomodal" title="Show Domain Info" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
-                      <i class="fas fa-info-circle fa-fw cursor-pointer"></i></a>
-                    <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
-                }],
-                ['dt' => 5,   'db' => 'updated'],
+                        return ('SLAVE' !== $row['type']) ? '
+                    <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
+                    }
+                ],
+                [
+                    'dt' => 4,
+                    'db' => 'id',
+                    'formatter' => function ($d, $row) {
+                        return '
+                    <a href="?o=domains&m=shwho&name=' . $row['name'] . '" class="bslink" title="Whois Summary">
+                      <i class="bi bi-info-circle cursor-pointer"></i></a>
+                    <a href="?o=domains&m=delete&i=' . $row['id'] . '" class="bslink" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="bi bi-trash cursor-pointer text-danger"></i></a>';
+                    }
+                ],
+                ['dt' => 5, 'db' => 'updated'],
             ];
 
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
@@ -305,11 +308,14 @@ class Plugins_Domains extends Plugin
 
     protected function shwho(): string
     {
-        return shell_exec('sudo shwho ' . $this->in['name']);
+        return $this->g->t->shwho(
+            $this->inp['name'],
+            shell_exec('sudo shwho ' . $this->inp['name'])
+        );
     }
 
     protected function incsoa(): string
     {
-        return shell_exec('sudo incsoa ' . $this->in['name']);
+        return shell_exec('sudo incsoa ' . $this->inp['name']);
     }
 }

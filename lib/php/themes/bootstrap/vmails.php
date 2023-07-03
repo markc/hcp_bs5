@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20200413
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20230625
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 {
@@ -88,6 +88,15 @@ $(document).ready(function() {
       {"targets":3, "className":"text-right", "width":"2rem", "sortable": false},
       {"targets":4, "visible":false, "sortable": true}
     ]
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
   });
 
   $("#removemodal").on("show.bs.modal", function (event) {

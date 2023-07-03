@@ -53,7 +53,7 @@ class Util
                 : ($_SESSION[$k] ?? $v));
     }
 
-    public static function cfg(gbl $g): void
+    public static function cfg($g): void
     {
         if (file_exists($g->cfg['file'])) {
             foreach (include $g->cfg['file'] as $k => $v) {

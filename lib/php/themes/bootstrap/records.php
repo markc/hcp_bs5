@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/records.php 20180714
-// Copyright (C) 2015-2018 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/themes/bootstrap/records.php 20180714 - 20230625
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
 {
@@ -78,7 +78,7 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
             </div>
           </div>
           <div class="col-xl-2 col-md-4 col-8 my-2">
-            <div class="input-group">' . ($this->dropdown($this->g->types, 'type', 'A', '', 'custom-select')) . '
+            <div class="input-group">' . ($this->dropdown($this->types, 'type', 'A', '', 'form-select')) . '
             </div>
           </div>
           <div class="col-xl-1 col-md-2 col-4 my-2">

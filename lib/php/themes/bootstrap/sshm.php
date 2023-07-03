@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20230611
+// lib/php/themes/bootstrap/sshm.php 20230703 - 20230703
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
+class Themes_Bootstrap_Sshm extends Themes_Bootstrap_Theme
 {
     public function create(): string
     {
@@ -75,8 +75,8 @@ class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
         return '
         <div class="row">
           <h3>
-            <i class="bi bi-card-heading"></i> DKIM
-            <a href="#" title="Add New DKIM Key" data-bs-toggle="modal" data-bs-target="#createmodal">
+            <i class="bi bi-key"></i> SSH Manager
+            <a href="#" title="Add New SSH Host" data-bs-toggle="modal" data-bs-target="#createmodal">
             <small><i class="bi bi-plus-circle"></i></small></a>
           </h3>
         </div>

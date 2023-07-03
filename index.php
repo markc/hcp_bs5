@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// index.php 20150101 - 20230619
+// index.php 20150101 - 20230627
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -20,27 +20,20 @@ spl_autoload_register(function ($c): void {
     }
 });
 
-function elog(string $content): void
-{
-    if (DBG) {
-        error_log($content);
-    }
-}
-
 echo new Init(new class()
 {
-    public Object $t; // theme object
+    public object $t; // theme object
 
-    public $cfg = [
+    public array $cfg = [
         'email' => 'markc@renta.net',
-        'file' => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // settings override
+        'file' => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // this config override
         'hash' => 'SHA512-CRYPT',
         'host' => '',
         'perp' => 25,
         'self' => '/hcp/',
     ];
 
-    public $in = [
+    public array $in = [
         'a' => '',           // API (apiusr:apikey)
         'd' => '',           // Domain (current)
         'g' => null,         // Group/Category
@@ -48,25 +41,25 @@ echo new Init(new class()
         'l' => '',           // Log (message)
         'm' => 'list',       // Method (action)
         'o' => 'home',       // Object (content)
-        't' => 'bootstrap5', // Theme (bootstrap, bootstrap5, mazer)
+        't' => 'bootstrap',  // Theme (bootstrap(5))
         'x' => '',           // XHR (request)
     ];
 
-    public $out = [
+    public array $out = [
         'doc'  => 'NetServa',
         'css'  => '',
         'log'  => '',
         'nav1' => '',
         'nav2' => '',
         'nav3' => '',
-        'head' => 'NetServa',
+        'head' => 'NetServa HCP',
         'main' => 'Error: missing page!',
         'foot' => 'Copyright (C) 2015-2023 Mark Constable (AGPL-3.0)',
         'js'   => '',
         'end'  => '',
     ];
 
-    public $db = [
+    public array $db = [
         'host' => '127.0.0.1', // DB site
         'name' => 'sysadm',    // DB name
         'pass' => 'lib' . DS . '.ht_pw', // MySQL password override
@@ -77,7 +70,7 @@ echo new Init(new class()
         'user' => 'sysadm',    // DB user
     ];
 
-    public $nav1 = [
+    public array $nav1 = [
         'non' => [
             ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
             ['Phpmyadmin',  'phpmyadmin/',      'bi bi-globe'],
@@ -89,6 +82,7 @@ echo new Init(new class()
         'adm' => [
             ['Manage',       [
                 ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
+                ['SSH Manager', '?o=sshm',      'bi bi-key'],
                 ['Vhosts',      '?o=vhosts',    'bi bi-globe2'],
                 ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
                 ['Aliases',     '?o=valias',    'bi bi-envelope-paper-fill'],
@@ -108,9 +102,9 @@ echo new Init(new class()
         ],
     ];
 
-    public $nav2 = [];
+    public array $nav2 = [];
 
-    public $dns = [
+    public array $dns = [
         'a'    => '127.0.0.1',
         'mx'   => '',
         'ns1'  => 'ns1.',
@@ -126,18 +120,18 @@ echo new Init(new class()
             'ttl'     => 3600,
         ],
         'db' => [
-            'host' => '127.0.0.1', // Alt DNS DB site
-            'name' => 'pdns',      // Alt DNS DB name
+            'host' => '127.0.0.1',  // Alt DNS DB site
+            'name' => 'pdns',       // Alt DNS DB name
             'pass' => 'lib' . DS . '.ht_dns_pw', // MySQL DNS password override
             'path' => '/var/lib/sqlite/sysadm/pdns.db', // DNS SQLite DB
-            'port' => '3306',      // Alt DNS DB port
-            'sock' => '',          // '/run/mysqld/mysqld.sock',
-            'type' => '',          // mysql | sqlite | '' to disable
-            'user' => 'pdns',      // Alt DNS DB user
+            'port' => '3306',       // Alt DNS DB port
+            'sock' => '',           // '/run/mysqld/mysqld.sock',
+            'type' => 'mysql',      // mysql | sqlite | '' to disable
+            'user' => 'sysadm',     // Alt DNS DB user
         ],
     ];
 
-    public $acl = [
+    public array $acl = [
         0 => 'SuperAdmin',
         1 => 'Administrator',
         2 => 'User',

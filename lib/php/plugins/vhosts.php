@@ -145,7 +145,7 @@ class Plugins_Vhosts extends Plugin
             $columns = [
                 ['dt' => 0,  'db' => 'domain',      'formatter' => function ($d, $row) {
                     return '
-                    <a class="editlink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update VHOST">
+                    <a class="bslink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update VHOST">
                       <b>' . $row['domain'] . '</b></a>';
                 }],
                 ['dt' => 1,  'db' => 'num_aliases'],

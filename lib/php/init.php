@@ -4,15 +4,11 @@ declare(strict_types=1);
 // lib/php/init.php 20150101 - 20200414
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-
 class Init
 {
-    public $g;
-
-    public function __construct($g)
-    {
-        $this->g = $g; //gbl::getInstance();
-
+    public function __construct(
+        public object $g
+    ) {
         session_start();
 
         elog('GET=' . var_export($_GET, true));
@@ -24,9 +20,11 @@ class Init
 
         $this->g->cfg['host'] ??= getenv('HOSTNAME');
         $this->g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+        util::cfg($this->g); // include config override file if exists
 
-        //        util::cfg($this->g);
         $this->g->in = util::esc($this->g->in);
+
+        $this->g->in['a'] ? util::chkapi($this->g) : util::remember($this->g);
 
         if (!isset($_SESSION['c'])) {
             $_SESSION['c'] = Util::random_token(32);
@@ -45,15 +43,9 @@ class Init
             ? new $t1($this->g)
             : (class_exists($t2) ? new $t2($this->g) : new Theme($this->g));
 
-        //        $this->g->p = class_exists($p)
-        //            ? new $p($this->g) : new Plugin($this->g);
-
-        if (class_exists($p)) {
-            $this->g->in['a'] ? util::chkapi($this->g) : util::remember($this->g);
-            $this->g->out['main'] = (string) new $p($this->g);
-        } else {
-            $this->g->out['main'] = 'Error: no plugin object!';
-        }
+        $this->g->out['main'] = class_exists($p)
+            ? (string) new $p($this->g)
+            : "Error: plugin '$p' does not exist!";
 
         if (empty($this->g->in['x'])) {
             foreach ($this->g->out as $k => $v) {
@@ -63,19 +55,12 @@ class Init
         }
     }
 
-    /**
-     * Summary of __destruct
-     */
     public function __destruct()
     {
         //error_log('SESSION=' . var_export($_SESSION, true));
         elog(__FILE__ . ' ' . $_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4) . "\n");
     }
 
-    /**
-     * Summary of __toString
-     * @return string
-     */
     public function __toString(): string
     {
         $x = $this->g->in['x'];
@@ -101,5 +86,12 @@ class Init
         }
 
         return $this->g->t->html();
+    }
+}
+
+function elog(string $content): void
+{
+    if (DBG) {
+        error_log($content);
     }
 }

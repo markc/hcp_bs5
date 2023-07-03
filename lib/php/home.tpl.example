@@ -1,4 +1,5 @@
-<div class="col-12">
+<!-- Manually edit and rename to "home.tpl" to overide the "home" plugin -->
+<div class="row text-center">
 <h1>Your Page Title</h1>
 <p>Lorem ipsum...</p>
 </div>
