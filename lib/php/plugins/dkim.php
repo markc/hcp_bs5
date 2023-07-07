@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/dkim.php 20180511 - 20230604
+// lib/php/plugins/dkim.php 20180511 - 20230705
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Dkim extends Plugin
 {
-    protected array $in = [
+    public array $inp = [
         'dnstxt' => '',
         'domain' => '',
         'keylen' => '2048',
@@ -16,9 +16,9 @@ class Plugins_Dkim extends Plugin
     public function create(): string
     {
         if (util::is_post()) {
-            $domain = escapeshellarg($this->in['domain']);
-            $select = escapeshellarg($this->in['select']);
-            $keylen = escapeshellarg($this->in['keylen']);
+            $domain = escapeshellarg($this->inp['domain']);
+            $select = escapeshellarg($this->inp['select']);
+            $keylen = escapeshellarg($this->inp['keylen']);
             util::exe('dkim add ' . $domain . ' ' . $select . ' ' . $keylen);
         }
         util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
@@ -27,7 +27,7 @@ class Plugins_Dkim extends Plugin
 
     public function read(): string
     {
-        $domain = explode('._domainkey.', $this->in['dnstxt'])[1]; // too fragile?
+        $domain = explode('._domainkey.', $this->inp['dnstxt'])[1]; // too fragile?
         $domain_esc = escapeshellarg($domain);
         exec("sudo dkim show {$domain_esc} 2>&1", $retArr, $retVal);
         $buf = '
@@ -47,7 +47,7 @@ class Plugins_Dkim extends Plugin
     public function delete(): string
     {
         if (util::is_post()) {
-            $domain = escapeshellarg($this->in['domain']);
+            $domain = escapeshellarg($this->inp['domain']);
             util::exe('dkim del ' . $domain);
         }
         util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');

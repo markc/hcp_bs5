@@ -73,11 +73,12 @@ class Util
         return (boolval($retVal) ? true : false);
     }
 
-    public static function run(string $cmd): string
+    public static function run(string $cmd): array
     {
         elog(__METHOD__ . "({$cmd})");
 
-        return exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1');
+        exec(escapeshellcmd($cmd) . " 2>&1", $retArr, $retVal);
+        return ['ary' => $retArr, 'err' => $retVal];
     }
 
     public static function now(string $date1, string $date2 = null): string

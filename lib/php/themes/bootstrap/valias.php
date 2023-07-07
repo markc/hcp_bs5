@@ -110,8 +110,7 @@ $(document).ready(function() {
 
     private function modal_body(array $in): string
     {
-        $actbuf = ($in['active'] ? 1 : 0) ? ' checked' : '';
-
+        $active_buf = ($in['active'] ? 1 : 0) ? ' checked' : '';
         return '
         <div class="mb-3">
           <label class="form-label" for="source">Alias Address(es)</label>
@@ -127,7 +126,7 @@ $(document).ready(function() {
           <div>Full email address/es (comma-separated).</div>
         </div>
         <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" name="active" id="active"' . $actbuf . '>
+          <input class="form-check-input" type="checkbox" name="active" id="active"' . $active_buf . '>
           <label class="form-check-label" for="active">Active</label>
         </div>';
     }
