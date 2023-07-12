@@ -13,38 +13,28 @@ class Util
         } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
             $l = $_SESSION['log'];
             $_SESSION['log'] = [];
-
             return $l;
         }
-
         return [];
     }
 
     public static function enc(string $v): string
     {
-        elog(__METHOD__ . "({$v})");
-
         return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
     }
 
     public static function esc(array $in): array
     {
-        elog(__METHOD__ . " in = " . var_export($in, true));
-        elog('REQUEST inside esc=' . var_export($_REQUEST, true));
-
         foreach ($in as $k => $v) {
             $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
                 ? self::enc($_REQUEST[$k]) : $v;
         }
-
         return $in;
     }
 
     // TODO please document what $k, $v and $x are for?
     public static function ses(string $k, string $v = '', string $x = null): string
     {
-        elog(__METHOD__ . "({$k}, {$v}, {$x})");
-
         return $_SESSION[$k] =
             (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
                 || (isset($_REQUEST[$k], $_SESSION[$k])
@@ -69,14 +59,12 @@ class Util
         exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
         // class="mb-0" appearance tweak for Bootstrap5 should not be here
         util::log('<pre class="mb-0">' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
-
         return (boolval($retVal) ? true : false);
     }
 
     public static function run(string $cmd): array
     {
-        elog(__METHOD__ . "({$cmd})");
-
+        elog(__METHOD__ . "($cmd)");
         exec(escapeshellcmd($cmd) . " 2>&1", $retArr, $retVal);
         return ['ary' => $retArr, 'err' => $retVal];
     }
@@ -120,7 +108,6 @@ class Util
                 ++$current_level;
             }
         }
-
         return implode(' ', $result) . ' ago';
     }
 
@@ -202,7 +189,6 @@ class Util
         } else {
             util::log('Passwords must be at least 12 characters');
         }
-
         return false;
     }
 
@@ -273,7 +259,6 @@ class Util
         } else {
             header('Location:' . $url);
         }
-
         exit;
     }
 
@@ -300,7 +285,6 @@ class Util
         if ($size >= 1000) {
             return round(($size / 1000), $precision ?? 0) . ' KB';
         }
-
         return $size . ' Bytes';
     }
 
@@ -312,14 +296,12 @@ class Util
         }
         $base = log($size, 1024);
         $suffixes = [' Bytes', ' KiB', ' MiB', ' GiB', ' TiB'];
-
         return round(1024 ** ($base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 
     public static function is_valid_domain_name(string $domainname): bool
     {
         $domainname = idn_to_ascii($domainname);
-
         return preg_match('/^([a-z\\d](-*[a-z\\d])*)(\\.([a-z\\d](-*[a-z\\d])*))*$/i', $domainname)
             && preg_match('/^.{1,253}$/', $domainname)
             && preg_match('/^[^\\.]{1,63}(\\.[^\\.]{1,63})*$/', $domainname);
@@ -328,7 +310,6 @@ class Util
     public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT'): string
     {
         $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
-
         return 'SHA512-CRYPT' === $hash
             ? '{SHA512-CRYPT}' . crypt($pw, '$6$' . $salt_str . '$')
             : '{SSHA256}' . base64_encode(hash('sha256', $pw . $salt_str, true) . $salt_str);
@@ -338,7 +319,6 @@ class Util
     {
         $dtF = new \DateTime('@0');
         $dtT = new \DateTime("@{$seconds}");
-
         return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
     }
 
@@ -349,10 +329,8 @@ class Util
                 self::log('Possible CSRF attack');
                 self::redirect('?o=' . $_SESSION['o'] . '&m=list');
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -365,7 +343,6 @@ class Util
         $ary[2] = ($day == $ymd)
             ? "{$ymd}" . sprintf('%02d', $rev + 1)
             : "{$ymd}" . '00';
-
         return implode(' ', $ary);
     }
 
@@ -377,7 +354,6 @@ class Util
         if (strlen($random_base64) < $length) {
             return self::random_token($length);
         }
-
         return substr($random_base64, 0, $length);
     }
 }
