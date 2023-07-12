@@ -85,7 +85,7 @@ class Themes_Bootstrap_Sshm extends Themes_Bootstrap_Theme
             foreach ($in['ary'] as $line) {
                 $ary = preg_split('/\s+/', $line);
                 $skey_buf = (empty($ary[4]) || $ary[4] === 'none') ? '' : '
-              <a class="bslink" href="?o=sshm&m=shkey&skey=' . $ary[4] . '"><b>' . $ary[4] . '</b></a>';
+              <a class="bslink" href="?o=sshm&m=key_read&skey=' . $ary[4] . '"><b>' . $ary[4] . '</b></a>';
 
                 $buf .=
                     '
@@ -150,8 +150,8 @@ class Themes_Bootstrap_Sshm extends Themes_Bootstrap_Theme
           <div class="modal-dialog" id="deletedialog">
           </div>
         </div>
-        <div class="modal fade" id="shkeymodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
-          <div class="modal-dialog" id="shkeydialog">
+        <div class="modal fade" id="key_readmodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
+          <div class="modal-dialog" id="key_readdialog">
           </div>
         </div>
         <div class="modal fade" id="helpmodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
@@ -180,15 +180,6 @@ $(document).ready(function() {
 
 });
         </script>';
-    }
-
-    public function shkey(string $name, string $body): string
-    {
-        return $this->modal_content([
-            'title'     => 'SSH Key: <b>' . $name . '</b>',
-            'body'      => '
-            <textarea rows="12" style="width:100%;">' . $body . '</textarea>',
-        ]);
     }
 
     public function help(string $name, string $body): string
@@ -253,6 +244,15 @@ $(document).ready(function() {
             'mid_cmd'   => 'Help',
             'rhs_cmd'   => 'Create',
             'body'      => $this->modal_key_body($in)
+        ]);
+    }
+
+    public function key_read(string $name, string $body): string
+    {
+        return $this->modal_content([
+            'title'     => 'SSH Key: <b>' . $name . '</b>',
+            'body'      => '
+            <textarea rows="12" style="width:100%;">' . $body . '</textarea>',
         ]);
     }
 

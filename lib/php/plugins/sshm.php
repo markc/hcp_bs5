@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/sshm.php 20230703 - 20230707
+// lib/php/plugins/sshm.php 20230703 - 20230712
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Sshm extends Plugin
@@ -62,14 +62,6 @@ class Plugins_Sshm extends Plugin
         return $this->g->t->list(util::run('sshm list'));
     }
 
-    protected function shkey(): string
-    {
-        return $this->g->t->shkey(
-            $this->inp['skey'],
-            shell_exec('sshm key_read ' . $this->inp['skey'])
-        );
-    }
-
     public function help(): string
     {
         return $this->g->t->help(
@@ -89,15 +81,20 @@ class Plugins_Sshm extends Plugin
             );
             util::relist('key_list');
         } else {
-            //$keys = util::run('sshm key_list');
-            //$this->inp['keys'] = $keys['ary'];
             return $this->g->t->key_create($this->inp);
         }
     }
 
+    protected function key_read(): string
+    {
+        return $this->g->t->key_read(
+            $this->inp['skey'],
+            shell_exec('sshm key_read ' . $this->inp['skey'])
+        );
+    }
+
     public function key_delete(): ?string
     {
-        elog('!!!!!! key_delete this->inp[] = ' . var_export($this->inp, true));
         if (util::is_post()) {
             util::run('sshm key_delete ' . $this->inp['key_name']);
             util::relist('key_list');
