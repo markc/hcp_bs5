@@ -330,16 +330,28 @@ class Themes_Bootstrap_Theme extends Theme
     {
         extract($ary);
 
-        $hidden = isset($hidden) && $hidden ? $hidden : '';
-        $lhs_cmd = $lhs_cmd ? '
-                    <a class="btn btn-danger bslink" href="?o=' . $this->g->in['o'] . '&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>
-                    ' : '';
-
-        $footer = $rhs_cmd ? '
-                <div class="modal-footer d-flex justify-content-between">' . $lhs_cmd . '
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">' . $rhs_cmd . '</button>
-                </div>' : '';
+        $action = empty($action) ? '' : $action;
+        $hidden = empty($hidden) ? '' : $hidden;
+        $lhs_cmd = empty($lhs_cmd) ? '' : '
+                <a class="btn btn-danger bslink" href="?o=' . $this->g->in['o'] . '&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>';
+        $mid_cmd = empty($mid_cmd) ? '' : '
+                <a class="btn btn-info bslink" href="?o=' . $this->g->in['o'] . '&m=help&name=' . $this->g->in['m'] . '">' . $mid_cmd . '</a>';
+        $footer = empty($rhs_cmd) ? '' : '
+              <div class="modal-footer d-flex justify-content-between">' . $lhs_cmd . '
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' . $mid_cmd . '
+                <button type="submit" class="btn btn-primary">' . $rhs_cmd . '</button>
+              </div>';
+        $body = '
+                <div class="modal-body">' . $body . '
+                </div>';
+        $body_buf = empty($footer) ? $body : '
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                <input type="hidden" name="m" value="' . $action . '">
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">'
+            . $hidden . $body . $footer . '
+              </form>';
 
         return '
             <div class="modal-content">
@@ -347,15 +359,7 @@ class Themes_Bootstrap_Theme extends Theme
                 <h5 class="modal-title">' . $title . '</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 </button>
-              </div>
-              <form method="post" action="' . $this->g->cfg['self'] . '">
-                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-                <input type="hidden" name="m" value="' . $action . '">
-                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
-                <div class="modal-body">' . $body . '
-                </div>' . $footer . '
-              </form>
+              </div>' . $body_buf . '
             </div>';
     }
 }

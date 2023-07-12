@@ -66,12 +66,12 @@ class Plugin
         }
     }
 
-    protected function read(): string
+    protected function read(): ?string
     {
         return $this->g->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
-    protected function update(): string
+    protected function update(): ?string
     {
         if (util::is_post()) {
             $this->inp['updated'] = date('Y-m-d H:i:s');

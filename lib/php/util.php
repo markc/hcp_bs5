@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/util.php 20150225 - 2022023
+// lib/php/util.php 20150225 - 20230712
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
@@ -277,9 +277,10 @@ class Util
         exit;
     }
 
-    public static function relist(): void
+    public static function relist(string $m = ''): void
     {
-        self::redirect('?o=' . $_SESSION['o'] . '&m=list');
+        $m = empty($m) ? 'list' : $m;
+        self::redirect('?o=' . $_SESSION['o'] . '&m=' . $m);
     }
 
     public static function numfmt(float $size, int $precision = null): string
