@@ -66,7 +66,7 @@ class Plugins_Sshm extends Plugin
     {
         return $this->g->t->help(
             $this->inp['name'],
-            shell_exec('sshm help ' . escapeshellarg($this->inp['name']))
+            util::run('sshm help ' . escapeshellarg($this->inp['name']))
         );
     }
 
@@ -105,6 +105,6 @@ class Plugins_Sshm extends Plugin
 
     public function key_list(): string
     {
-        return $this->g->t->key_list(util::run('sshm key_list all'));
+        return $this->g->t->key_list(util::run('sshm key_list all', $this->g->in['r']));
     }
 }

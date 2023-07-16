@@ -32,6 +32,7 @@ class Init
         util::ses('o');
         util::ses('m');
         util::ses('l');
+        util::ses('r');
 
         $thm = util::ses('t', '', $this->g->in['t']);
 

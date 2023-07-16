@@ -13,7 +13,7 @@ class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
           <h3 class="mb-0"><i class="bi bi-envelope"></i> Processes <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h3>
           <form method="post" class="form-inline">
             <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
-            <input type="hidden" name="m" value="processes">
+            <input type="hidden" name="m" value="list">
             <div class="form-group">
                 <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Refresh</button>
             </div>

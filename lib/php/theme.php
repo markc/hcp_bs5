@@ -57,7 +57,7 @@ class Theme
     <header>
       <h1>
         <a href="' . $this->g->cfg['self'] . '">' . $this->g->out['head'] . '</a>
-      </h1>' . $this->g->out['nav1'] . '
+      </h1>' . $this->g->out['nav1'] . $this->g->out['nav2'] . '
     </header>';
     }
 

@@ -180,6 +180,7 @@ class Themes_Bootstrap_Theme extends Theme
         <div class="container">
             <a class="navbar-brand" href="' . $this->g->cfg['self'] . '">
                 <b><i class="bi bi-box"></i> ' . $this->g->out['head'] . '</b>
+                (' . $_SESSION['r'] . ')
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -212,12 +213,12 @@ class Themes_Bootstrap_Theme extends Theme
             <li class="nav-item"><a class="nav-link' . $c . '" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
         }, $a));
     }
-    /*
+
     public function nav2(): string
     {
-        return $this->nav_dropdown(['Theme', $this->g->t->nav2, 'fa fa-th fa-fw']);
+        return $this->nav_dropdown(['Sites', $this->g->nav2, 'bi bi-globe'], 'r');
     }
-    */
+
     public function nav3(): string
     {
         if (util::is_usr()) {
@@ -238,14 +239,17 @@ class Themes_Bootstrap_Theme extends Theme
 
     public function nav_dropdown(array $a = []): string
     {
-        $o = '?o=' . $this->g->in['o'];
+        $o = "?o=" . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
 
         return '
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">' . $i . $a[0] . '</a>
               <div class="dropdown-menu">' . implode('', array_map(function ($n) use ($o) {
-            $c = $o === $n[1] ? ' active' : '';
+            elog('n=' . var_export($n, true));
+            $tmp = isset($n[3]) ? '?r=' . $this->g->in[$n[3]] : $o;
+
+            $c = ($tmp === $n[1]) ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
 
             return '

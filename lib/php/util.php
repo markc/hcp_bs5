@@ -64,9 +64,12 @@ class Util
 
     public static function run(string $cmd): array
     {
-        elog(__METHOD__ . "($cmd)");
+        $rem = $_SESSION['r'];
+        $cmd = ($rem && $rem !== 'local') ? "LANG=posix sx $rem $cmd" : $cmd;
         exec(escapeshellcmd($cmd) . " 2>&1", $retArr, $retVal);
-        return ['ary' => $retArr, 'err' => $retVal];
+        $ary = empty($retArr) ? ["Error: empty command from '" . $cmd . "'"] : array_filter($retArr);
+        //elog(__METHOD__ . ' ary = ' . var_export($ary, true) . ' retVal = ' . $retVal);
+        return ['ary' => $ary, 'err' => $retVal];
     }
 
     public static function now(string $date1, string $date2 = null): string

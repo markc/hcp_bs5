@@ -30,7 +30,7 @@ echo new Init(new class()
         'hash' => 'SHA512-CRYPT',
         'host' => '',
         'perp' => 25,
-        'self' => '/hcp/',
+        'self' => '/',
     ];
 
     public array $in = [
@@ -41,6 +41,7 @@ echo new Init(new class()
         'l' => '',           // Log (message)
         'm' => 'list',       // Method (action)
         'o' => 'home',       // Object (content)
+        'r' => 'local',      // Remote Server (local)
         't' => 'bootstrap',  // Theme (bootstrap(5))
         'x' => '',           // XHR (request)
     ];
@@ -63,10 +64,10 @@ echo new Init(new class()
         'host' => '127.0.0.1', // DB site
         'name' => 'sysadm',    // DB name
         'pass' => 'lib' . DS . '.ht_pw', // MySQL password override
-        'path' => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
+        'path' => 'sqlite/sysadm/sysadm.db', // SQLite DB
         'port' => '3306',      // DB port
         'sock' => '',          // '/run/mysqld/mysqld.sock',
-        'type' => 'mysql',     // mysql | sqlite
+        'type' => 'sqlite',     // mysql | sqlite
         'user' => 'sysadm',    // DB user
     ];
 
@@ -99,10 +100,19 @@ echo new Init(new class()
                 ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
                 ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
             ], 'bi bi-list'],
+            ['Sites',        [
+                ['local',   '?r=local',     'bi bi-globe', 'r'],
+                ['mgo',     '?r=mgo',       'bi bi-globe', 'r'],
+                ['vmd1',    '?r=vmd1',      'bi bi-globe', 'r'],
+            ], 'bi bi-globe'],
         ],
     ];
 
-    public array $nav2 = [];
+    public array $nav2 = [
+        ['local',   '?r=local',     'bi bi-globe'],
+        ['mgo',     '?r=mgo',       'bi bi-globe'],
+        ['vmd1',    '?r=vmd1',      'bi bi-globe'],
+    ];
 
     public array $dns = [
         'a'    => '127.0.0.1',
@@ -123,10 +133,10 @@ echo new Init(new class()
             'host' => '127.0.0.1',  // Alt DNS DB site
             'name' => 'pdns',       // Alt DNS DB name
             'pass' => 'lib' . DS . '.ht_dns_pw', // MySQL DNS password override
-            'path' => '/var/lib/sqlite/sysadm/pdns.db', // DNS SQLite DB
+            'path' => 'sqlite/sysadm/pdns.db', // DNS SQLite DB
             'port' => '3306',       // Alt DNS DB port
             'sock' => '',           // '/run/mysqld/mysqld.sock',
-            'type' => 'mysql',      // mysql | sqlite | '' to disable
+            'type' => 'sqlite',      // mysql | sqlite | '' to disable
             'user' => 'sysadm',     // Alt DNS DB user
         ],
     ];

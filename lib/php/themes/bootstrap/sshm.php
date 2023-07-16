@@ -285,7 +285,7 @@ $(document).ready(function() {
                     '
           <tr>
             <td>
-              <a class="bslink" href="?o=sshm&m=shkey&skey=' . $ary[0] . '"><b>' . $ary[0] . '</b></a>
+              <a class="bslink" href="?o=sshm&m=key_read&skey=' . $ary[0] . '"><b>' . $ary[0] . '</b></a>
             </td>
             <td>' . $ary[1] . '</td>
             <td>' . $ary[2] . '</td>
@@ -336,16 +336,12 @@ $(document).ready(function() {
           <div class="modal-dialog" id="key_createdialog">
           </div>
         </div>
-        <div class="modal fade" id="key_updatemodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
-          <div class="modal-dialog" id="key_updatedialog">
+        <div class="modal fade" id="key_readmodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
+          <div class="modal-dialog" id="key_readdialog">
           </div>
         </div>
         <div class="modal fade" id="key_deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
           <div class="modal-dialog" id="key_deletedialog">
-          </div>
-        </div>
-        <div class="modal fade" id="shkeymodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
-          <div class="modal-dialog" id="shkeydialog">
           </div>
         </div>
         <div class="modal fade" id="helpmodal" tabindex="-1" role="dialog" aria-labelledby="shkeymodal" aria-hidden="true">
