@@ -52,7 +52,9 @@ class Util
         }
     }
 
-    public static function exe(string $cmd, bool $ret = false): bool
+    // util::run should be used instead of this one and move the
+    // usage of 'sudo' to the calling method
+    public static function exe(string $cmd): bool
     {
         elog(__METHOD__ . "({$cmd})");
 
@@ -62,14 +64,44 @@ class Util
         return (boolval($retVal) ? true : false);
     }
 
+    /**
+     * # Introducing shell exit strategies to trigger Bootstrap5 alerts
+     * #
+     * # exit 0        - success, no alert and continue
+     * # exit 1-250    - error, with 'danger' alert and continue
+     * # exit 251      - success, with 'success' alert and continue
+     * # exit 252      - info, with 'info' alert and continue
+     * # exit 253      - warning, with 'warning' alert and continue
+     * # exit 254      - warning, with 'warning' alert and empty content
+     * # exit 255      - error, with 'danger' alert and empty content
+     * #
+     * # 251/252/253 strip the first line to be used in alert message
+     */
     public static function run(string $cmd): array
     {
         $rem = $_SESSION['r'];
         $cmd = ($rem && $rem !== 'local') ? "LANG=posix sx $rem $cmd" : $cmd;
+
         exec(escapeshellcmd($cmd) . " 2>&1", $retArr, $retVal);
-        $ary = empty($retArr) ? ["Error: empty command from '" . $cmd . "'"] : array_filter($retArr);
-        //elog(__METHOD__ . ' ary = ' . var_export($ary, true) . ' retVal = ' . $retVal);
-        return ['ary' => $ary, 'err' => $retVal];
+
+        if (empty($retArr)) {
+            util::log("Info: empty result from '" . $cmd . "'", 'info');
+        } elseif ($retVal === 255) {
+            util::log(implode('\n', $retArr), 'danger');
+        } elseif ($retVal === 254) {
+            util::log(implode('\n', $retArr), 'warning');
+        } elseif ($retVal === 253) {
+            util::log(array_shift($retArr), 'warning');
+        } elseif ($retVal === 252) {
+            util::log(array_shift($retArr), 'info');
+        } elseif ($retVal === 251) {
+            util::log(array_shift($retArr), 'success');
+        } elseif ($retVal > 0) {
+            util::log(implode('\n', $retArr), 'danger');
+        }
+        elog(__METHOD__ . ' cmd=' . $cmd . ' retArr = ' . var_export($retArr, true) . ' retVal = ' . $retVal);
+
+        return ['ary' => array_filter($retArr), 'err' => $retVal];
     }
 
     public static function now(string $date1, string $date2 = null): string

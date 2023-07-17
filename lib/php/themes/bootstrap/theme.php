@@ -246,9 +246,8 @@ class Themes_Bootstrap_Theme extends Theme
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">' . $i . $a[0] . '</a>
               <div class="dropdown-menu">' . implode('', array_map(function ($n) use ($o) {
-            elog('n=' . var_export($n, true));
+            //elog('n=' . var_export($n, true));
             $tmp = isset($n[3]) ? '?r=' . $this->g->in[$n[3]] : $o;
-
             $c = ($tmp === $n[1]) ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
 

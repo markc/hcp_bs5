@@ -45,43 +45,11 @@ class Themes_Bootstrap_Sshm extends Themes_Bootstrap_Theme
         ]);
     }
 
-    /**
-     * # Introducing shell exit strategies to trigger Bootstrap5 alerts
-     * #
-     * # exit 0        - success, no alert and continue
-     * # exit 1-250    - error, with 'danger' alert and continue
-     * # exit 251      - success, with 'success' alert and continue
-     * # exit 252      - info, with 'info' alert and continue
-     * # exit 253      - warning, with 'warning' alert and continue
-     * # exit 254      - warning, with 'warning' alert and empty content
-     * # exit 255      - error, with 'danger' alert and empty content
-     * #
-     * # 251/252/253 strip the first line to be used in alert message
-     */
     public function list(array $in): string
     {
         $buf = '';
         // TODO: move this mess to a dedicated util::alert method
-        if ($in['err'] === 254 || $in['err'] === 255) {
-            $lvl = $in['err'] === 254 ? 'warning' : 'danger';
-            util::log($in['ary'][0], $lvl);
-        } else {
-            if ($in['err'] === 253) {
-                $msg = array_shift($in['ary']);
-                util::log($msg, 'warning');
-            }
-            if ($in['err'] === 252) {
-                $msg = array_shift($in['ary']);
-                util::log($msg, 'info');
-            }
-            if ($in['err'] === 251) {
-                $msg = array_shift($in['ary']);
-                util::log($msg, 'success');
-            }
-            if ($in['err'] > 0) {
-                util::log($in['ary'][0], 'danger');
-            }
-
+        if (!empty($in)) {
             foreach ($in['ary'] as $line) {
                 $ary = preg_split('/\s+/', $line);
                 $skey_buf = (empty($ary[4]) || $ary[4] === 'none') ? '' : '
