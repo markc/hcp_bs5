@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/init.php 20150101 - 20200414
+// lib/php/init.php 20150101 - 20230729
 // Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
@@ -32,7 +32,7 @@ class Init
         util::ses('o');
         util::ses('m');
         util::ses('l');
-        util::ses('r');
+        util::ses('r', '', 'local'); // Remote target
 
         $thm = util::ses('t', '', $this->g->in['t']);
 

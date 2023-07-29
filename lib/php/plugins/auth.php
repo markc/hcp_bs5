@@ -62,13 +62,14 @@ class Plugins_Auth extends Plugin
     {
         $u = $this->inp['login'];
         $p = $this->inp['webpw'];
-
+        elog("u=$u, p=$p");
         if ($u) {
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
+                elog('usr=' . var_export($usr, true));
                 extract($usr);
                 if (9 !== $acl) {
-                    //if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
-                    if ($p == 'changeme') {
+                    if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
+                        //if ($p == 'changeme') {
                         if ($this->inp['remember']) {
                             $uniq = util::random_token(32);
                             db::update(['cookie' => $uniq], [['id', '=', $id]]);
@@ -107,7 +108,7 @@ class Plugins_Auth extends Plugin
         $u = (util::is_usr()) ? $_SESSION['usr']['login'] : $_SESSION['resetpw']['usr']['login'];
 
         if (util::is_post()) {
-            if ($usr = db::read('login,acl,otpttl', 'id', $i, '', 'one')) {
+            if ($usr = db::read('login,acl,otpttl', 'id', (string) $i, '', 'one')) {
                 $p1 = html_entity_decode($this->inp['passwd1'], ENT_QUOTES, 'UTF-8');
                 $p2 = html_entity_decode($this->inp['passwd2'], ENT_QUOTES, 'UTF-8');
                 if (util::chkpw($p1, $p2)) {
