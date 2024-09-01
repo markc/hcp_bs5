@@ -5,82 +5,98 @@ declare(strict_types=1);
 // index.php 20150101 - 20240901
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+// Define constants for directory separator and the path to the included PHP files
 const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
-const DBG = true;
+const DBG = true;  // Enable or disable debugging
 
+// Autoload function to automatically load class files when instantiated
 spl_autoload_register(static function (string $class): void {
+    // Convert class name to file path
     $file = INC . str_replace(['\\', '_'], [DS, DS], strtolower($class)) . '.php';
+
+    // Check if the file exists and include it
     if (is_file($file)) {
         require $file;
+        // Log the loaded file if debugging is enabled
         if (DBG) {
             error_log("Loaded: $file");
         }
     } else {
+        // Log an error if the file does not exist
         error_log("Error: {$file} does not exist");
     }
 });
 
+// Create a new Init object with an anonymous class for configuration
 echo new Init(new class()
 {
-    public object $t; // theme object
+    public object $t; // Placeholder for a theme object
 
+    // Configuration settings
     public array $cfg = [
-        'email' => 'markc@renta.net',
-        'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // this config override
-        'hash'  => 'SHA512-CRYPT',
-        'host'  => '',
-        'perp'  => 25,
-        'self'  => '/',
+        'email' => 'markc@renta.net', // Default email address
+        'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // Path to config override file
+        'hash'  => 'SHA512-CRYPT',  // Default hashing algorithm
+        'host'  => '',              // Hostname (to be defined later)
+        'perp'  => 25,              // Pagination setting
+        'self'  => '/',             // Base URL or path
     ];
 
+    // Input parameters, typically from user or API requests
     public array $in = [
-        'a'     => '',           // API (apiusr:apikey)
-        'd'     => '',           // Domain (current)
-        'g'     => null,         // Group/Category
-        'i'     => null,         // Item or ID
-        'l'     => '',           // Log (message)
-        'm'     => 'list',       // Method (action)
-        'o'     => 'home',       // Object (content)
-        'r'     => 'local',      // Remote Server (local)
-        't'     => 'bootstrap',  // Theme (bootstrap(5))
-        'x'     => '',           // XHR (request)
+        'a'     => '',              // API credentials (apiusr:apikey)
+        'd'     => '',              // Domain name
+        'g'     => null,            // Group or category
+        'i'     => null,            // Item ID
+        'l'     => '',              // Log message
+        'm'     => 'list',          // Method or action
+        'o'     => 'home',          // Object or content type
+        'r'     => 'local',         // Remote server identifier
+        't'     => 'bootstrap',     // Theme (default: bootstrap)
+        'x'     => '',              // XMLHttpRequest flag
     ];
 
+    // Output settings for rendering content
     public array $out = [
-        'doc'   => 'NetServa',
-        'css'   => '',
-        'log'   => '',
-        'nav1'  => '',
-        'nav2'  => '',
-        'nav3'  => '',
-        'head'  => 'NetServa HCP',
-        'main'  => 'Error: missing page!',
-        'foot'  => 'Copyright (C) 2015-2024 Mark Constable (AGPL-3.0)',
-        'js'    => '',
-        'end'   => '',
+        'doc'   => 'NetServa',      // Document title
+        'css'   => '',              // Additional CSS styles
+        'log'   => '',              // Log output
+        'nav1'  => '',              // First-level navigation
+        'nav2'  => '',              // Second-level navigation
+        'nav3'  => '',              // Third-level navigation
+        'head'  => 'NetServa HCP',  // HTML head content
+        'main'  => 'Error: missing page!',  // Main content area
+        'foot'  => 'Copyright (C) 2015-2024 Mark Constable (AGPL-3.0)',  // Footer content
+        'js'    => '',              // Additional JavaScript
+        'end'   => '',              // End of document content
     ];
 
+    // Database configuration settings
     public array $db = [
-        'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
-        'path'  => 'sqlite/sysadm/sysadm.db', // SQLite DB
-        'port'  => '3306',      // DB port
-        'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',     // mysql | sqlite
-        'user'  => 'sysadm',    // DB user
+        'host'  => '127.0.0.1',     // Database host
+        'name'  => 'sysadm',        // Database name
+        'pass'  => 'lib' . DS . '.ht_pw',  // Path to MySQL password override file
+        'path'  => 'sqlite/sysadm/sysadm.db',  // SQLite database path
+        'port'  => '3306',          // Database port
+        'sock'  => '',              // MySQL socket (optional)
+        'type'  => 'sqlite',        // Database type (mysql | sqlite)
+        'user'  => 'sysadm',        // Database username
     ];
 
+    // First-level navigation settings
     public array $nav1 = [
+        // Non-authenticated user menu
         'non' => [
             ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
             ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
         ],
+        // Regular user menu
         'usr' => [
             ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
             ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
         ],
+        // Administrator menu
         'adm' => [
             ['Manage', [
                 ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
@@ -109,44 +125,49 @@ echo new Init(new class()
         ],
     ];
 
+    // Second-level navigation settings
     public array $nav2 = [
         ['local',   '?r=local', 'bi bi-globe'],
         ['mgo',     '?r=mgo',   'bi bi-globe'],
         ['vmd1',    '?r=vmd1',  'bi bi-globe'],
     ];
 
+    // DNS configuration settings
     public array $dns = [
-        'a'     => '127.0.0.1',
-        'mx'    => '',
-        'ns1'   => 'ns1.',
-        'ns2'   => 'ns2.',
-        'prio'  => 0,
-        'ttl'   => 300,
+        'a'     => '127.0.0.1',     // Default A record
+        'mx'    => '',              // Default MX record
+        'ns1'   => 'ns1.',          // Primary nameserver
+        'ns2'   => 'ns2.',          // Secondary nameserver
+        'prio'  => 0,               // Priority setting
+        'ttl'   => 300,             // Time to live
+        // Start of Authority record settings
         'soa'   => [
-            'primary'   => 'ns1.',
-            'email'     => 'admin.',
-            'refresh'   => 7200,
-            'retry'     => 540,
-            'expire'    => 604800,
-            'ttl'       => 3600,
+            'primary'   => 'ns1.',  // Primary nameserver
+            'email'     => 'admin.', // Domain email address
+            'refresh'   => 7200,    // Refresh interval
+            'retry'     => 540,     // Retry interval
+            'expire'    => 604800,  // Expiration time
+            'ttl'       => 3600,    // TTL for SOA record
         ],
+        // Alternate DNS database settings
         'db'    => [
-            'host'      => '127.0.0.1',  // Alt DNS DB site
-            'name'      => 'pdns',       // Alt DNS DB name
-            'pass'      => 'lib' . DS . '.ht_dns_pw', // MySQL DNS password override
-            'path'      => 'sqlite/sysadm/pdns.db', // DNS SQLite DB
-            'port'      => '3306',       // Alt DNS DB port
-            'sock'      => '',           // '/run/mysqld/mysqld.sock',
-            'type'      => 'sqlite',     // mysql | sqlite | '' to disable
-            'user'      => 'sysadm',     // Alt DNS DB user
+            'host'      => '127.0.0.1', // Alternate DNS DB host
+            'name'      => 'pdns',  // Alternate DNS DB name
+            'pass'      => 'lib' . DS . '.ht_dns_pw', // Path to DNS password override file
+            'path'      => 'sqlite/sysadm/pdns.db', // Path to DNS SQLite DB
+            'port'      => '3306',  // Alternate DNS DB port
+            'sock'      => '',      // MySQL socket (optional)
+            'type'      => 'sqlite',// DB type (mysql | sqlite | '' to disable)
+            'user'      => 'sysadm',// Alternate DNS DB user
         ],
     ];
 
+    // Access control levels (ACL) defining user roles
     public array $acl = [
-        0   => 'SuperAdmin',
-        1   => 'Administrator',
-        2   => 'User',
-        3   => 'Suspended',
-        9   => 'Anonymous',
+        0   => 'SuperAdmin',        // Full access
+        1   => 'Administrator',     // Admin access
+        2   => 'User',              // Regular user access
+        3   => 'Suspended',         // Suspended access
+        9   => 'Anonymous',         // No authentication required
     ];
 });
