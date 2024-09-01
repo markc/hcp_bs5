@@ -1,22 +1,22 @@
 <?php
 
 declare(strict_types=1);
-// index.php 20150101 - 20230627
-// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20240901
+// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 const DBG = true;
 
-spl_autoload_register(function ($c): void {
-    $f = INC . str_replace(['\\', '_'], [DS, DS], strtolower($c)) . '.php';
-    if (file_exists($f)) {
-        include $f;
+spl_autoload_register(static function (string $class): void {
+    $file = INC . str_replace(['\\', '_'], [DS, DS], strtolower($class)) . '.php';
+    if (is_file($file)) {
+        require $file;
         if (DBG) {
-            error_log("include $f");
+            error_log("Loaded: $file");
         }
     } else {
-        error_log("!!! {$f} does not exist");
+        error_log("Error: {$file} does not exist");
     }
 });
 
@@ -35,15 +35,15 @@ echo new Init(new class()
 
     public array $in = [
         'a' => '',           // API (apiusr:apikey)
-        'd' => '',           // Domain (current)
-        'g' => null,         // Group/Category
-        'i' => null,         // Item or ID
-        'l' => '',           // Log (message)
-        'm' => 'list',       // Method (action)
-        'o' => 'home',       // Object (content)
-        'r' => 'local',      // Remote Server (local)
-        't' => 'bootstrap',  // Theme (bootstrap(5))
-        'x' => '',           // XHR (request)
+'d' => '',           // Domain (current)
+'g' => null,         // Group/Category
+'i' => null,         // Item or ID
+'l' => '',           // Log (message)
+'m' => 'list',       // Method (action)
+'o' => 'home',       // Object (content)
+'r' => 'local',      // Remote Server (local)
+'t' => 'bootstrap',  // Theme (bootstrap(5))
+'x' => '',           // XHR (request)
     ];
 
     public array $out = [
@@ -55,9 +55,9 @@ echo new Init(new class()
         'nav3' => '',
         'head' => 'NetServa HCP',
         'main' => 'Error: missing page!',
-        'foot' => 'Copyright (C) 2015-2023 Mark Constable (AGPL-3.0)',
-        'js'   => '',
-        'end'  => '',
+        'foot' => 'Copyright (C) 2015-2024 Mark Constable (AGPL-3.0)',
+              'js'   => '',
+              'end'  => '',
     ];
 
     public array $db = [
@@ -83,27 +83,27 @@ echo new Init(new class()
         'adm' => [
             ['Manage',       [
                 ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
-                ['SSH Manager', '?o=sshm',      'bi bi-key'],
-                ['Vhosts',      '?o=vhosts',    'bi bi-globe2'],
-                ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
-                ['Aliases',     '?o=valias',    'bi bi-envelope-paper-fill'],
-                ['DKIM',        '?o=dkim',      'bi bi-person-vcard-fill'],
-                ['Domains',     '?o=domains',   'bi bi-globe-americas'],
+              ['SSH Manager', '?o=sshm',      'bi bi-key'],
+              ['Vhosts',      '?o=vhosts',    'bi bi-globe2'],
+              ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
+              ['Aliases',     '?o=valias',    'bi bi-envelope-paper-fill'],
+              ['DKIM',        '?o=dkim',      'bi bi-person-vcard-fill'],
+              ['Domains',     '?o=domains',   'bi bi-globe-americas'],
             ], 'bi bi-stack'],
             ['Stats',       [
                 ['Sys Info',    '?o=infosys',   'bi bi-speedometer2'],
-                ['Processes',   '?o=processes', 'bi bi-bezier2'],
-                ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
-                ['Mail Graph',  '?o=mailgraph', 'bi bi-bar-chart'],
+              ['Processes',   '?o=processes', 'bi bi-bezier2'],
+              ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
+              ['Mail Graph',  '?o=mailgraph', 'bi bi-bar-chart'],
             ], 'bi bi-graph-up-arrow'],
             ['Links',        [
                 ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
-                ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+              ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
             ], 'bi bi-list'],
             ['Sites',        [
                 ['local',   '?r=local',     'bi bi-globe', 'r'],
-                ['mgo',     '?r=mgo',       'bi bi-globe', 'r'],
-                ['vmd1',    '?r=vmd1',      'bi bi-globe', 'r'],
+              ['mgo',     '?r=mgo',       'bi bi-globe', 'r'],
+              ['vmd1',    '?r=vmd1',      'bi bi-globe', 'r'],
             ], 'bi bi-globe'],
         ],
     ];
@@ -149,5 +149,3 @@ echo new Init(new class()
         9 => 'Anonymous',
     ];
 });
-
-//echo new Init();
