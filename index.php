@@ -5,9 +5,14 @@ declare(strict_types=1);
 // index.php 20150101 - 20240902
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-// Define constants for directory separator and the path to the included PHP files
-const INC = __DIR__ . '/lib/php/';
-const DBG = true;  // Enable or disable debugging
+// Define directory separator
+const DS = DIRECTORY_SEPARATOR;
+
+// Define the path to the included PHP files
+const INC = __DIR__ . DS . 'lib' . DS . 'php';
+
+// Enable or disable debugging via elog()
+const DBG = true;
 
 /**
  * Autoload function to automatically load class files when instantiated.
