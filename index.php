@@ -9,7 +9,7 @@ declare(strict_types=1);
 const DS = DIRECTORY_SEPARATOR;
 
 // Define the path to the included PHP files
-const INC = __DIR__ . DS . 'lib' . DS . 'php';
+const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 // Enable or disable debugging via elog()
 const DBG = true;
