@@ -23,7 +23,7 @@ const DBG = true;
  */
 spl_autoload_register(static function (string $className): void {
     // Create path to the class file
-    $filePath = INC . $className[0] . DS . substr($className, 1) . '.php';
+    $filePath = INC . str_replace(['\\', '_'], [DS, DS], strtolower($className)) . '.php';
 
     // Check if the class file exists
     if (is_file($filePath)) {
