@@ -1,33 +1,87 @@
 <?php
 
 declare(strict_types=1);
+
 // lib/php/util.php 20150225 - 20230712
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
-    public static function log(string $msg = '', string $lvl = 'danger'): array
+
+    /**
+     * Log a message to the session log array.
+     *
+     * If $message is given, it is appended to the log array with the given $level.
+     * If $message is not given, the log array is returned and cleared.
+     *
+     * The log array is stored in the $_SESSION['log'] variable. It is an associative array
+     * where each key is a log level (e.g. 'danger', 'success', etc.) and the value is an
+     * array of messages for that log level.
+     *
+     * @param string $message The message to log. If empty, the log array is returned.
+     * @param string $level The log level. Default is 'danger'.
+     * @return array<string, array<string>> The log array if $message is empty.
+     */
+    public static function log(string $message = '', string $level = 'danger'): array
     {
-        if ($msg) {
-            $_SESSION['log'][$lvl] = empty($_SESSION['log'][$lvl]) ? $msg : $_SESSION['log'][$lvl] . '<br>' . $msg;
-        } elseif (isset($_SESSION['log']) and $_SESSION['log']) {
-            $l = $_SESSION['log'];
+        // If we're given a message, add it to the log array
+        if (!empty($message)) {
+            // If the log array doesn't exist, create it
+            if (!isset($_SESSION['log'])) {
+                $_SESSION['log'] = [];
+            }
+            // If the log array doesn't have an entry for the given log level, create it
+            if (!isset($_SESSION['log'][$level])) {
+                $_SESSION['log'][$level] = [];
+            }
+            // Add the message to the log array for the given log level
+            $_SESSION['log'][$level][] = $message;
+        } else {
+            // If we weren't given a message, return the log array and clear it
+            $log = $_SESSION['log'] ?? [];
             $_SESSION['log'] = [];
-            return $l;
+            return $log;
         }
+        // If we were given a message, return an empty array
         return [];
     }
 
+
+    /**
+     * Encodes a string for safe output in HTML.
+     *
+     * This takes a string, trims it, and then runs it through htmlentities()
+     * with the ENT_QUOTES and UTF-8 flags. This is good for preventing XSS
+     * attacks when outputting user-supplied data in HTML.
+     *
+     * @param string $v The string to encode.
+     * @return string The encoded string.
+     */
     public static function enc(string $v): string
     {
-        return htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
+        return \htmlentities(\trim($v), \ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Escapes values in an array using enc() if they are also in $_REQUEST.
+     *
+     * This takes an array of values, and for each key, checks if the same key
+     * exists in $_REQUEST and is not an array. If so, it runs the value through
+     * the enc() method, which trims it and encodes it for safe output in HTML.
+     * If not, it leaves the value alone.
+     *
+     * This is useful for safely outputting user-supplied data in HTML.
+     *
+     * @param array<string, mixed> $in The array of values to escape.
+     * @return array<string, mixed> The array of escaped values.
+     */
     public static function esc(array $in): array
     {
+        $request = &$_REQUEST;
         foreach ($in as $k => $v) {
-            $in[$k] = isset($_REQUEST[$k]) && !is_array($_REQUEST[$k])
-                ? self::enc($_REQUEST[$k]) : $v;
+            if (isset($request[$k]) && !is_array($request[$k])) {
+                $in[$k] = self::enc((string)$request[$k]);
+            }
         }
         return $in;
     }
@@ -82,7 +136,7 @@ class Util
         $rem = $_SESSION['r'];
         $cmd = ($rem && $rem !== 'local') ? "LANG=posix sx $rem $cmd" : $cmd;
 
-        exec(escapeshellcmd($cmd) . " 2>&1", $retArr, $retVal);
+        exec(escapeshellcmd("sudo $cmd") . " 2>&1", $retArr, $retVal);
 
         if (empty($retArr)) {
             util::log("Info: empty result from '" . $cmd . "'", 'info');
