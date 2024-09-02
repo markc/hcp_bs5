@@ -2,29 +2,31 @@
 
 declare(strict_types=1);
 
-// index.php 20150101 - 20240901
+// index.php 20150101 - 20240902
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 // Define constants for directory separator and the path to the included PHP files
-const DS = DIRECTORY_SEPARATOR;
-const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
+const INC = __DIR__ . '/lib/php/';
 const DBG = true;  // Enable or disable debugging
 
-// Autoload function to automatically load class files when instantiated
-spl_autoload_register(static function (string $class): void {
-    // Convert class name to file path
-    $file = INC . str_replace(['\\', '_'], [DS, DS], strtolower($class)) . '.php';
+/**
+ * Autoload function to automatically load class files when instantiated.
+ *
+ * @param string $className Class name to load.
+ *
+ * @throws \LogicException If the class file is not found.
+ */
+spl_autoload_register(static function (string $className): void {
+    // Create path to the class file
+    $filePath = INC . $className[0] . DS . substr($className, 1) . '.php';
 
-    // Check if the file exists and include it
-    if (is_file($file)) {
-        require $file;
-        // Log the loaded file if debugging is enabled
-        if (DBG) {
-            error_log("Loaded: $file");
-        }
+    // Check if the class file exists
+    if (is_file($filePath)) {
+        // Load the class file
+        require $filePath;
     } else {
-        // Log an error if the file does not exist
-        error_log("Error: {$file} does not exist");
+        // Throw an exception if the class file does not exist
+        throw new \LogicException("Class $className not found");
     }
 });
 
