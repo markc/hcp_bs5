@@ -36,11 +36,31 @@ spl_autoload_register(static function (string $className): void {
 });
 
 // Create a new Init object with an anonymous class for configuration
-echo new Init(new class()
-{
+// This anonymous class is used to override any default values in the $cfg array
+// The Init class is defined below and is used to set up the initial environment
+// and configuration for the HCP web interface
+// The constructor for Init expects an object with an array of configuration
+// settings, which is what the anonymous class provides
+// The constructor for Init will set up the initial environment and
+// configuration for the HCP web interface based on the values provided in
+// the $cfg array
+// @see Init::__construct()
+echo new Init(new class() {
+    /**
+     * Configuration settings
+     *
+     * @var array
+     */
     public object $t; // Placeholder for a theme object
 
-    // Configuration settings
+    /**
+     * Configuration settings
+     *
+     * The $cfg array contains the default configuration settings that can be
+     * overridden by the contents of the file specified in $cfg['file'].
+     *
+     * @var array
+     */
     public array $cfg = [
         'email' => 'markc@renta.net', // Default email address
         'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // Path to config override file
@@ -50,18 +70,60 @@ echo new Init(new class()
         'self'  => '/',             // Base URL or path
     ];
 
-    // Input parameters, typically from user or API requests
+    /**
+     * Input parameters, typically from user or API requests
+     *
+     * This is a placeholder for data that is passed into the HCP web interface
+     * from the user or an API request.
+     *
+     * The keys in this array are the names of parameters that are passed in via
+     * the URL or as HTTP request data. The values in this array are the default
+     * values for each parameter.
+     *
+     * @var array
+     */
     public array $in = [
-        'a'     => '',              // API credentials (apiusr:apikey)
-        'd'     => '',              // Domain name
-        'g'     => null,            // Group or category
-        'i'     => null,            // Item ID
-        'l'     => '',              // Log message
-        'm'     => 'list',          // Method or action
-        'o'     => 'home',          // Object or content type
-        'r'     => 'local',         // Remote server identifier
-        't'     => 'bootstrap',     // Theme (default: bootstrap)
-        'x'     => '',              // XMLHttpRequest flag
+        // API credentials (apiusr:apikey)
+        // This is used for API requests to authenticate the user.
+        'a'     => '',
+
+        // Domain name
+        // This is used to route the request to the appropriate virtual host.
+        'd'     => '',
+
+        // Group or category
+        // This is used to group objects together in the HCP web interface.
+        'g'     => null,
+
+        // Item ID
+        // This is used to identify a specific item in the HCP web interface.
+        'i'     => null,
+
+        // Log message
+        // This is used to pass a log message to the HCP web interface.
+        'l'     => '',
+
+        // Method or action
+        // This is used to determine which method to call in the HCP web interface.
+        'm'     => 'list',
+
+        // Object or content type
+        // This is used to determine which type of object to render in the HCP
+        // web interface.
+        'o'     => 'home',
+
+        // Remote server identifier
+        // This is used to identify the remote server that the request is coming
+        // from.
+        'r'     => 'local',
+
+        // Theme (default: bootstrap)
+        // This is used to determine which theme to use in the HCP web interface.
+        't'     => 'bootstrap',
+
+        // XMLHttpRequest flag
+        // This is used to determine if the request is an XMLHttpRequest or not.
+        'x'     => '',
     ];
 
     // Output settings for rendering content
