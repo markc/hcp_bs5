@@ -302,21 +302,37 @@ class Themes_Bootstrap_Theme extends Theme
     ';
     }
 
+    /**
+     * Return html for log messages stored in session
+     *
+     * @return string
+     */
     public function log(): string
     {
+        // Initialize variable to hold the log messages
         $logs = '';
+
+        // Loop through the log messages stored in session
         foreach (util::log() as $lvl => $msg) {
-            $logs .= $msg ? '
-            <div class="row">
-              <div class="col">
-                <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                  </button>' . rtrim($msg) . '
-                </div>
-              </div>
-            </div>' : '';
+            // If the $msg is an array and not empty, then loop through it and create a log message
+            if (is_array($msg) && !empty($msg)) {
+                // Loop through the array
+                foreach ($msg as $text) {
+                    // Add the log message to the $logs variable
+                    $logs .= '
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          ' . htmlspecialchars($text) . '
+                        </div>
+                      </div>
+                    </div>';
+                }
+            }
         }
 
+        // Return the log messages
         return $logs;
     }
 
