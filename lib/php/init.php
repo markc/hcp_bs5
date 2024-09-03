@@ -5,6 +5,17 @@ declare(strict_types=1);
 // lib/php/init.php 20150101 - 20240901
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+/**
+ * Class Init
+ * @package hcp
+ *
+ * Initialisation code for the application. This class is called once per
+ * request and is used to set up the environment and load the necessary code.
+ *
+ * @author Mark Constable <markc@renta.net>
+ * @copyright 2015-2024 Mark Constable <markc@renta.net>
+ * @license AGPL-3.0
+ */
 class Init
 {
     /**
@@ -61,19 +72,20 @@ class Init
 
         // Instantiate the theme object
         $this->g->t = class_exists($t1)
-        ? new $t1($this->g)
-        : (class_exists($t2) ? new $t2($this->g) : new Theme($this->g));
+            ? new $t1($this->g)
+            : (class_exists($t2) ? new $t2($this->g) : new Theme($this->g));
 
         // Process the main content using the plugin class if it exists
         $this->g->out['main'] = class_exists($p)
-        ? (string) new $p($this->g)
-        : "Error: plugin '$p' does not exist!";
+            ? (string) new $p($this->g)
+            : "Error: plugin '$p' does not exist!";
 
         // If not an XHR request, process additional content output
         if (empty($this->g->in['x'])) {
             foreach ($this->g->out as $k => $v) {
                 $this->g->out[$k] = method_exists($this->g->t, $k)
-                ? $this->g->t->{$k}() : $v;
+                ? $this->g->t->{$k}()
+                : $v;
             }
         }
     }
@@ -116,39 +128,62 @@ class Init
     }
 
     /**
-     * Convert the object to a string representation based on the request type.
+     * Converts the object to a string representation based on the request type.
      *
-     * @param string $x The request type, one of 'html', 'text', 'json', or a specific key to return.
+     * The request type is determined by the 'x' parameter in the request. If
+     * 'x' is not set, the default value is 'html'.
+     *
+     * The method returns the response content in the appropriate format. The
+     * returned content is determined as follows:
+     *
+     *   * If 'x' is 'html', the method returns the HTML content of the page.
+     *   * If 'x' is 'text', the method returns the plain text content of the
+     *     page, stripped of HTML tags and with excess whitespace removed.
+     *   * If 'x' is 'json', the method returns the JSON content of the page.
+     *   * If 'x' is a specific key, the method returns the value of that key
+     *     in the output array as JSON.
+     *
+     * @param string $x The request type, one of 'html', 'text', 'json', or a
+     * specific key to return.
      * @return string The response content in the appropriate format
      */
     public function __toString(): string
     {
         $x = $this->g->in['x'];
+        $out = $this->g->out;
 
-        // Return HTML content
+        // If $x is 'html', return the HTML content of the page
         if ($x === 'html') {
-            return (string) $this->g->out['main'];
+            return $out['main'];
         }
 
-        // Return plain text content
+        // If $x is 'text', strip HTML tags and excess whitespace from the
+        // content and return the plain text content
         if ($x === 'text') {
-            return preg_replace('/^\h*\v+/m', '', strip_tags((string) $this->g->out['main']));
+            return trim(
+                preg_replace(
+                    '/^\h*\v+/m',
+                    '',
+                    strip_tags($out['main'])
+                )
+            );
         }
 
-        // Return JSON content
-        if ($x === 'json') {
+        // If $x is 'json', return the JSON content of the page
+        if ($x === 'json' || array_key_exists($x, $out)) {
             header('Content-Type: application/json');
-            return json_encode($this->g->out['main'], JSON_PRETTY_PRINT);
-        }
 
-        // Return specific output as JSON if specified
-        if (array_key_exists($x, $this->g->out)) {
-            header('Content-Type: application/json');
-            return json_encode($this->g->out[$x], JSON_PRETTY_PRINT);
+            // If $x is 'json', return the entire output array as JSON
+            if ($x === 'json') {
+                return json_encode($out['main'], JSON_PRETTY_PRINT);
+            }
+
+            // Otherwise, return the value of the specified key as JSON
+            return json_encode($out[$x], JSON_PRETTY_PRINT);
         }
 
         // Default to rendering the HTML view
-        return (string) $this->g->t->html();
+        return $this->g->t->html();
     }
 }
 
