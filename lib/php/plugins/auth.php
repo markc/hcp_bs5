@@ -189,13 +189,24 @@ class Plugins_Auth extends Plugin
      */
     public function update(): string
     {
+        // The user needs to be either logged in or have a valid session for resetting their password
+        // If they are not, log an error and redirect them to the login page
         if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
             util::log('Session expired! Please login and try again.');
             util::relist();
         }
 
-        $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
-        $u = (util::is_usr()) ? $_SESSION['usr']['login'] : $_SESSION['resetpw']['usr']['login'];
+        // Depending on whether the user is logged in or not, use the appropriate user ID and login
+        $i = (util::is_usr())
+            // If the user is logged in, use their ID from the session
+            ? $_SESSION['usr']['id']
+            // If the user is not logged in, use the ID from the reset password session
+            : $_SESSION['resetpw']['usr']['id'];
+        $u = (util::is_usr())
+            // If the user is logged in, use their login from the session
+            ? $_SESSION['usr']['login']
+            // If the user is not logged in, use the login from the reset password session
+            : $_SESSION['resetpw']['usr']['login'];
 
         if (util::is_post()) {
             if ($usr = db::read('login,acl,otpttl', 'id', (string) $i, '', 'one')) {
