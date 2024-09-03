@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// index.php 20150101 - 20240902
+// index.php 20150101 - 20240903
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 // Define directory separator for cross-platform compatibility
