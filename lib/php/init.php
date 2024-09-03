@@ -80,16 +80,45 @@ class Init
 
     /**
      * Destructor to log execution time and any necessary cleanup.
+     *
+     * This destructor is triggered when the Init object is about to be destroyed,
+     * which happens when the PHP script execution ends. It logs the execution time
+     * and any necessary cleanup.
+     *
+     * The execution time is logged by storing the current microtime(true) value
+     * when the destructor is first called, and then calculating the difference
+     * between the current microtime(true) and the stored value when the destructor
+     * is called again. This gives the total execution time of the script.
+     *
+     * The log message is sent to the error log using the elog() function, which
+     * is a wrapper around the error_log() function. The log message includes the
+     * file name, the remote address of the client, and the execution time.
      */
-    public function __destruct()
-    {
-        // Log execution time and remote address for debugging
-        elog(__FILE__ . ' ' . $_SERVER['REMOTE_ADDR'] . ' ' . round((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']), 4) . "\n");
+    public function __destruct() {
+        static $start;
+
+        // If $start is not set, then this is the first time the destructor is
+        // being called, so set $start to the current microtime(true) value.
+        if (!isset($start)) {
+            $start = microtime(true);
+        } else {
+            // If $start is already set, then this is not the first time the
+            // destructor is being called, so log the execution time.
+            elog(
+                __FILE__
+                . ' '
+                . $_SERVER['REMOTE_ADDR']
+                . ' '
+                . round(microtime(true) - $start, 4)
+                . "\n"
+            );
+        }
     }
 
     /**
      * Convert the object to a string representation based on the request type.
      *
+     * @param string $x The request type, one of 'html', 'text', 'json', or a specific key to return.
      * @return string The response content in the appropriate format
      */
     public function __toString(): string
@@ -98,32 +127,28 @@ class Init
 
         // Return HTML content
         if ($x === 'html') {
-            elog($this->g->out['main']);
-            return $this->g->out['main'];
+            return (string) $this->g->out['main'];
         }
 
         // Return plain text content
         if ($x === 'text') {
-            return preg_replace('/^\h*\v+/m', '', strip_tags($this->g->out['main']));
+            return preg_replace('/^\h*\v+/m', '', strip_tags((string) $this->g->out['main']));
         }
 
         // Return JSON content
         if ($x === 'json') {
             header('Content-Type: application/json');
-            return $this->g->out['main'];
+            return json_encode($this->g->out['main'], JSON_PRETTY_PRINT);
         }
 
         // Return specific output as JSON if specified
-        if ($x) {
-            $out = $this->g->out[$x] ?? '';
-            if ($out) {
-                header('Content-Type: application/json');
-                return json_encode($out, JSON_PRETTY_PRINT);
-            }
+        if (array_key_exists($x, $this->g->out)) {
+            header('Content-Type: application/json');
+            return json_encode($this->g->out[$x], JSON_PRETTY_PRINT);
         }
 
         // Default to rendering the HTML view
-        return $this->g->t->html();
+        return (string) $this->g->t->html();
     }
 }
 
@@ -131,6 +156,7 @@ class Init
  * Logs a message to the error log if debugging is enabled.
  *
  * @param string $content The message to log
+ * @return void
  */
 function elog(string $content): void
 {
