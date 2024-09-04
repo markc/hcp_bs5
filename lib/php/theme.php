@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 // lib/php/theme.php 20150101 - 20240904
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
