@@ -1,22 +1,22 @@
 <?php
 
 declare(strict_types=1);
+
 // lib/php/db.php 20150225 - 20230623
 // Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
 {
-    public static $dbh;
-
-    public static $tbl;
+    public static ?self $dbh = null;
+    public static string $tbl;
 
     public function __construct(array $dbcfg)
     {
-        if (is_null(self::$dbh)) {
+        if (self::$dbh === null) {
             extract($dbcfg);
-            $dsn = 'mysql' === $type
-                ? 'mysql:' . ($sock ? 'unix_socket=' . $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
-                : 'sqlite:' . $path;
+            $dsn = $type === 'mysql'
+                ? "mysql:" . ($sock ? "unix_socket=$sock" : "host=$host;port=$port") . ";dbname=$name"
+                : "sqlite:$path";
             $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
 
             try {
@@ -31,29 +31,24 @@ class Db extends \PDO
         }
     }
 
-    public static function create(array $ary)
+    public static function create(array $ary): string
     {
         $fields = $values = '';
         foreach ($ary as $k => $v) {
-            $fields .= "
-                {$k},";
-            $values .= "
-                :{$k},";
+            $fields .= "\n                $k,";
+            $values .= "\n                :$k,";
         }
         $fields = rtrim($fields, ',');
         $values = rtrim($values, ',');
 
-        $sql = '
- INSERT INTO `' . self::$tbl . "` ({$fields})
- VALUES ({$values})";
+        $sql = "\n INSERT INTO `" . self::$tbl . "` ($fields)\n VALUES ($values)";
 
-        elog("sql={$sql}");
+        elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
-            $res = $stm->execute();
-
+            $stm->execute();
             return self::$dbh->lastInsertId();
         } catch (\PDOException $e) {
             exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
@@ -67,72 +62,45 @@ class Db extends \PDO
         string $extra = '',
         string $type = 'all'
     ) {
-        $w = $where ? "
-    WHERE {$where} = :wval" : '';
-
-        $a = ($wval || '0' == $wval) ? ['wval' => $wval] : [];
-
-        $sql = "
- SELECT {$field}
-   FROM `" . self::$tbl . "`{$w} {$extra}";
-
-        elog("sql={$sql}");
-
+        $w = $where ? "\n    WHERE $where = :wval" : '';
+        $a = ($wval || $wval === '0') ? ['wval' => $wval] : [];
+        $sql = "\n SELECT $field\n   FROM `" . self::$tbl . "`$w $extra";
+        elog("sql=$sql");
         return self::qry($sql, $a, $type);
     }
 
-    public static function update(array $set, array $where)
+    public static function update(array $set, array $where): bool
     {
-        $set_str = '';
-        foreach ($set as $k => $v) {
-            $set_str .= "
-        {$k} = :{$k},";
-        }
-        $set_str = rtrim($set_str, ',');
-
-        $where_str = '';
-        $where_ary = [];
-        foreach ($where as $k => $v) {
-            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
-            $where_ary[$v[0]] = $v[2];
-        }
+        $set_str = implode(",\n        ", array_map(fn($k) => "$k = :$k", array_keys($set)));
+        $where_str = implode(' AND ', array_map(fn($v) => "{$v[0]} {$v[1]} :{$v[0]}", $where));
+        $where_ary = array_combine(array_column($where, 0), array_column($where, 2));
         $ary = array_merge($set, $where_ary);
 
-        $sql = '
- UPDATE `' . self::$tbl . "` SET{$set_str}
-  WHERE{$where_str}";
+        $sql = "\n UPDATE `" . self::$tbl . "` SET\n        $set_str\n  WHERE $where_str";
 
-        elog("sql={$sql}");
+        elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
-
             return $stm->execute();
         } catch (\PDOException $e) {
             exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
-    public static function delete(array $where)
+    public static function delete(array $where): bool
     {
-        $where_str = '';
-        $where_ary = [];
-        foreach ($where as $k => $v) {
-            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
-            $where_ary[$v[0]] = $v[2];
-        }
+        $where_str = implode(' AND ', array_map(fn($v) => "{$v[0]} {$v[1]} :{$v[0]}", $where));
+        $where_ary = array_combine(array_column($where, 0), array_column($where, 2));
 
-        $sql = '
- DELETE FROM `' . self::$tbl . "`
-  WHERE {$where_str}";
+        $sql = "\n DELETE FROM `" . self::$tbl . "`\n  WHERE $where_str";
 
-        elog("sql={$sql}");
+        elog("sql=$sql");
 
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $where_ary);
-
             return $stm->execute();
         } catch (\PDOException $e) {
             exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
@@ -142,7 +110,7 @@ class Db extends \PDO
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
         try {
-            if ('all' !== $type) {
+            if ($type !== 'all') {
                 $sql .= ' LIMIT 1';
             }
             $stm = self::$dbh->prepare($sql);
@@ -150,50 +118,40 @@ class Db extends \PDO
                 self::bvs($stm, $ary);
             }
             if ($stm->execute()) {
-                $res = null;
-                if ('all' === $type) {
-                    $res = $stm->fetchAll();
-                } elseif ('one' === $type) {
-                    $res = $stm->fetch();
-                } elseif ('col' === $type) {
-                    $res = $stm->fetchColumn();
-                }
+                $res = match ($type) {
+                    'all' => $stm->fetchAll(),
+                    'one' => $stm->fetch(),
+                    'col' => $stm->fetchColumn(),
+                    default => null,
+                };
                 $stm->closeCursor();
-
                 return $res;
             }
-
             return false;
         } catch (\PDOException $e) {
             exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
-    // bind value statement
     public static function bvs($stm, array $ary): void
     {
-        if (is_object($stm) && ($stm instanceof \PDOStatement)) {
+        if ($stm instanceof \PDOStatement) {
             foreach ($ary as $k => $v) {
-                if (is_numeric($v)) {
-                    $p = \PDO::PARAM_INT;
-                } elseif (is_bool($v)) {
-                    $p = \PDO::PARAM_BOOL;
-                } elseif (is_null($v)) {
-                    $p = \PDO::PARAM_NULL;
-                } elseif (is_string($v)) {
-                    $p = \PDO::PARAM_STR;
-                } else {
-                    $p = false;
-                }
-                if (false !== $p) {
-                    $stm->bindValue(":{$k}", $v, $p);
+                $p = match (true) {
+                    is_int($v) => \PDO::PARAM_INT,
+                    is_bool($v) => \PDO::PARAM_BOOL,
+                    is_null($v) => \PDO::PARAM_NULL,
+                    is_string($v) => \PDO::PARAM_STR,
+                    default => false,
+                };
+                if ($p !== false) {
+                    $stm->bindValue(":$k", $v, $p);
                 }
             }
         }
     }
 
-    // See http://datatables.net/usage/server-side
-    public static function simple($request, $table, $primaryKey, $columns, $extra = '')
+    public static function simple($request, $table, $primaryKey, $columns, $extra = ''): array
     {
         $db = self::$dbh;
         $cols = '`' . implode('`, `', self::pluck($columns, 'db')) . '`';
@@ -204,151 +162,113 @@ class Db extends \PDO
         $where = self::filter($request, $columns, $bind);
 
         if ($extra) {
-            $where .= $where ? " AND ({$extra})" : " WHERE {$extra}";
+            $where .= $where ? " AND ($extra)" : " WHERE $extra";
         }
 
-        elog("where={$where}");
+        elog("where=$where");
 
-        $query = "
- SELECT {$cols}
-   FROM `{$table}` {$where} {$order} {$limit}";
+        $query = "\n SELECT $cols\n   FROM `$table` $where $order $limit";
 
         $data = self::sql_exec($db, $bind, $query);
 
-        $recordsFiltered = self::sql_exec($db, $bind, "
- SELECT COUNT(`{$primaryKey}`)
-   FROM `{$table}` {$where}", 'col');
+        $recordsFiltered = self::sql_exec($db, $bind, "\n SELECT COUNT(`$primaryKey`)\n   FROM `$table` $where", 'col');
 
-        $recordsTotal = self::qry("
- SELECT COUNT(`{$primaryKey}`)
-   FROM `{$table}`", [], 'col');
+        $recordsTotal = self::qry("\n SELECT COUNT(`$primaryKey`)\n   FROM `$table`", [], 'col');
 
         return [
-            'draw' => isset($request['draw']) ? intval($request['draw']) : 0,
-            'recordsTotal' => intval($recordsTotal),
-            'recordsFiltered' => intval($recordsFiltered),
+            'draw' => $request['draw'] ?? 0,
+            'recordsTotal' => (int)$recordsTotal,
+            'recordsFiltered' => (int)$recordsFiltered,
             'data' => self::data_output($columns, $data),
         ];
     }
 
-    public static function data_output($columns, $data)
+    public static function data_output($columns, $data): array
     {
-        $out = [];
-
-        for ($i = 0, $ien = count($data); $i < $ien; ++$i) {
+        return array_map(function($d) use ($columns) {
             $row = [];
-
-            for ($j = 0, $jen = count($columns); $j < $jen; ++$j) {
-                $column = $columns[$j];
-
-                // Is there a formatter?
+            foreach ($columns as $column) {
                 if (isset($column['formatter'])) {
-                    $row[$column['dt']] = $column['formatter'](($data[$i][$column['db']] ?? ''), $data[$i]);
-                } else {
-                    if (null !== $column['dt']) {
-                        $row[$column['dt']] = $data[$i][$columns[$j]['db']];
-                    }
+                    $row[$column['dt']] = $column['formatter']($d[$column['db']] ?? '', $d);
+                } elseif ($column['dt'] !== null) {
+                    $row[$column['dt']] = $d[$column['db']];
                 }
             }
-
-            $out[] = $row;
-        }
-
-        return $out;
+            return $row;
+        }, $data);
     }
 
-    public static function limit($request, $columns)
+    public static function limit($request, $columns): string
     {
-        $limit = '';
-
-        if (isset($request['start']) && -1 != $request['length']) {
-            $limit = 'LIMIT ' . intval($request['start']) . ', ' . intval($request['length']);
-        }
-
-        return $limit;
+        return isset($request['start'], $request['length']) && $request['length'] != -1
+            ? 'LIMIT ' . (int)$request['start'] . ', ' . (int)$request['length']
+            : '';
     }
 
-    public static function order($request, $columns)
+    public static function order($request, $columns): string
     {
         $order = '';
-
         if (isset($request['order']) && count($request['order'])) {
-            $orderBy = [];
-            //            $dtColumns = self::pluck($columns, 'dt');
-
-            for ($i = 0, $ien = count($request['order']); $i < $ien; ++$i) {
-                $columnIdx = intval($request['order'][$i]['column']);
+            $orderBy = array_filter(array_map(function($ord) use ($request, $columns) {
+                $columnIdx = (int)$ord['column'];
                 $requestColumn = $request['columns'][$columnIdx];
-                //                $columnIdx = array_search($requestColumn['data'], $dtColumns); // don't use $dtColumns
                 $columnIdx = array_search($requestColumn['data'], array_column($columns, 'dt'));
                 $column = $columns[$columnIdx];
-
-                if ('true' == $requestColumn['orderable']) {
-                    $dir = 'asc' === $request['order'][$i]['dir'] ? 'ASC' : 'DESC';
-                    $orderBy[] = '`' . $column['db'] . '` ' . $dir;
+                if ($requestColumn['orderable'] == 'true') {
+                    $dir = $ord['dir'] === 'asc' ? 'ASC' : 'DESC';
+                    return "`{$column['db']}` $dir";
                 }
-            }
-
+                return null;
+            }, $request['order']));
             if (count($orderBy)) {
                 $order = 'ORDER BY ' . implode(', ', $orderBy);
             }
         }
-
         return $order;
     }
 
-    public static function filter($request, $columns, &$bindings)
+    public static function filter($request, $columns, &$bindings): string
     {
         $globalSearch = $columnSearch = [];
         $dtColumns = self::pluck($columns, 'dt');
 
-        if (isset($request['search']) && '' != $request['search']['value']) {
+        if (isset($request['search']) && $request['search']['value'] != '') {
             $str = $request['search']['value'];
-
-            for ($i = 0, $ien = count($request['columns']); $i < $ien; ++$i) {
+            for ($i = 0, $ien = count($request['columns']); $i < $ien; $i++) {
                 $requestColumn = $request['columns'][$i];
                 $columnIdx = array_search($requestColumn['data'], $dtColumns);
                 $column = $columns[$columnIdx];
-
-                if ('true' == $requestColumn['searchable'] && $column['db']) {
-                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
-                    $globalSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
+                if ($requestColumn['searchable'] == 'true' && $column['db']) {
+                    $binding = self::bind($bindings, "%$str%", \PDO::PARAM_STR);
+                    $globalSearch[] = "`{$column['db']}` LIKE $binding";
                 }
             }
         }
 
-        // Individual column filtering
         if (isset($request['columns'])) {
-            for ($i = 0, $ien = count($request['columns']); $i < $ien; ++$i) {
-                $requestColumn = $request['columns'][$i];
+            foreach ($request['columns'] as $requestColumn) {
                 $columnIdx = array_search($requestColumn['data'], $dtColumns);
                 $column = $columns[$columnIdx];
-
                 $str = $requestColumn['search']['value'];
-
-                if ('true' == $requestColumn['searchable'] && '' != $str && null !== $column['db']) {
-                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
+                if ($requestColumn['searchable'] == 'true' && $str != '' && $column['db'] !== null) {
+                    $binding = self::bind($bindings, "%$str%", \PDO::PARAM_STR);
                     if ($column['db']) {
-                        $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
+                        $columnSearch[] = "`{$column['db']}` LIKE $binding";
                     }
                 }
             }
         }
 
-        // Combine the filters into a single string
         $where = '';
-
         if (count($globalSearch)) {
             $where = '(' . implode(' OR ', $globalSearch) . ')';
         }
-
         if (count($columnSearch)) {
-            $where = '' === $where ?
-                implode(' AND ', $columnSearch) :
-                $where . ' AND ' . implode(' AND ', $columnSearch);
+            $where = $where === ''
+                ? implode(' AND ', $columnSearch)
+                : $where . ' AND ' . implode(' AND ', $columnSearch);
         }
-
-        if ('' !== $where) {
+        if ($where !== '') {
             $where = 'WHERE ' . $where;
         }
 
@@ -357,80 +277,53 @@ class Db extends \PDO
 
     public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
     {
-        elog("sql={$sql}");
-
-        // Argument shifting
-        if (null === $sql) {
+        elog("sql=$sql");
+        if ($sql === null) {
             $sql = $bindings;
         }
-
         $stmt = $db->prepare($sql);
-
-        // Bind parameters
         if (is_array($bindings)) {
-            for ($i = 0, $ien = count($bindings); $i < $ien; ++$i) {
-                $binding = $bindings[$i];
+            foreach ($bindings as $binding) {
                 $stmt->bindValue($binding['key'], $binding['val'], $binding['type']);
             }
         }
-
-        // Execute
         try {
             $stmt->execute();
         } catch (PDOException $e) {
             self::fatal('An SQL error occurred: ' . $e->getMessage());
         }
-
-        if ('all' === $type) {
-            return $stmt->fetchAll();
-        }
-        if ('both' === $type) {
-            return $stmt->fetchAll(PDO::FETCH_BOTH);
-        }
-        if ('one' === $type) {
-            return $stmt->fetch();
-        }
-        if ('col' === $type) {
-            return $stmt->fetchColumn();
-        }
+        return match ($type) {
+            'all' => $stmt->fetchAll(),
+            'both' => $stmt->fetchAll(PDO::FETCH_BOTH),
+            'one' => $stmt->fetch(),
+            'col' => $stmt->fetchColumn(),
+            default => null,
+        };
     }
 
     private static function fatal($msg): void
     {
         echo json_encode(['error' => $msg]);
-
         exit(0);
     }
 
-    private static function bind(&$a, $val, $type)
+    private static function bind(&$a, $val, $type): string
     {
         $key = ':binding_' . count($a);
         $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
-
         return $key;
     }
 
-    private static function pluck($a, $prop)
+    private static function pluck($a, $prop): array
     {
-        $out = [];
-        for ($i = 0, $len = count($a); $i < $len; ++$i) {
-            if ($a[$i][$prop]) {
-                $out[] = $a[$i][$prop];
-            }
-        }
-
-        return $out;
+        return array_filter(array_column($a, $prop));
     }
 
-    private static function _flatten($a, $join = ' AND ')
+    private static function _flatten($a, $join = ' AND '): string
     {
         if (!$a) {
             return '';
         }
-        if ($a && is_array($a)) {
-            return implode($join, $a);
-        }
-
-        return $a;
+        return is_array($a) ? implode($join, $a) : $a;
     }
 }
