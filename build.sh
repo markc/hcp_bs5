@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ~/.sh/build.sh 20170301 - 20230625
+# ~/.sh/build.sh 20170301 - 20240904
 # Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 [[ $1 =~ '-h' ]] && echo "Usage: [bash] build.sh [path(pwd)]
@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 (
     cat lib/php/db.php
-    cat lib/php/ddns.php
     cat lib/php/init.php
     cat lib/php/plugin.php
     cat lib/php/plugins/accounts.php
@@ -35,7 +34,6 @@ declare(strict_types=1);
     cat lib/php/plugins/home.php
     cat lib/php/plugins/infomail.php
     cat lib/php/plugins/infosys.php
-    cat lib/php/plugins/mailgraph.php
     cat lib/php/plugins/processes.php
     cat lib/php/plugins/records.php
     cat lib/php/plugins/valias.php
@@ -50,7 +48,6 @@ declare(strict_types=1);
     cat lib/php/themes/bootstrap/home.php
     cat lib/php/themes/bootstrap/infomail.php
     cat lib/php/themes/bootstrap/infosys.php
-    cat lib/php/themes/bootstrap/mailgraph.php
     cat lib/php/themes/bootstrap/processes.php
     cat lib/php/themes/bootstrap/records.php
     cat lib/php/themes/bootstrap/valias.php
