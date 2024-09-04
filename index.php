@@ -60,7 +60,7 @@ echo new Init(new class() {
             'nav3'  => '',
             'head'  => 'NetServa HCP',
             'main'  => 'Error: missing page!',
-            'foot'  => 'Copyright (C) 2015-2024 Mark Constable (AGPL-3.0)',
+            'foot'  => 'Copyright (C) 2015-2024 Netserva HCP (AGPL-3.0)',
             'js'    => '',
             'end'   => '',
         ],
