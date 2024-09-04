@@ -1,8 +1,9 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/sshm.php 20230703 - 20230712
-// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
+
+// lib/php/plugins/sshm.php 20230703 - 20240904
+// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Sshm extends Plugin
 {
@@ -22,11 +23,12 @@ class Plugins_Sshm extends Plugin
         if (util::is_post()) {
             util::run('sshm create ' . implode(' ', $this->inp));
             util::relist();
-        } else {
-            $keys = util::run('sshm key_list');
-            $this->inp['keys'] = $keys['ary'];
-            return $this->g->t->create($this->inp);
+            return null;
         }
+        
+        $keys = util::run('sshm key_list');
+        $this->inp['keys'] = $keys['ary'];
+        return $this->g->t->create($this->inp);
     }
 
     public function update(): ?string
@@ -34,17 +36,17 @@ class Plugins_Sshm extends Plugin
         if (util::is_post()) {
             util::run('sshm create ' . implode(' ', $this->inp));
             util::relist();
-        } else {
-            $host = util::run('sshm read ' . $this->inp['name']);
-            $i = 0;
-            foreach ($this->inp as $k => $v) {
-                $inp[$k] = isset($host['ary'][$i]) ? $host['ary'][$i] : '';
-                $i++;
-            }
-            $keys = util::run('sshm key_list');
-            $inp['keys'] = $keys['ary'];
-            return $this->g->t->update($inp);
+            return null;
         }
+        
+        $host = util::run('sshm read ' . $this->inp['name']);
+        $inp = array_combine(
+            array_keys($this->inp),
+            array_map(fn($k, $i) => $host['ary'][$i] ?? '', array_keys($this->inp), array_keys($this->inp))
+        );
+        $keys = util::run('sshm key_list');
+        $inp['keys'] = $keys['ary'];
+        return $this->g->t->update($inp);
     }
 
     public function delete(): ?string
@@ -52,9 +54,9 @@ class Plugins_Sshm extends Plugin
         if (util::is_post()) {
             util::run('sshm delete ' . $this->inp['name']);
             util::relist();
-        } else {
-            return $this->g->t->delete($this->inp);
+            return null;
         }
+        return $this->g->t->delete($this->inp);
     }
 
     public function list(): string
@@ -75,14 +77,14 @@ class Plugins_Sshm extends Plugin
         if (util::is_post()) {
             util::run(
                 'sshm key_create ' .
-                    $this->inp['key_name'] . " " .
-                    $this->inp['key_cmnt'] . " " .
-                    $this->inp['key_pass']
+                $this->inp['key_name'] . ' ' .
+                $this->inp['key_cmnt'] . ' ' .
+                $this->inp['key_pass']
             );
             util::relist('key_list');
-        } else {
-            return $this->g->t->key_create($this->inp);
+            return null;
         }
+        return $this->g->t->key_create($this->inp);
     }
 
     protected function key_read(): string
@@ -98,9 +100,9 @@ class Plugins_Sshm extends Plugin
         if (util::is_post()) {
             util::run('sshm key_delete ' . $this->inp['key_name']);
             util::relist('key_list');
-        } else {
-            return $this->g->t->key_delete($this->inp);
+            return null;
         }
+        return $this->g->t->key_delete($this->inp);
     }
 
     public function key_list(): string
