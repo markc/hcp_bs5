@@ -27,10 +27,10 @@ enum AclLevel: int {
 }
 
 echo new Init(new class() {
-    public readonly object $t;
+    public object $t;
 
     public function __construct(
-        public readonly array $cfg = [
+        public array $cfg = [
             'email' => '',
             'admpw' => '',
             'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php',
@@ -39,7 +39,7 @@ echo new Init(new class() {
             'perp'  => 25,
             'self'  => '/',
         ],
-        public readonly array $in = [
+        public array $in = [
             'a' => '',
             'd' => '',
             'g' => null,
@@ -51,7 +51,7 @@ echo new Init(new class() {
             't' => 'bootstrap',
             'x' => '',
         ],
-        public readonly array $out = [
+        public array $out = [
             'doc'   => 'NetServa',
             'css'   => '',
             'log'   => '',
@@ -64,7 +64,7 @@ echo new Init(new class() {
             'js'    => '',
             'end'   => '',
         ],
-        public readonly array $db = [
+        public array $db = [
             'host'  => '127.0.0.1',
             'name'  => 'sysadm',
             'pass'  => 'lib' . DS . '.ht_pw',
@@ -74,7 +74,7 @@ echo new Init(new class() {
             'type'  => 'sqlite',
             'user'  => 'sysadm',
         ],
-        public readonly array $nav1 = [
+        public array $nav1 = [
             'non' => [
                 ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
                 ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
@@ -110,12 +110,12 @@ echo new Init(new class() {
                 ], 'bi bi-globe'],
             ],
         ],
-        public readonly array $nav2 = [
+        public array $nav2 = [
             ['local',   '?r=local', 'bi bi-globe'],
             ['mgo',     '?r=mgo',   'bi bi-globe'],
             ['vmd1',    '?r=vmd1',  'bi bi-globe'],
         ],
-        public readonly array $dns = [
+        public array $dns = [
             'a'     => '127.0.0.1',
             'mx'    => '',
             'ns1'   => 'ns1.',
@@ -141,7 +141,7 @@ echo new Init(new class() {
                 'user'      => 'sysadm',
             ],
         ],
-        public readonly array $acl = [
+        public array $acl = [
             AclLevel::SuperAdmin->value    => AclLevel::SuperAdmin->name,
             AclLevel::Administrator->value => AclLevel::Administrator->name,
             AclLevel::User->value          => AclLevel::User->name,
