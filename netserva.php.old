@@ -1,0 +1,5189 @@
+<?php
+
+declare(strict_types=1);
+
+// netserva.php 2024-09-04 01:32:27 UTC
+// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
+// This is single script concatenation of all PHP files in lib/php at
+// https://github.com/markc/hcp
+
+
+// lib/php/db.php 20150225 - 20230623
+
+class Db extends \PDO
+{
+    public static $dbh;
+
+    public static $tbl;
+
+    public function __construct(array $dbcfg)
+    {
+        if (is_null(self::$dbh)) {
+            extract($dbcfg);
+            $dsn = 'mysql' === $type
+                ? 'mysql:' . ($sock ? 'unix_socket=' . $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
+                : 'sqlite:' . $path;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+
+            try {
+                parent::__construct($dsn, $user, $pass, [
+                    \PDO::ATTR_EMULATE_PREPARES => false,
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                ]);
+            } catch (\PDOException $e) {
+                exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+            }
+        }
+    }
+
+    public static function create(array $ary)
+    {
+        $fields = $values = '';
+        foreach ($ary as $k => $v) {
+            $fields .= "
+                {$k},";
+            $values .= "
+                :{$k},";
+        }
+        $fields = rtrim($fields, ',');
+        $values = rtrim($values, ',');
+
+        $sql = '
+ INSERT INTO `' . self::$tbl . "` ({$fields})
+ VALUES ({$values})";
+
+        elog("sql={$sql}");
+
+        try {
+            $stm = self::$dbh->prepare($sql);
+            self::bvs($stm, $ary);
+            $res = $stm->execute();
+
+            return self::$dbh->lastInsertId();
+        } catch (\PDOException $e) {
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+        }
+    }
+
+    public static function read(
+        string $field,
+        string $where = '',
+        string $wval = '',
+        string $extra = '',
+        string $type = 'all'
+    ) {
+        $w = $where ? "
+    WHERE {$where} = :wval" : '';
+
+        $a = ($wval || '0' == $wval) ? ['wval' => $wval] : [];
+
+        $sql = "
+ SELECT {$field}
+   FROM `" . self::$tbl . "`{$w} {$extra}";
+
+        elog("sql={$sql}");
+
+        return self::qry($sql, $a, $type);
+    }
+
+    public static function update(array $set, array $where)
+    {
+        $set_str = '';
+        foreach ($set as $k => $v) {
+            $set_str .= "
+        {$k} = :{$k},";
+        }
+        $set_str = rtrim($set_str, ',');
+
+        $where_str = '';
+        $where_ary = [];
+        foreach ($where as $k => $v) {
+            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
+            $where_ary[$v[0]] = $v[2];
+        }
+        $ary = array_merge($set, $where_ary);
+
+        $sql = '
+ UPDATE `' . self::$tbl . "` SET{$set_str}
+  WHERE{$where_str}";
+
+        elog("sql={$sql}");
+
+        try {
+            $stm = self::$dbh->prepare($sql);
+            self::bvs($stm, $ary);
+
+            return $stm->execute();
+        } catch (\PDOException $e) {
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+        }
+    }
+
+    public static function delete(array $where)
+    {
+        $where_str = '';
+        $where_ary = [];
+        foreach ($where as $k => $v) {
+            $where_str .= ' ' . $v[0] . ' ' . $v[1] . ' :' . $v[0];
+            $where_ary[$v[0]] = $v[2];
+        }
+
+        $sql = '
+ DELETE FROM `' . self::$tbl . "`
+  WHERE {$where_str}";
+
+        elog("sql={$sql}");
+
+        try {
+            $stm = self::$dbh->prepare($sql);
+            self::bvs($stm, $where_ary);
+
+            return $stm->execute();
+        } catch (\PDOException $e) {
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+        }
+    }
+
+    public static function qry(string $sql, array $ary = [], string $type = 'all')
+    {
+        try {
+            if ('all' !== $type) {
+                $sql .= ' LIMIT 1';
+            }
+            $stm = self::$dbh->prepare($sql);
+            if ($ary) {
+                self::bvs($stm, $ary);
+            }
+            if ($stm->execute()) {
+                $res = null;
+                if ('all' === $type) {
+                    $res = $stm->fetchAll();
+                } elseif ('one' === $type) {
+                    $res = $stm->fetch();
+                } elseif ('col' === $type) {
+                    $res = $stm->fetchColumn();
+                }
+                $stm->closeCursor();
+
+                return $res;
+            }
+
+            return false;
+        } catch (\PDOException $e) {
+            exit(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+        }
+    }
+
+    // bind value statement
+    public static function bvs($stm, array $ary): void
+    {
+        if (is_object($stm) && ($stm instanceof \PDOStatement)) {
+            foreach ($ary as $k => $v) {
+                if (is_numeric($v)) {
+                    $p = \PDO::PARAM_INT;
+                } elseif (is_bool($v)) {
+                    $p = \PDO::PARAM_BOOL;
+                } elseif (is_null($v)) {
+                    $p = \PDO::PARAM_NULL;
+                } elseif (is_string($v)) {
+                    $p = \PDO::PARAM_STR;
+                } else {
+                    $p = false;
+                }
+                if (false !== $p) {
+                    $stm->bindValue(":{$k}", $v, $p);
+                }
+            }
+        }
+    }
+
+    // See http://datatables.net/usage/server-side
+    public static function simple($request, $table, $primaryKey, $columns, $extra = '')
+    {
+        $db = self::$dbh;
+        $cols = '`' . implode('`, `', self::pluck($columns, 'db')) . '`';
+        $bind = [];
+
+        $limit = self::limit($request, $columns);
+        $order = self::order($request, $columns);
+        $where = self::filter($request, $columns, $bind);
+
+        if ($extra) {
+            $where .= $where ? " AND ({$extra})" : " WHERE {$extra}";
+        }
+
+        elog("where={$where}");
+
+        $query = "
+ SELECT {$cols}
+   FROM `{$table}` {$where} {$order} {$limit}";
+
+        $data = self::sql_exec($db, $bind, $query);
+
+        $recordsFiltered = self::sql_exec($db, $bind, "
+ SELECT COUNT(`{$primaryKey}`)
+   FROM `{$table}` {$where}", 'col');
+
+        $recordsTotal = self::qry("
+ SELECT COUNT(`{$primaryKey}`)
+   FROM `{$table}`", [], 'col');
+
+        return [
+            'draw' => isset($request['draw']) ? intval($request['draw']) : 0,
+            'recordsTotal' => intval($recordsTotal),
+            'recordsFiltered' => intval($recordsFiltered),
+            'data' => self::data_output($columns, $data),
+        ];
+    }
+
+    public static function data_output($columns, $data)
+    {
+        $out = [];
+
+        for ($i = 0, $ien = count($data); $i < $ien; ++$i) {
+            $row = [];
+
+            for ($j = 0, $jen = count($columns); $j < $jen; ++$j) {
+                $column = $columns[$j];
+
+                // Is there a formatter?
+                if (isset($column['formatter'])) {
+                    $row[$column['dt']] = $column['formatter'](($data[$i][$column['db']] ?? ''), $data[$i]);
+                } else {
+                    if (null !== $column['dt']) {
+                        $row[$column['dt']] = $data[$i][$columns[$j]['db']];
+                    }
+                }
+            }
+
+            $out[] = $row;
+        }
+
+        return $out;
+    }
+
+    public static function limit($request, $columns)
+    {
+        $limit = '';
+
+        if (isset($request['start']) && -1 != $request['length']) {
+            $limit = 'LIMIT ' . intval($request['start']) . ', ' . intval($request['length']);
+        }
+
+        return $limit;
+    }
+
+    public static function order($request, $columns)
+    {
+        $order = '';
+
+        if (isset($request['order']) && count($request['order'])) {
+            $orderBy = [];
+            //            $dtColumns = self::pluck($columns, 'dt');
+
+            for ($i = 0, $ien = count($request['order']); $i < $ien; ++$i) {
+                $columnIdx = intval($request['order'][$i]['column']);
+                $requestColumn = $request['columns'][$columnIdx];
+                //                $columnIdx = array_search($requestColumn['data'], $dtColumns); // don't use $dtColumns
+                $columnIdx = array_search($requestColumn['data'], array_column($columns, 'dt'));
+                $column = $columns[$columnIdx];
+
+                if ('true' == $requestColumn['orderable']) {
+                    $dir = 'asc' === $request['order'][$i]['dir'] ? 'ASC' : 'DESC';
+                    $orderBy[] = '`' . $column['db'] . '` ' . $dir;
+                }
+            }
+
+            if (count($orderBy)) {
+                $order = 'ORDER BY ' . implode(', ', $orderBy);
+            }
+        }
+
+        return $order;
+    }
+
+    public static function filter($request, $columns, &$bindings)
+    {
+        $globalSearch = $columnSearch = [];
+        $dtColumns = self::pluck($columns, 'dt');
+
+        if (isset($request['search']) && '' != $request['search']['value']) {
+            $str = $request['search']['value'];
+
+            for ($i = 0, $ien = count($request['columns']); $i < $ien; ++$i) {
+                $requestColumn = $request['columns'][$i];
+                $columnIdx = array_search($requestColumn['data'], $dtColumns);
+                $column = $columns[$columnIdx];
+
+                if ('true' == $requestColumn['searchable'] && $column['db']) {
+                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
+                    $globalSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
+                }
+            }
+        }
+
+        // Individual column filtering
+        if (isset($request['columns'])) {
+            for ($i = 0, $ien = count($request['columns']); $i < $ien; ++$i) {
+                $requestColumn = $request['columns'][$i];
+                $columnIdx = array_search($requestColumn['data'], $dtColumns);
+                $column = $columns[$columnIdx];
+
+                $str = $requestColumn['search']['value'];
+
+                if ('true' == $requestColumn['searchable'] && '' != $str && null !== $column['db']) {
+                    $binding = self::bind($bindings, '%' . $str . '%', PDO::PARAM_STR);
+                    if ($column['db']) {
+                        $columnSearch[] = '`' . $column['db'] . '` LIKE ' . $binding;
+                    }
+                }
+            }
+        }
+
+        // Combine the filters into a single string
+        $where = '';
+
+        if (count($globalSearch)) {
+            $where = '(' . implode(' OR ', $globalSearch) . ')';
+        }
+
+        if (count($columnSearch)) {
+            $where = '' === $where ?
+                implode(' AND ', $columnSearch) :
+                $where . ' AND ' . implode(' AND ', $columnSearch);
+        }
+
+        if ('' !== $where) {
+            $where = 'WHERE ' . $where;
+        }
+
+        return $where;
+    }
+
+    public static function sql_exec($db, $bindings, $sql = null, string $type = 'all')
+    {
+        elog("sql={$sql}");
+
+        // Argument shifting
+        if (null === $sql) {
+            $sql = $bindings;
+        }
+
+        $stmt = $db->prepare($sql);
+
+        // Bind parameters
+        if (is_array($bindings)) {
+            for ($i = 0, $ien = count($bindings); $i < $ien; ++$i) {
+                $binding = $bindings[$i];
+                $stmt->bindValue($binding['key'], $binding['val'], $binding['type']);
+            }
+        }
+
+        // Execute
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            self::fatal('An SQL error occurred: ' . $e->getMessage());
+        }
+
+        if ('all' === $type) {
+            return $stmt->fetchAll();
+        }
+        if ('both' === $type) {
+            return $stmt->fetchAll(PDO::FETCH_BOTH);
+        }
+        if ('one' === $type) {
+            return $stmt->fetch();
+        }
+        if ('col' === $type) {
+            return $stmt->fetchColumn();
+        }
+    }
+
+    private static function fatal($msg): void
+    {
+        echo json_encode(['error' => $msg]);
+
+        exit(0);
+    }
+
+    private static function bind(&$a, $val, $type)
+    {
+        $key = ':binding_' . count($a);
+        $a[] = ['key' => $key, 'val' => $val, 'type' => $type];
+
+        return $key;
+    }
+
+    private static function pluck($a, $prop)
+    {
+        $out = [];
+        for ($i = 0, $len = count($a); $i < $len; ++$i) {
+            if ($a[$i][$prop]) {
+                $out[] = $a[$i][$prop];
+            }
+        }
+
+        return $out;
+    }
+
+    private static function _flatten($a, $join = ' AND ')
+    {
+        if (!$a) {
+            return '';
+        }
+        if ($a && is_array($a)) {
+            return implode($join, $a);
+        }
+
+        return $a;
+    }
+}
+
+// lib/php/ddns.php 20180606 - 20200414
+
+//elog(__FILE__.' '.$_SERVER['REMOTE_ADDR']);
+//elog(var_export($_REQUEST, true));
+
+// TODO: REFACTOR and test, for now wrap in unused function to isolate namespace
+
+function ddns()
+{
+    define('APIKEY', '../.ht_ddns');
+
+    if (file_exists(APIKEY)) {
+        $mykey = trim(file_get_contents(APIKEY));
+    } else {
+        exit('Error: missing '.APIKEY);
+    }
+
+    $db = [
+        'host' => '127.0.0.1', // DB site
+        'name' => 'sysadm',    // DB name
+        'pass' => '../.ht_pw', // MySQL password override
+        'path' => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
+        'port' => '3306',      // DB port
+        'sock' => '',          // '/run/mysqld/mysqld.sock',
+        'type' => 'mysql',     // mysql | sqlite
+        'user' => 'sysadm',    // DB user
+    ];
+
+    class Db extends \PDO
+    {
+        public static $dbh;
+        public static $tbl;
+
+        public function __construct(array $dbcfg)
+        {
+            if (is_null(self::$dbh)) {
+                extract($dbcfg);
+                $dsn = 'mysql' === $type
+                    ? 'mysql:'.($sock ? 'unix_socket='.$sock : 'host='.$host.';port='.$port).';dbname='.$name
+                    : 'sqlite:'.$path;
+                $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
+
+                try {
+                    parent::__construct($dsn, $user, $pass, [
+                        \PDO::ATTR_EMULATE_PREPARES => false,
+                        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                    ]);
+                } catch (\PDOException $e) {
+                    exit(__FILE__.' '.__LINE__."<br>\n".$e->getMessage());
+                }
+            }
+        }
+    }
+
+    function inc_soa(string $soa): string
+    {
+        $ary = explode(' ', $soa);
+        $ymd = date('Ymd');
+        $day = substr($ary[2], 0, 8);
+        $rev = substr($ary[2], -2);
+        $ary[2] = ($day == $ymd)
+            ? "{$ymd}".sprintf('%02d', $rev + 1)
+            : "{$ymd}".'00';
+
+        return implode(' ', $ary);
+    }
+
+    if (!isset($_GET['key'])) {
+        exit('API key not supplied');
+    }
+
+    if (!isset($_GET['for'])) {
+        exit('API domain not supplied');
+    }
+
+    $key = htmlentities(trim($_GET['key']), ENT_QUOTES, 'UTF-8');
+    $for = htmlentities(trim($_GET['for']), ENT_QUOTES, 'UTF-8');
+    $sub = isset($_GET['sub']) ? htmlentities(trim($_GET['sub'])).'.' : '';
+    $msg = isset($_GET['msg']) ? htmlentities(trim($_GET['msg'])) : 'admin@'.$for;
+
+    if ($key !== $mykey) {
+        exit('API key does not match');
+    }
+
+    if (!filter_var(gethostbyname($for.'.'), FILTER_VALIDATE_IP)) {
+        exit("Invalid domain name: gethostbyname({$for})");
+    }
+
+    // Okay, let's get this show on the road
+    $time = time();
+    $date = date('Y-m-d H:i:s');
+    $newip = $_SERVER['REMOTE_ADDR'];
+    db::$dbh = new db($db);
+
+    $stmt = db::$dbh->prepare('
+    SELECT id FROM domains
+    WHERE name = :name');
+
+    $res = $stmt->execute(['name' => $for]);
+
+    if (empty($res)) {
+        exit('Error looking up target domain in domains table');
+    }
+
+    $did = $stmt->fetchColumn();
+
+    if (empty($did)) {
+        exit("'{$for}' is not in the local DNS domains table");
+    }
+
+    $stmt = db::$dbh->prepare("
+    SELECT content
+    FROM records
+    WHERE type='SOA'
+        AND domain_id=:did");
+
+    $res = $stmt->execute(['did' => $did]);
+
+    if (empty($res)) {
+        exit('Error looking up SOA record in records table');
+    }
+
+    $oldsoa = $stmt->fetchColumn();
+
+    if (empty($oldsoa)) {
+        exit("SOA record for '{$for}' does not exist");
+    }
+
+    $newsoa = inc_soa($oldsoa);
+
+    $stmt = db::$dbh->prepare("
+    UPDATE records
+        SET content=:content,change_date=:change_date
+    WHERE type='SOA'
+        AND domain_id=:did");
+
+    $res = $stmt->execute(['did' => $did, 'content' => $newsoa, 'change_date' => $time]);
+
+    if (empty($res)) {
+        exit('Error updating SOA record table');
+    }
+
+    $stmt = db::$dbh->prepare("
+    UPDATE records
+        SET content=:content,change_date=:change_date
+    WHERE type='A'
+        AND domain_id=:did
+        AND name=:name");
+
+    $res = $stmt->execute(['did' => $did, 'name' => $sub.$for, 'content' => $newip, 'change_date' => $time]);
+
+    if (empty($res)) {
+        exit('Error updating A record in records table');
+    }
+
+    mail(
+        $msg,
+        '[DDNS] '.$for.'\'s new IP is '.$newip,
+        "{$date} -> {$newip}"
+    );
+}
+
+
+// lib/php/init.php 20150101 - 20240904
+
+class Init
+{
+    public function __construct(public object $g)
+    {
+        session_start();
+
+        elog('GET=' . var_export($_GET, true));
+        elog('POST=' . var_export($_POST, true));
+        elog('SESSION=' . var_export($_SESSION, true));
+        elog('REQUEST=' . var_export($_REQUEST, true));
+
+        $this->g->cfg['host'] ??= getenv('HOSTNAME');
+        $this->g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+
+        util::cfg($this->g);
+        $this->g->in = util::esc($this->g->in);
+        $this->g->in['a'] ? util::chkapi($this->g) : util::remember($this->g);
+
+        $_SESSION['c'] ??= Util::random_token(32);
+
+        util::ses('o');
+        util::ses('m');
+        util::ses('l');
+        util::ses('r', '', 'local');
+
+        $thm = util::ses('t', '', $this->g->in['t']);
+        $t1 = 'themes_' . $thm . '_' . $this->g->in['o'];
+        $t2 = 'themes_' . $thm . '_theme';
+        $p = 'plugins_' . $this->g->in['o'];
+
+        $this->g->t = class_exists($t1)
+            ? new $t1($this->g)
+            : (class_exists($t2) ? new $t2($this->g) : new Theme($this->g));
+
+        $this->g->out['main'] = class_exists($p)
+            ? (string) new $p($this->g)
+            : "Error: plugin '$p' does not exist!";
+
+        if (empty($this->g->in['x'])) {
+            foreach ($this->g->out as $k => $v) {
+                $this->g->out[$k] = method_exists($this->g->t, $k)
+                ? $this->g->t->{$k}()
+                : $v;
+            }
+        }
+    }
+
+    public function __destruct() {
+        static $start;
+
+        if (!isset($start)) {
+            $start = microtime(true);
+        } else {
+            elog(
+                __FILE__
+                . ' '
+                . $_SERVER['REMOTE_ADDR']
+                . ' '
+                . round(microtime(true) - $start, 4)
+                . "\n"
+            );
+        }
+    }
+
+    public function __toString(): string
+    {
+        $x = $this->g->in['x'];
+        $out = $this->g->out;
+
+        if ($x === 'html') {
+            return $out['main'];
+        }
+
+        if ($x === 'text') {
+            return trim(
+                preg_replace(
+                    '/^\h*\v+/m',
+                    '',
+                    strip_tags($out['main'])
+                )
+            );
+        }
+
+        if ($x === 'json' || array_key_exists($x, $out)) {
+            header('Content-Type: application/json');
+
+            if ($x === 'json') {
+                return json_encode($out['main'], JSON_PRETTY_PRINT);
+            }
+
+            return json_encode($out[$x], JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->html();
+    }
+}
+
+function elog(string $content): void
+{
+    if (DBG) {
+        error_log($content);
+    }
+}
+
+// lib/php/plugin.php 20150101 - 20230627
+
+class Plugin
+{
+    public $g;
+
+    public array $inp = [];
+
+    protected mixed $dbh = null;
+
+    protected string $buf = '';
+
+    protected string $tbl = '';
+
+    public function __construct($g)
+    {
+        $this->g = $g;
+
+        $this->inp = util::esc($this->inp);
+
+        $o = $this->g->in['o'];
+        $m = $this->g->in['m'];
+
+        if (!util::is_usr() && ('auth' !== $o || ('list' !== $m && 'create' !== $m && 'resetpw' !== $m))) {
+            util::redirect($this->g->cfg['self'] . '?o=auth');
+        }
+
+        if ($this->tbl) {
+            if (!is_null($this->dbh)) {
+                db::$dbh = $this->dbh;
+            } elseif (is_null(db::$dbh)) {
+                db::$dbh = new db($this->g->db);
+            }
+            db::$tbl = $this->tbl;
+        }
+
+        $this->buf .= $this->{$this->g->in['m']}();
+    }
+
+    public function __toString(): string
+    {
+        return $this->buf;
+    }
+
+    public function __call(string $name, array $args): string
+    {
+        elog(__METHOD__ . '() name = ' . $name . ', args = ' . var_export($args, true));
+
+        return 'Plugin::' . $name . '() not implemented';
+    }
+
+    protected function create(): ?string
+    {
+        if (util::is_post()) {
+            $this->inp['updated'] = date('Y-m-d H:i:s');
+            $this->inp['created'] = date('Y-m-d H:i:s');
+            $lid = db::create($this->inp);
+            util::log('Item number ' . $lid . ' created', 'success');
+            util::relist();
+        } else {
+            return $this->g->t->create($this->inp);
+        }
+    }
+
+    protected function read(): ?string
+    {
+        return $this->g->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+    }
+
+    protected function update(): ?string
+    {
+        if (util::is_post()) {
+            $this->inp['updated'] = date('Y-m-d H:i:s');
+            if (db::update($this->inp, [['id', '=', $this->g->in['i']]])) {
+                util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+                util::relist();
+            } else {
+                util::log('Error updating item.');
+            }
+        }
+
+        return $this->read();
+    }
+
+    protected function delete(): ?string
+    {
+        if (util::is_post()) {
+            if ($this->g->in['i']) {
+                $res = db::delete([['id', '=', $this->g->in['i']]]);
+                util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+                util::relist();
+            }
+        } else {
+            return $this->g->t->delete($this->g->in);
+        }
+
+        util::log('Error deleting item');
+    }
+
+    protected function list(): string
+    {
+        return $this->g->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
+    }
+}
+
+// lib/php/plugins/users.php 20150101 - 20200414
+
+class Plugins_Accounts extends Plugin
+{
+    protected string $tbl = 'accounts';
+
+    // get/post input parameters
+    public array $inp = [
+        'grp'       => 1,
+        'acl'       => 2,
+        'vhosts'    => 1,
+        'login'     => '',
+        'fname'     => '',
+        'lname'     => '',
+        'altemail'  => '',
+    ];
+
+    protected function read(): string
+    {
+        return $this->g->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+
+        //return $this->list(); // this might work?
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                ['dt' => null, 'db' => 'id'],
+                ['dt' => 0, 'db' => 'login', 'formatter' => function ($d, $row) {
+                    return '
+                    <b><a class="bslink" href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
+                }],
+                ['dt' => 1, 'db' => 'fname'],
+                ['dt' => 2, 'db' => 'lname'],
+                ['dt' => 3, 'db' => 'altemail'],
+                ['dt' => 4, 'db' => 'acl', 'formatter' => fn ($d) => $this->g->acl[$d]],
+                ['dt' => 5, 'db' => 'grp'],
+            ];
+
+            return json_encode(db::simple($_GET, 'accounts', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->list($this->inp);
+    }
+
+    protected function switch_user(): void
+    {
+        if (util::is_adm() and !is_null($this->g->in['i'])) {
+            $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
+            util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
+        } else {
+            util::log('Not authorized to switch users');
+        }
+        util::relist();
+    }
+}
+
+
+// lib/php/plugins/auth.php 20150101 - 20240904
+
+class Plugins_Auth extends Plugin
+{
+    public const OTP_LENGTH = 10;
+    public const REMEMBER_ME_EXP = 604800;
+
+    protected string $tbl = 'accounts';
+
+    public array $inp = [
+        'acl'       => null,
+        'grp'       => null,
+        'id'        => null,
+        'login'     => '',
+        'otp'       => '',
+        'passwd1'   => '',
+        'passwd2'   => '',
+        'remember'  => '',
+        'webpw'     => '',
+    ];
+
+    public function create(): string
+    {
+        $u = $this->inp['login'];
+
+        if (util::is_post()) {
+            if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
+                if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
+                    if (9 != $usr['acl']) {
+                        $newpass = util::genpw(self::OTP_LENGTH);
+                        if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->cfg['email'])) {
+                            db::update([
+                                'otp' => $newpass,
+                                'otpttl' => time(),
+                            ], [['id', '=', $usr['id']]]);
+                            util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
+                        } else {
+                            util::log('Problem sending message to ' . $u, 'danger');
+                        }
+                        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+                    } else {
+                        util::log('Account is disabled, contact your System Administrator');
+                    }
+                } else {
+                    util::log('User does not exist');
+                }
+            } else {
+                util::log('You must provide a valid email address');
+            }
+        }
+
+        return $this->g->t->create(['login' => $u]);
+    }
+
+    public function list(): string
+    {
+        if (util::is_usr()) {
+            util::redirect($this->g->cfg['self']);
+        }
+
+        [$u, $p] = [$this->inp['login'] ?? '', $this->inp['webpw'] ?? ''];
+
+        if ($u && $p) {
+            if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
+                extract($usr);
+                if (9 !== $acl) {
+                    if (password_verify(html_entity_decode($p, ENT_QUOTES, 'UTF-8'), $webpw)) {
+                        if ($this->inp['remember']) {
+                            $uniq = util::random_token(32);
+                            db::update(['cookie' => $uniq], [['id', '=', $id]]);
+                            util::put_cookie('remember', $uniq, self::REMEMBER_ME_EXP);
+                        }
+                        $_SESSION['usr'] = $usr;
+                        util::log($login . ' is now logged in', 'success');
+                        if (0 === (int) $acl) {
+                            $_SESSION['adm'] = $id;
+                        }
+                        $_SESSION['m'] = 'list';
+                        util::redirect($this->g->cfg['self']);
+                    } else {
+                        util::log('Invalid Email Or Password');
+                    }
+                } else {
+                    util::log('Account is disabled, contact your System Administrator');
+                }
+            } else {
+                util::log('Invalid Email Or Password');
+            }
+        }
+
+        return $this->g->t->list(['login' => $u]);
+    }
+
+    public function update(): string
+    {
+        if (!(util::is_usr() || isset($_SESSION['resetpw']))) {
+            util::log('Session expired! Please login and try again.');
+            util::relist();
+        }
+
+        $i = (util::is_usr()) ? $_SESSION['usr']['id'] : $_SESSION['resetpw']['usr']['id'];
+        $u = (util::is_usr()) ? $_SESSION['usr']['login'] : $_SESSION['resetpw']['usr']['login'];
+
+        if (util::is_post()) {
+            if ($usr = db::read('login,acl,otpttl', 'id', (string) $i, '', 'one')) {
+                $p1 = html_entity_decode($this->inp['passwd1'], ENT_QUOTES, 'UTF-8');
+                $p2 = html_entity_decode($this->inp['passwd2'], ENT_QUOTES, 'UTF-8');
+                if (util::chkpw($p1, $p2)) {
+                    if (util::is_usr() or ($usr['otpttl'] && (($usr['otpttl'] + 3600) > time()))) {
+                        if (!is_null($usr['acl'])) {
+                            if (db::update([
+                                'webpw' => password_hash($p1, PASSWORD_DEFAULT),
+                                'otp' => '',
+                                'otpttl' => 0,
+                                'updated' => date('Y-m-d H:i:s'),
+                            ], [['id', '=', $i]])) {
+                                util::log('Password reset for ' . $usr['login'], 'success');
+                                if (util::is_usr()) {
+                                    util::redirect($this->g->cfg['self']);
+                                } else {
+                                    unset($_SESSION['resetpw']);
+                                    util::relist();
+                                }
+                            } else {
+                                util::log('Problem updating database');
+                            }
+                        } else {
+                            util::log($usr['login'] . ' is not allowed access');
+                        }
+                    } else {
+                        util::log('Your one time password key has expired');
+                    }
+                }
+            } else {
+                util::log('User does not exist');
+            }
+        }
+
+        return $this->g->t->update(['id' => $i, 'login' => $u]);
+    }
+
+    public function delete(): ?string
+    {
+        if (util::is_usr()) {
+            $u = $_SESSION['usr']['login'];
+            $id = $_SESSION['usr']['id'];
+
+            if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm']) {
+                unset($_SESSION['adm']);
+            }
+
+            unset($_SESSION['usr']);
+
+            if (isset($_COOKIE['remember'])) {
+                db::update(['cookie' => ''], [['id', '=', $id]]);
+                $this->setcookie('remember', '', strtotime('-1 hour', 0));
+            }
+
+            util::log($u . ' is now logged out', 'success');
+        }
+
+        util::redirect($this->g->cfg['self']);
+
+        return '';
+    }
+
+    public function resetpw(): ?string
+    {
+        $otp = html_entity_decode($this->inp['otp']);
+
+        if (self::OTP_LENGTH === strlen($otp)) {
+            if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
+                extract($usr);
+
+                if ($otpttl && (($otpttl + 3600) > time())) {
+                    if (3 !== $acl) {
+                        $_SESSION['resetpw'] = ['usr' => $usr];
+                        return $this->g->t->update(['id' => $id, 'login' => $login]);
+                    } else {
+                        util::log($login . ' is not allowed access');
+                    }
+                } else {
+                    util::log('Your one time password key has expired');
+                }
+            } else {
+                util::log('Your one time password key no longer exists');
+            }
+        } else {
+            util::log('Incorrect one time password key');
+        }
+
+        util::redirect($this->g->cfg['self']);
+    }
+
+    private function mail_forgotpw(string $email, string $newpass, string $headers = ''): bool
+    {
+        $host = $_SERVER['REQUEST_SCHEME'] . '://'
+            . $this->g->cfg['host']
+            . $this->g->cfg['self'];
+
+        $msg = <<<EOT
+Here is your new OTP (one time password) key that is valid for one hour.
+
+Please click on the link below and continue with reseting your password.
+
+If you did not request this action then please ignore this message.
+
+{$host}?o=auth&m=resetpw&otp={$newpass}
+EOT;
+
+        return mail(
+            "{$email}",
+            'Reset password for ' . $this->g->cfg['host'],
+            $msg,
+            $headers
+        );
+    }
+}
+
+// lib/php/plugins/dkim.php 20180511 - 20230705
+
+class Plugins_Dkim extends Plugin
+{
+    public array $inp = [
+        'dnstxt' => '',
+        'domain' => '',
+        'keylen' => '2048',
+        'select' => 'mail',
+    ];
+
+    public function create(): string
+    {
+        if (util::is_post()) {
+            $domain = escapeshellarg($this->inp['domain']);
+            $select = escapeshellarg($this->inp['select']);
+            $keylen = escapeshellarg($this->inp['keylen']);
+            util::exe('dkim add ' . $domain . ' ' . $select . ' ' . $keylen);
+        }
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        return 'Redirect'; // workaround to satisy string return type
+    }
+
+    public function read(): string
+    {
+        $domain = explode('._domainkey.', $this->inp['dnstxt'])[1]; // too fragile?
+        $domain_esc = escapeshellarg($domain);
+        exec("sudo dkim show {$domain_esc} 2>&1", $retArr, $retVal);
+        $buf = '
+        <b>' . $retArr[0] . '</b><br>
+        <div style="word-break:break-all;font-family:monospace;width:100%;">' . $retArr[1] . '</div>';
+
+        return $this->g->t->read(['buf' => $buf, 'domain' => $domain]);
+    }
+
+    public function update(): string
+    {
+        //return $this->list(); // override parent update()
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        return "Update"; // workaround to satisy string return type
+    }
+
+    public function delete(): string
+    {
+        if (util::is_post()) {
+            $domain = escapeshellarg($this->inp['domain']);
+            util::exe('dkim del ' . $domain);
+        }
+        util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        return ''; // to make compatible with parent::delete()
+    }
+
+    public function list(): string
+    {
+        $buf = '<p style="columns:350px 3;column-rule: 1px dotted #ddd;text-align:center;">';
+        exec('sudo dkim list 2>&1', $retArr, $retVal);
+        foreach ($retArr as $line) {
+            if ($retVal === 0) {
+                $buf .= '
+            <a href="?o=dkim&m=read&dnstxt=' . $line . '"><b>' . $line . '</b></a>';
+            } else {
+                $buf .= '<b>' . $line . '</b><br>';
+            }
+        }
+
+        return $this->g->t->list(['buf' => $buf . '</p>']);
+    }
+}
+
+// lib/php/plugins/domains.php 20150101 - 20230604
+
+class Plugins_Domains extends Plugin
+{
+    //    protected mixed $dbh;
+
+    protected string $tbl = 'domains';
+
+    public array $inp = [
+        'name'              => '',
+        'master'            => '',
+        'last_check'        => '',
+        'type'              => '',
+        'notified_serial'   => '',
+        'account'           => '',
+        'ip'                => '',
+        'ns1'               => '',
+        'ns2'               => '',
+    ];
+
+    public function __construct($g)
+    {
+        if ($g->dns['db']['type']) {
+            $this->dbh = new db($g->dns['db']);
+        }
+        parent::__construct($g);
+    }
+
+    public function create(): string
+    {
+        if (util::is_post()) {
+            extract($_POST);
+            // Usage: addpdns domain ip ns1 ns2 [mx] [spfip] [sshkey]
+            //util::exe("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            util::log("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            elog("addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"");
+            return "addpdns {$domain} {$ip} {$ns1} {$ns2} {$mxhost} \"{$spfip}\"";
+        } else {
+            return $this->g->t->create($this->inp);
+        }
+    }
+
+    protected function create2(): string
+    {
+        if (util::is_post()) {
+            extract($_POST);
+            extract($this->g->dns);
+            $created = date('Y-m-d H:i:s');
+            $disable = 0;
+            $soa_buf =
+                $soa['primary'] . $domain . ' ' .
+                $soa['email'] . $domain . '. ' .
+                date('Ymd') . '00' . ' ' .
+                $soa['refresh'] . ' ' .
+                $soa['retry'] . ' ' .
+                $soa['expire'] . ' ' .
+                $soa['ttl'];
+            $did = db::create([
+                'name' => $domain,
+                'master' => 'SLAVE' === $type ? $master : '',
+                'type' => $type ? $type : 'MASTER',
+                'updated' => $created,
+                'created' => $created,
+            ]);
+
+            if ('SLAVE' === $type) {
+                util::log('Created DNS Zone: ' . $domain, 'success');
+                util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+            }
+
+            $sql = '
+ INSERT INTO `records` (
+        content, created, disabled, domain_id, name, prio, ttl, type, updated
+) VALUES (
+        :content, :created, :disabled, :did, :domain, :prio, :ttl, :type, :updated
+)';
+            db::qry($sql, [
+                'content' => $soa_buf,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'SOA',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $ns1 . $domain,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'NS',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $ns2 . $domain,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'NS',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => 'cdn.' . $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => 'www.' . $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $mx . $domain,
+                'created' => $created,
+                'did' => $did,
+                'disabled' => $disable,
+                'domain' => $domain,
+                'prio' => $prio,
+                'ttl' => $ttl,
+                'type' => 'MX',
+                'updated' => $created,
+            ]);
+            util::log('Created DNS Zone: ' . $domain, 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        }
+
+        return $this->g->t->create($this->inp);
+    }
+
+    protected function update(): string
+    {
+        if ($this->inp['increment']) {
+            //            if ($this->inp['increment']) {
+            $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            $oldsoa = explode(' ', db::qry($sql, ['did' => $this->g->in['i']], 'col'));
+            $primary = $oldsoa[0];
+            $email = $oldsoa[1];
+            $serial = $oldsoa[2];
+            $refresh = $oldsoa[3];
+            $retry = $oldsoa[4];
+            $expire = $oldsoa[5];
+            $ttl = $oldsoa[6];
+            //            } else {
+            //                extract($_POST);
+            //            }
+
+            $today = date('Ymd');
+            $serial_day = substr($serial, 0, 8);
+            $serial_rev = substr($serial, -2);
+
+            $serial = ($serial_day == $today)
+                ? "{$today}" . sprintf('%02d', $serial_rev + 1)
+                : "{$today}" . '00';
+
+            $soa =
+                $primary . ' ' .
+                $email . ' ' .
+                $serial . ' ' .
+                $refresh . ' ' .
+                $retry . ' ' .
+                $expire . ' ' .
+                $ttl;
+
+            $sql = "
+ UPDATE records SET
+        ttl     = :ttl,
+        content = :soa,
+        updated = :updated
+  WHERE type = 'SOA'
+    AND domain_id = :did";
+
+            $res = db::qry($sql, [
+                'did' => $this->g->in['i'],
+                'soa' => $soa,
+                'ttl' => $ttl,
+                'updated' => date('Y-m-d H:i:s'),
+            ]);
+
+            if ($this->inp['increment']) {
+                return $serial;
+            }
+
+            // TODO check $res ???
+            util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        } elseif (util::is_post() && $this->g->in['i']) {
+            extract($_POST);
+
+            $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
+            if ('SLAVE' === $dom['type']) {
+                return $this->g->t->update($dom);
+            }
+            $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
+
+            return $this->g->t->update(array_merge($dom, $soa));
+        }
+
+        return 'Error updating item';
+    }
+
+    protected function delete(): ?string
+    {
+        if (util::is_post()) {
+            $sql = '
+ DELETE FROM `records`
+  WHERE  domain_id = :id';
+
+            $res1 = db::qry($sql, ['id' => $this->g->in['i']]);
+            $res2 = db::delete([['id', '=', $this->g->in['i']]]);
+            // TODO check $res1 and $res2 ???
+            util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        } else {
+            return $this->g->t->delete($this->g->in);
+        }
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                [
+                    'dt' => 0,
+                    'db' => 'name',
+                    'formatter' => function ($d, $row) {
+                        return ('SLAVE' !== $row['type']) ? '
+                    <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
+                      <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
+                    }
+                ],
+                ['dt' => 1, 'db' => 'type'],
+                ['dt' => 2, 'db' => 'records'],
+                [
+                    'dt' => 3,
+                    'db' => 'soa',
+                    'formatter' => function ($d, $row) {
+                        $soa = explode(' ', $row['soa']);
+
+                        return ('SLAVE' !== $row['type']) ? '
+                    <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
+                    }
+                ],
+                [
+                    'dt' => 4,
+                    'db' => 'id',
+                    'formatter' => function ($d, $row) {
+                        return '
+                    <a href="?o=domains&m=shwho&name=' . $row['name'] . '" class="bslink" title="Whois Summary">
+                      <i class="bi bi-info-circle cursor-pointer"></i></a>
+                    <a href="?o=domains&m=delete&i=' . $row['id'] . '" class="bslink" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="bi bi-trash cursor-pointer text-danger"></i></a>';
+                    }
+                ],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+
+            return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->list([]);
+    }
+
+    protected function shwho(): string
+    {
+        return $this->g->t->shwho(
+            $this->inp['name'],
+            shell_exec('sudo shwho ' . $this->inp['name'])
+        );
+    }
+
+    protected function incsoa(): string
+    {
+        return shell_exec('sudo incsoa ' . $this->inp['name']);
+    }
+}
+
+// lib/php/plugins/home.php 20150101 - 20180614
+
+class Plugins_Home extends Plugin
+{
+    public array $inp = [];
+
+    public function list(): string
+    {
+        if (file_exists(INC . 'home.tpl')) {
+            ob_start();
+            include INC . 'home.tpl';
+            return ob_get_clean();
+        }
+
+        return $this->g->t->list([]);
+    }
+}
+
+// lib/php/plugins/mail/infomail.php 20170225 - 20170514
+
+class Plugins_InfoMail extends Plugin
+{
+    private const PFLOG = '/tmp/pflogsumm.log';
+
+    protected function list(): string
+    {
+        return $this->g->t->list([
+            'mailq' => shell_exec('mailq'),
+            'pflogs' => is_readable(self::PFLOG)
+                ? file_get_contents(self::PFLOG)
+                : 'none',
+            'pflog_time' => is_readable(self::PFLOG)
+                ? round(abs(date('U') - filemtime(self::PFLOG)) / 60, 0) . ' min.'
+                : '0 min.',
+        ]);
+    }
+
+    protected function pflog_renew(): string
+    {
+        shell_exec('sudo pflogs');
+        return $this->list();
+    }
+}
+
+// plugins/infosys.php 20170225 - 20200807
+
+class Plugins_InfoSys extends Plugin
+{
+    public function list(): string
+    {
+        $mem = $dif = $cpu = [];
+        $cpu_name = $procs = '';
+        $cpu_num = 0;
+        $os = 'Unknown OS';
+
+        $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
+        $loadAvg = sys_getloadavg();
+        $lav = sprintf('1 min: %.2f - 5 min: %.2f - 15 min: %.2f', $loadAvg[0], $loadAvg[1], $loadAvg[2]);
+        $stat1 = file('/proc/stat');
+        sleep(1);
+        $stat2 = file('/proc/stat');
+
+        if (is_readable('/proc/cpuinfo')) {
+            $tmp = trim(file_get_contents('/proc/cpuinfo'));
+            $ret = preg_match_all('/model name.+/', $tmp, $matches);
+            $cpu_name = $ret ? explode(': ', $matches[0][0])[1] : 'Unknown CPU';
+            $cpu_num = count($matches[0]);
+        }
+
+        if (is_readable('/etc/os-release')) {
+            $tmp = explode("\n", trim(file_get_contents('/etc/os-release')));
+            $osr = [];
+            foreach ($tmp as $line) {
+                [$k, $v] = explode('=', $line);
+                $osr[$k] = trim($v, '" ');
+            }
+            $os = $osr['PRETTY_NAME'] ?? 'Unknown OS';
+        }
+
+        foreach ($pmi as $line) {
+            [$k, $v] = explode(':', $line);
+            [$mem[$k],] = explode(' ', trim($v));
+        }
+
+        $info1 = explode(' ', preg_replace('!cpu +!', '', $stat1[0]));
+        $info2 = explode(' ', preg_replace('!cpu +!', '', $stat2[0]));
+        $dif['user'] = $info2[0] - $info1[0];
+        $dif['nice'] = $info2[1] - $info1[1];
+        $dif['sys'] = $info2[2] - $info1[2];
+        $dif['idle'] = $info2[3] - $info1[3];
+        $total = array_sum($dif);
+        foreach ($dif as $x => $y) {
+            $cpu[$x] = round($y / $total * 100, 2);
+        }
+        $cpu_all = sprintf('User: %01.1f - System: %01.1f - Nice: %01.1f - Idle: %01.1f', $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
+        $cpu_pcnt = intval(round(100 - $cpu['idle']));
+
+        $dt = (float) disk_total_space('/');
+        $df = (float) disk_free_space('/');
+        $du = (float) $dt - $df;
+        $dp = floor(($du / $dt) * 100);
+
+        $mt = (float) $mem['MemTotal'] * 1000;
+        $mu = (float) ($mem['MemTotal'] - $mem['MemFree'] - $mem['Cached'] - $mem['SReclaimable'] - $mem['Buffers']) * 1000;
+        $mf = (float) $mt - $mu;
+        $mp = floor(($mu / $mt) * 100);
+
+        $ip = gethostbyname(gethostname());
+        $hn = gethostbyaddr($ip);
+        $knl = is_readable('/proc/version')
+            ? explode(' ', trim(file_get_contents('/proc/version')))[2]
+            : 'Unknown';
+
+        return $this->g->t->list([
+            'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
+            'dsk_free' => util::numfmt($df, 1),
+            'dsk_pcnt' => $dp,
+            'dsk_text' => $dp > 5 ? $dp . '%' : '',
+            'dsk_total' => util::numfmt($dt, 1),
+            'dsk_used' => util::numfmt($du, 1),
+            'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
+            'mem_free' => util::numfmt($mf),
+            'mem_pcnt' => $mp,
+            'mem_text' => $mp > 5 ? $mp . '%' : '',
+            'mem_total' => util::numfmt($mt, 1),
+            'mem_used' => util::numfmt($mu, 1),
+            'os_name' => $os,
+            'uptime' => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
+            'loadav' => $lav,
+            'hostname' => $hn,
+            'host_ip' => $ip,
+            'kernel' => $knl,
+            'cpu_all' => $cpu_all,
+            'cpu_name' => $cpu_name,
+            'cpu_num' => $cpu_num,
+            'cpu_color' => $cpu_pcnt > 90 ? 'danger' : ($cpu_pcnt > 80 ? 'warning' : 'default'),
+            'cpu_pcnt' => $cpu_pcnt,
+            'cpu_text' => $cpu_pcnt > 5 ? $cpu_pcnt . '%' : '',
+        ]);
+    }
+}
+
+// lib/php/plugins/mailgraph.php 20170225 - 20170514
+
+class Plugins_MailGraph extends Plugin
+{
+    public function list(): string
+    {
+        $return = '';
+        $images = ['0-n', '1-n', '2-n', '3-n'];
+        foreach ($images as $image) {
+            $image = 'http://localhost:81/mailgraph.cgi?' . $image;
+            $headers = get_headers($image);
+            $return_code = substr($headers[0], 9, 3);
+            if ($return_code >= 400) {
+                $return .= '<img class="img-responsive" alt="not-yet-available" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAG3UlEQVRYR8WXC2yT1xXH/+dcx0loRkMhULZuA2WxAwjStVsYiZ06IYUOClRbVaGJ0m0MCaEpqOs00anVgErtNq1ZH5PWVRUIOtZ2LevGUOkjbydMbKM8x+wQKKWsCYSUFvLAj++c6fvAxo4NDtKkWbIsfd+55/+79/7PudeE//OHblR/A8A11TNnwIiXVSYqMZPggsA6MTQy/vCSffuGbyTnmAFafZ56JXxfhb7JjOJsIgSJQrhTmV4eKYq/smh3TyQXTE6A5pryKkX8WaPma4lklkivIToiRGcYahF0ggJeAXsYcHI6MYYfD3SENxOg1wK5JkBrIODSWO+Tyvjx5aQyAOIXGLL9ro5j/24NzCpikanCljGWDPiDPeferSotyTeubwP0Q4XOtEUJeJdhragJ9vRnX7UsT1sD0wog+X+EYokCQkAjjGujZUW+ZGBWiyWL2XBZ6lAB+gnaBPDW2mDovXaf9yGL9GkGTQBwnAl339UR/mC0XMYK2Cbz+707GLgPis8Avd+QHIzBNDKwIteeOrNW/J3YWhOP531ijOxUYI4KPpCCvHn1zUfOpObIAGitKd8A1Z8RcMEC17oopgLzVyi+MBbxRIxjSOU16oq8CSu/DUCFQto6gsfmbwDkalxK1hafp4KU9gmDifReUTptFB0g3Hwj4mmxhB9ITN8G0wFmTCJQQyAYej4rQJvf+44CC4j0xZg7/hMzkrefGNNTE06uX4zB7qMYPpW+naagEJ9fthynX98KleQEISJxMFUzYTqUXhXo+XyhL/u6whevmPRy+ia/d44BDhIwzLCmCZnHVNGQKn7rPfeh/NGnEP3kHA6sewjDp044r23x2b94AcVfnYu+t/6E8C8fS4Mg4NDZW8N3TO717lFCJYCHa4PhZ9IAWn2eX4HoERG8xHmux8mKfqhgdwJgysJlmPHTnwN02TYORMNKRM72JsUTsVkhFA8oqQHoFRHaP78rdEcaQJu//F927Sq0HooKIno6kXDCnfNQ0bg5KZ54Hj0/gJGPTuLmOXdmWOTU9hdx4neNyecKvF0QH/pWhG86D0Z+1IpPWbjn+FlnOnZTgRW/CIGVL0Ofi5jCN0G8MDGa89yYtelZTKyuHZMXL/X9x1kd+zfxEcGlyHiruGDQNBHgg9KS2s7QLgfAcT/RAbth1AbDX2mqLvvYME9NVRsrxGXxB3Gp7+NMWMOz1dIGgq5O+MABaK4pq2HldruBBDrDc5ury2LM7BqdwYF44jlMrApkXYnrisNpqfNJtZ5AjxJoUyAYsvvNVQAA/6gNhiub/WVRBueNVkl1ezaC6EA/DqxbmVGiiVhi1KlFC0C6HkQbaztCGxyA9pry2aJ6SEROzu86Nr3Z5/2ICbeliuQSTxrzSnUkSjRtG0lmivAjIKxSxbq6zvBzDsCeebcVjrhuGrKPzVhh/nj3cPQ1kC5ODB6r+PUg7P5SNFxUfHHcYDuAeSS6KNDVvTt5FrT5vQftQ8N+ocylgCbbZfHtX0dF4xaQK90WttGGPzyOW+b6M3bk5JbfwP4mlx+y0yW8IsIyALBL3VRS3xwaSAK0+D1P2uZQ4GVx08OuqJ5SYFwiwSR/vVOKZIzzKFFq9r6PLtHTb2xDz/NPAXr1HkJKS5UwEdAtAO2tDYa+YedJArQGPOVi0VEDianRUrV4rQ2UOrVJNXdj1sZnEOnvSyu11BLNJm4LBoKhqna/d7+zysDaQDD82zQApyFVe/8MxjJS/OHiSNHqcYWD/2TCjFQIuwSHTnRn1LkNMWXBUvS+tSNt5nYDchmqFGglFC8RcNYdH5pW9bfTIxkATb5yj4usw84ZQLqcYd5XlU4FJo+pBY4KEkCJsJzYvE+WtU+B8apYVdcZ3nzVG6MGtfg8P7LPAQFGQHKPiukjsXaNvoLlAhKRQUO0Mp7v3kMjkaA9XqC76oLdS1MvqVkvpS1+7zYCHrQhGFiZJ3gnRvKEENZma1AZMITdYNNgWVG3gdkJoJRAR43m+fydh8+nxmcFsG/EFO/dqoTv2MEKbIlZ8fVuN7kh5rsWdDFZdDszCq68F1V0E+l7JLSt/1PXoZKJVgOpbrQrSVSOWMoLF3SFMw6Ia17LFaB2f/l6S6xN9rlgNxIBtgLYTmbq3v6SNi3p90ywjNtE3Zc+tf+EtFR7vUS4X4A1iU4qkDciUV21aG/PhWzblvOPiX1Tcgl+rYy6ZAKRITCFCHQGkLiAb2HAk2pWgfYQeH1dMLTjen7JCZAY3Oz3VDLoe6K4d/Q5keLoC0rUrMDvz00J/eWB12HlMuuYAVITtdeUftFS4yHCJAUbqPUZGTreX9J9bCyiOU2Yi/p/+f6/yPUmTii6UZAAAAAASUVORK5CYII=" /><p>Not enough data</p>';
+            } else {
+                $imageData = base64_encode(file_get_contents($image));
+                $return .= '<img class="img-responsive" alt="' . $image . '" src="data:image/png;base64,' . $imageData . '" />';
+            }
+        }
+
+        return $this->g->t->list(['mailgraph' => $return]);
+    }
+}
+
+// plugins/processes.php 20170225 - 20180430
+
+class Plugins_Processes extends Plugin
+{
+    public function list(): string
+    {
+        return $this->g->t->list(['procs' => shell_exec('sudo processes')]);
+    }
+}
+
+// lib/php/plugins/records.php 20150101 - 20190605
+
+class Plugins_Records extends Plugin
+{
+    protected string $tbl = 'records';
+
+    public array $inp = [
+        'content'   => '',
+        'name'      => '',
+        'prio'      => 0,
+        'ttl'       => 300,
+        'type'      => '',
+    ];
+
+    public function __construct($g)
+    {
+        if ($g->dns['db']['type']) {
+            $this->dbh = new db($g->dns['db']);
+        }
+        parent::__construct($g);
+    }
+
+    protected function create(): string
+    {
+        if (util::is_post()) {
+            $in = $this->validate($this->inp);
+            if (!empty($in)) {
+                $in['created'] = $in['updated'];
+                $lid = db::create($in);
+                $this->update_domains($in['domain_id'], $in['updated']);
+                util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
+            }
+            $i = intval(util::enc($_POST['did']));
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+        }
+
+        return 'Error creating DNS record';
+    }
+
+    protected function update(): string
+    {
+        if (util::is_post()) {
+            $in = $this->validate($this->inp);
+            if (!empty($in)) {
+                $dom = util::enc($_POST['domain']);
+                $in['created'] = $in['updated'];
+                db::update($in, [['id', '=', $this->g->in['i']]]);
+                $this->update_domains($in['domain_id'], $in['updated']);
+                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
+            }
+            $i = intval(util::enc($_POST['did']));
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+        }
+
+        return 'Error updating DNS record';
+    }
+
+    protected function delete(): ?string
+    {
+        if (util::is_post()) {
+            $dom = util::enc($_POST['domain']);
+            $did = intval(util::enc($_POST['did']));
+            $now = date('Y-m-d H:i:s');
+
+            db::delete([['id', '=', $this->g->in['i']]]);
+            $this->update_domains($did, $now);
+            util::log('Deleted DNS record ID: ' . $this->g->in['i'] . ' from ' . $dom, 'success');
+            $i = $did;
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+        }
+        util::log('Error deleting DNS record');
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                ['dt' => 0,  'db' => 'name'],
+                ['dt' => 1,  'db' => 'content'],
+                ['dt' => 2,  'db' => 'type'],
+                ['dt' => 3,  'db' => 'prio'],
+                ['dt' => 4,  'db' => 'ttl'],
+                ['dt' => 5,  'db' => 'id', 'formatter' => function ($d) {
+                    return '
+                    <a class="update" href="" title="Update DNS record ID: ' . $d . '" data-rowid="' . $d . '">
+                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
+                    <a class="delete" href="" title="Delete DNS record ID: ' . $d . '" data-rowid="' . $d . '">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 6,  'db' => 'active'],
+                ['dt' => 7,  'db' => 'did'],
+                ['dt' => 8,  'db' => 'domain'],
+                ['dt' => 9,  'db' => 'updated'],
+            ];
+
+            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, 'did=' . $_GET['did']), JSON_PRETTY_PRINT);
+        }
+
+        $domain = db::qry('
+ SELECT name FROM domains
+  WHERE id = :did', ['did' => $this->g->in['i']], 'col'); // i = domain id at this point
+
+        return $this->g->t->list(['domain' => $domain, 'did' => $this->g->in['i']]);
+    }
+
+    private function update_domains(int $did, string $now): bool
+    {
+        if ($did && $now) {
+            $sql = "
+ SELECT content
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            $soa = util::inc_soa(db::qry($sql, ['did' => $did], 'col'));
+            $sql = "
+ UPDATE records
+    SET content=:content
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+            db::qry($sql, ['did' => $did, 'content' => $soa]);
+            db::$tbl = 'domains';
+
+            return db::update(['updated' => $now], [['id', '=', $did]]);
+        }
+
+        return false;
+    }
+
+    private function validate(array $in): array
+    {
+        if (empty($in['content'])) {
+            util::log('Content must not be empty');
+
+            return [];
+        }
+        if (('A' === $in['type']) && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
+            util::log('An "A" record must contain a legitimate IP');
+
+            return [];
+        }
+        if ('CAA' === $in['type'] && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
+            util::log('CAA record content must only contain letters and numbers');
+
+            return [];
+        }
+        if ($in['name'] && '*' !== $in['name'] && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
+            util::log('Record name must contain letters, numbers, _ - or only *');
+
+            return [];
+        }
+
+        if ('TXT' === $in['type']) {
+            $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
+        }
+
+        if ('CAA' === $in['type']) {
+            $in['content'] = htmlspecialchars_decode($in['content'], ENT_COMPAT);
+        }
+
+        $domain = strtolower(util::enc($_POST['domain']));
+        $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
+        $in['name'] = $in['name'] ? $in['name'] . '.' . $domain : $domain;
+
+        $in['ttl'] = intval($in['ttl']);
+        $in['prio'] = intval($in['prio']);
+        $in['updated'] = date('Y-m-d H:i:s');
+        $in['domain_id'] = intval(util::enc($_POST['did']));
+
+        return $in;
+    }
+}
+
+// lib/php/plugins/valias.php 20170225 - 20230624
+
+class Plugins_Valias extends Plugin
+{
+    protected string $tbl = 'valias';
+
+    public array $inp = [
+        'aid'    => 1,
+        'hid'    => 1,
+        'source' => '',
+        'target' => '',
+        'active' => 0,
+    ];
+
+    // TODO: recfactor common parts of create() and update() into private methods
+    // yep, as of 20170704 this is still a low to medium priority TODO
+
+    protected function create(): string
+    {
+        if (util::is_post()) {
+            extract($this->inp);
+            $active = $active ? 1 : 0;
+            $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));
+            $targets = array_map('trim', preg_split("/( |,|;|\n)/", $target));
+
+            if (empty($source[0])) {
+                util::log('Alias source address is empty');
+                $_POST = [];
+
+                return $this->g->t->list($this->inp);
+            }
+
+            if (empty($targets[0])) {
+                util::log('Alias target address is empty');
+                $_POST = [];
+
+                return $this->g->t->list($this->inp);
+            }
+
+            foreach ($sources as $s) {
+                if (empty($s)) {
+                    continue;
+                }
+                $lhs = '';
+                $rhs = '';
+                if (str_contains($s, '@')) {
+                    [$lhs, $rhs] = explode('@', $s);
+                } else {
+                    $rhs = $s;
+                }
+
+                if (!$domain = idn_to_ascii($rhs)) {
+                    util::log('Invalid source domain: ' . $rhs);
+                    $_POST = [];
+
+                    return $this->g->t->create($this->inp);
+                }
+
+                $sql = '
+ SELECT `id`
+   FROM `vhosts`
+  WHERE `domain` = :domain';
+
+                $hid = db::qry($sql, ['domain' => $domain], 'col');
+
+                if (!$hid) {
+                    util::log($domain . ' does not exist as a local domain');
+                    $_POST = [];
+
+                    return $this->g->t->create($this->inp);
+                }
+
+                if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
+                    util::log('Alias source address is invalid');
+                    $_POST = [];
+
+                    return $this->g->t->create($this->inp);
+                }
+
+                $sql = '
+ SELECT 1 FROM `valias`
+  WHERE `source` = :catchall';
+
+                $catchall = db::qry($sql, ['catchall' => '@' . $domain], 'col');
+                //elog("catchall=$catchall");
+
+                if (1 !== $catchall) {
+                    $sql = '
+ SELECT `source`
+   FROM `valias`
+  WHERE `source` = :source';
+
+                    $num_results = count(db::qry($sql, ['source' => $s]));
+
+                    if ($num_results) {
+                        util::log($s . ' already exists as an alias');
+                        $_POST = [];
+
+                        return $this->g->t->create($this->inp);
+                    }
+                }
+
+                $sql = '
+ SELECT `user`
+   FROM `vmails`
+  WHERE `user` = :source';
+
+                $num_results = count(db::qry($sql, ['source' => $s]));
+
+                if ($num_results) {
+                    util::log($s . ' already exists as a regular mailbox');
+                    $_POST = [];
+
+                    return $this->g->t->create($this->inp);
+                }
+
+                foreach ($targets as $t) {
+                    if (empty($t)) {
+                        continue;
+                    }
+                    [$tlhs, $trhs] = explode('@', $t);
+
+                    if (!$tdomain = idn_to_ascii($trhs)) {
+                        util::log('Invalid target domain: ' . $tdomain);
+                        $_POST = [];
+
+                        return $this->g->t->create($this->inp);
+                    }
+
+                    if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
+                        util::log('Alias target address is invalid');
+                        $_POST = [];
+
+                        return $this->g->t->create($this->inp);
+                    }
+
+                    if (1 !== $catchall) {
+                        if ($t === $s) {
+                            util::log('Alias source and target addresses must not be the same');
+                            $_POST = [];
+
+                            return $this->g->t->create($this->inp);
+                        }
+                    }
+                }
+
+                $target = implode(',', $targets);
+
+                $sql = '
+ INSERT INTO `valias` (
+        `active`,
+        `hid`,
+        `source`,
+        `target`,
+        `updated`,
+        `created`
+) VALUES (
+        :active,
+        :hid,
+        :source,
+        :target,
+        :updated,
+        :created
+)';
+                $s = filter_var($s, FILTER_VALIDATE_EMAIL)
+                    ? $s
+                    : '@' . $domain;
+
+                $result = db::qry($sql, [
+                    'active'  => $active ? 1 : 0,
+                    'hid'     => $hid,
+                    'source'  => $s,
+                    'target'  => $target,
+                    'updated' => date('Y-m-d H:i:s'),
+                    'created' => date('Y-m-d H:i:s'),
+                ]);
+                // test $result?
+            }
+            util::log('Alias added', 'success');
+            util::ses('p', '', '1');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        } else {
+            return $this->g->t->create($this->inp);
+        }
+    }
+
+    protected function read(): string
+    {
+        return $this->g->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+    }
+
+    protected function update(): string
+    {
+        if (util::is_post()) {
+            extract($this->inp);
+            $active = $active ? 1 : 0;
+            $sources = array_map('trim', preg_split("/( |,|;|\n)/", $source));
+            $targets = array_map('trim', preg_split("/( |,|;|\n)/", $target));
+
+            if (empty($source[0])) {
+                util::log('Alias source address is empty');
+                $_POST = [];
+
+                return $this->read();
+            }
+
+            if (empty($targets[0])) {
+                util::log('Alias target address is empty');
+                $_POST = [];
+
+                return $this->read();
+            }
+
+            foreach ($sources as $s) {
+                if (empty($s)) {
+                    continue;
+                }
+                $lhs = '';
+                $rhs = '';
+                if (str_contains($s, '@')) {
+                    [$lhs, $rhs] = explode('@', $s);
+                } else {
+                    $rhs = $s;
+                }
+
+                if (!$domain = idn_to_ascii($rhs)) {
+                    util::log('Invalid source domain: ' . $rhs);
+                    $_POST = [];
+
+                    return $this->read();
+                }
+
+                $sql = '
+ SELECT `id`
+   FROM `vhosts`
+  WHERE `domain` = :domain';
+
+                $hid = db::qry($sql, ['domain' => $domain], 'col');
+
+                if (!$hid) {
+                    util::log($domain . ' does not exist as a local domain');
+                    $_POST = [];
+
+                    return $this->read();
+                }
+
+                if ((!filter_var($s, FILTER_VALIDATE_EMAIL)) && !empty($lhs)) {
+                    util::log('Alias source address is invalid');
+                    $_POST = [];
+
+                    return $this->read();
+                }
+
+                $sql = '
+ SELECT 1
+   FROM `valias`
+  WHERE `source` = :catchall';
+
+                $catchall = db::qry($sql, ['catchall' => '@' . $domain], 'col');
+                //elog("catchall=$catchall");
+
+                if (1 !== $catchall) {
+                    $sql = '
+ SELECT `user`
+   FROM `vmails`
+  WHERE `user` = :source';
+
+                    $num_results = count(db::qry($sql, ['source' => $s]));
+
+                    if ($num_results) {
+                        util::log($s . ' already exists as a regular mailbox');
+                        $_POST = [];
+
+                        return $this->read();
+                    }
+                }
+
+                foreach ($targets as $t) {
+                    if (empty($t)) {
+                        continue;
+                    }
+                    [$tlhs, $trhs] = explode('@', $t);
+
+                    if (!$tdomain = idn_to_ascii($trhs)) {
+                        util::log('Invalid target domain: ' . $tdomain);
+                        $_POST = [];
+
+                        return $this->read();
+                    }
+
+                    if (!filter_var($t, FILTER_VALIDATE_EMAIL)) {
+                        util::log('Alias target address is invalid');
+                        $_POST = [];
+
+                        return $this->read();
+                    }
+
+                    if (1 !== $catchall) {
+                        if ($t === $s) {
+                            util::log('Alias source and target addresses must not be the same');
+                            $_POST = [];
+
+                            return $this->read();
+                        }
+                    }
+                }
+
+                $target = implode(',', $targets);
+                $s = filter_var($s, FILTER_VALIDATE_EMAIL)
+                    ? $s
+                    : '@' . $domain;
+
+                $sql = '
+ SELECT `source`
+   FROM `valias`
+  WHERE `source` = :source';
+
+                $exists = count(db::qry($sql, ['source' => $s]));
+
+                if ($exists or (1 == count($sources))) {
+                    $sql = '
+ UPDATE `valias` SET
+        `active`  = :active,
+        `source`  = :source,
+        `target`  = :target,
+        `updated` = :updated
+  WHERE `id` = :id';
+
+                    $result = db::qry($sql, [
+                        'id' => $this->g->in['i'],
+                        'active' => $active,
+                        'source' => $s,
+                        'target' => $target,
+                        'updated' => date('Y-m-d H:i:s'),
+                    ]);
+                } else {
+                    $sql = '
+ INSERT INTO `valias` (
+        `active`,
+        `hid`,
+        `source`,
+        `target`,
+        `updated`,
+        `created`
+) VALUES (
+        :active,
+        :hid,
+        :source,
+        :target,
+        :updated,
+        :created
+)';
+                    $result = db::qry($sql, [
+                        'active' => $active ? 1 : 0,
+                        'hid' => $hid,
+                        'source' => $s,
+                        'target' => $target,
+                        'updated' => date('Y-m-d H:i:s'),
+                        'created' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
+            util::log('Changes to alias have been saved', 'success');
+            util::relist();
+        } elseif ($this->g->in['i']) {
+            return $this->read();
+        } else {
+            return 'Error updating item';
+        }
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                ['dt' => 0, 'db' => 'source', 'formatter' => function ($d, $row) {
+                    return '
+                    <a href="?o=valias&m=update&i=' . $row['id'] . '" class="bslink" title="Update entry for ' . $d . '">
+                      <b>' . $d . ' </b></a>';
+                }],
+                ['dt' => 1, 'db' => 'target', 'formatter' => fn ($d) => str_replace(',', '<br>', $d)],
+                ['dt' => 2, 'db' => 'domain'],
+                ['dt' => 3, 'db' => 'active', 'formatter' => fn ($d) => '<i class="' . ($d ? 'bi-check-lg text-success' : 'bi-x-lg text-danger') . '"></i>'],
+                ['dt' => 4, 'db' => 'id'],
+                ['dt' => 5, 'db' => 'updated'],
+            ];
+
+            return json_encode(db::simple($_GET, 'valias_view', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->list([]);
+    }
+}
+
+// lib/php/plugins/vhosts.php 20230623
+
+class Plugins_Vhosts extends Plugin
+{
+    protected string $tbl = 'vhosts';
+
+    public array $inp = [
+        'active'    => 0,
+        'aid'       => 0,
+        'aliases'   => 10,
+        'diskquota' => 1000000000,
+        'domain'    => '',
+        'gid'       => 1000,
+        'mailboxes' => 1,
+        'mailquota' => 500000000,
+        'uid'       => 1000,
+        'uname'     => '',
+        'cms'       => '',
+        'ssl'       => '',
+        'ip'        => '',
+        'uuser'     => '',
+    ];
+
+    protected function create(): string
+    {
+        if (util::is_post()) {
+            extract($this->inp);
+            //            $active = $active ? 1 : 0;
+
+            //            if(!util::is_valid_plan($plan)){
+            //                util::log('Invalid plan ' . $plan);
+            //                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            //            }
+
+            if (file_exists('/home/u/' . $domain)) {
+                util::log('/home/u/' . $domain . ' already exists', 'warning');
+                $_POST = [];
+
+                return $this->g->t->create($this->inp);
+            }
+
+            //            if ($mailquota > $diskquota) {
+            //                util::log('Mailbox quota exceeds domain disk quota');
+            //                $_POST = []; return $this->g->t->create($this->in);
+            //            }
+
+            $num_results = db::read('COUNT(id)', 'domain', $domain, '', 'col');
+
+            if (0 != $num_results) {
+                util::log('Domain already exists');
+                $_POST = [];
+
+                return $this->g->t->create($this->inp);
+            }
+
+            $cms = ('on' === $cms) ? 'wp' : 'none';
+            $ssl = ('on' === $ssl) ? 'self' : 'le';
+            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+
+            shell_exec("nohup sh -c 'sudo addvhost {$vhost} {$cms} {$ssl} {$ip}' > /tmp/addvhost.log 2>&1 &");
+            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
+            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+        }
+
+        return $this->g->t->create($this->inp);
+    }
+
+    protected function read(): string
+    {
+        return $this->g->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+    }
+
+    protected function update(): string
+    {
+        if (util::is_post()) {
+            extract($this->inp);
+            $diskquota *= 1000000;
+            $mailquota *= 1000000;
+            $active = $active ? 1 : 0;
+
+            $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
+
+            if ($mailquota > $diskquota) {
+                util::log('Mailbox quota exceeds disk quota');
+                $_POST = [];
+
+                return $this->read();
+            }
+
+            $sql = '
+ UPDATE `vhosts` SET
+        `active`    = :active,
+        `aliases`   = :aliases,
+        `diskquota` = :diskquota,
+        `domain`    = :domain,
+        `mailboxes` = :mailboxes,
+        `mailquota` = :mailquota,
+        `updated`   = :updated
+  WHERE `id` = :id';
+
+            $res = db::qry($sql, [
+                'id'        => $this->g->in['i'],
+                'active'    => $active,
+                'aliases'   => $aliases,
+                'diskquota' => $diskquota,
+                'domain'    => $domain,
+                'mailboxes' => $mailboxes,
+                'mailquota' => $mailquota,
+                'updated'   => date('Y-m-d H:i:s'),
+            ]);
+
+            util::log('Vhost ID ' . $this->g->in['i'] . ' updated', 'success');
+            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+        } elseif ($this->g->in['i']) {
+            return $this->read();
+        } else {
+            return 'Error updating item';
+        }
+    }
+
+    protected function delete(): ?string
+    {
+        if (util::is_post() && $this->g->in['i']) {
+            $domain = db::read('domain', 'id', $this->g->in['i'], '', 'col');
+            if ($domain) {
+                shell_exec("nohup sh -c 'sudo delvhost {$domain}' > /tmp/delvhost.log 2>&1 &");
+                util::log('Removed ' . $domain, 'success');
+                util::redirect($this->g->cfg['self'] . '?o=vhosts');
+            } else {
+                util::log('ERROR: domain does not exist');
+            }
+        }
+
+        util::log('Error deleting item');
+        return ''; // to satisfy ?string return type
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                ['dt' => 0,  'db' => 'domain',      'formatter' => function ($d, $row) {
+                    return '
+                    <a class="bslink" href="?o=vhosts&m=update&i=' . $row['id'] . '" title="Update VHOST">
+                      <b>' . $row['domain'] . '</b></a>';
+                }],
+                ['dt' => 1,  'db' => 'num_aliases'],
+                ['dt' => 2,  'db' => null,          'formatter' => fn ($d) => '/'],
+                ['dt' => 3,  'db' => 'aliases'],
+                ['dt' => 4,  'db' => 'num_mailboxes'],
+                ['dt' => 5,  'db' => null,          'formatter' => fn ($d) => '/'],
+                ['dt' => 6,  'db' => 'mailboxes'],
+                ['dt' => 7,  'db' => 'size_mpath',  'formatter' => fn ($d) => util::numfmt(intval($d))],
+                ['dt' => 8,  'db' => null,          'formatter' => fn ($d) => '/'],
+                ['dt' => 9,  'db' => 'mailquota',   'formatter' => fn ($d) => util::numfmt(intval($d))],
+                ['dt' => 10, 'db' => 'size_upath',  'formatter' => fn ($d) => util::numfmt(intval($d))],
+                ['dt' => 11, 'db' => null,          'formatter' => fn ($d) => '/'],
+                ['dt' => 12, 'db' => 'diskquota',   'formatter' => fn ($d) => util::numfmt(intval($d))],
+                ['dt' => 13, 'db' => 'active',      'formatter' => fn ($d) => '<i class="fas ' . ($d ? 'fa-check text-success' : 'fa-times text-danger') . '"></i>'],
+                ['dt' => 14, 'db' => 'id'],
+                ['dt' => 15, 'db' => 'updated'],
+            ];
+
+            return json_encode(db::simple($_GET, 'vhosts_view', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->list([]);
+    }
+}
+
+// lib/php/plugins/vmails.php 20180826 - 20200414
+
+class Plugins_Vmails extends Plugin
+{
+    protected string $tbl = 'vmails';
+
+    public array $inp = [
+        'newpw'     => 0,
+        'password'  => '',
+        'shpw'      => 0,
+        'user'      => '',
+    ];
+
+    protected function create(): string
+    {
+        if (util::is_post()) {
+            if (!filter_var($this->inp['user'], FILTER_VALIDATE_EMAIL)) {
+                util::log('Email address (' . $this->inp['user'] . ') is invalid');
+                $_POST = [];
+
+                return $this->read();
+            }
+            util::exe('addvmail ' . $this->inp['user']);
+        }
+        util::relist();
+    }
+
+    protected function update(): string
+    {
+        extract($this->inp);
+
+        if ($shpw) {
+            return util::run("shpw {$user}");
+        }
+        if ($newpw) {
+            return util::run('newpw');
+        }
+        if (util::is_post()) {
+            $password = html_entity_decode($password, ENT_QUOTES, 'UTF-8');
+            if (util::chkpw($password)) {
+                util::exe("chpw {$user} '{$password}'");
+            }
+        }
+        util::relist();
+    }
+
+    protected function delete(): ?string
+    {
+        if (util::is_post()) {
+            util::exe('delvmail ' . $this->inp['user']);
+        }
+        util::relist();
+    }
+
+    protected function list(): string
+    {
+        if ('json' === $this->g->in['x']) {
+            $columns = [
+                ['dt' => null, 'db' => 'id'],
+                ['dt' => 0, 'db' => 'user', 'formatter' => function ($d, $row) {
+                    return '
+                    <a href="" title="Change password for ' . $d . '" data-id="' . $row['id'] . '" data-user="' . $d . '" data-toggle="modal" data-target="#updatemodal">
+                      <b>' . $d . ' </b></a>';
+                }],
+                ['dt' => 1, 'db' => 'size_mail', 'formatter' => fn ($d) => util::numfmt(intval($d))],
+                ['dt' => 2, 'db' => 'num_total', 'formatter' => fn ($d) => number_format(intval($d))],
+                ['dt' => 3, 'db' => null, 'formatter' => function ($d, $row) {
+                    return '<a href="" title="Remove this Mailbox" data-removeuser="' . $row['user'] . '" data-toggle="modal" data-target="#removemodal">
+                    <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
+                  </a>';
+                }],
+                ['dt' => 4, 'db' => 'updated'],
+            ];
+
+            return json_encode(db::simple($_GET, 'vmails_view', 'id', $columns), JSON_PRETTY_PRINT);
+        }
+
+        return $this->g->t->list([]);
+    }
+}
+
+// lib/php/theme.php 20150101 - 20230627
+
+class Theme
+{
+    public $g;
+
+    private string $buf = '';
+
+    public function __construct($g)
+    {
+        $this->g = $g;
+    }
+
+    public function __toString(): string
+    {
+        return $this->buf;
+    }
+
+    public function __call(string $name, array $args): string
+    {
+        elog(__METHOD__ . '() name = ' . $name . ' class = ' . __CLASS__);
+
+        return 'Theme::' . $name . '() not implemented';
+    }
+
+    public function log(): string
+    {
+        $logs = '';
+        foreach (util::log() as $lvl => $msg) {
+            $logs .= $msg ? '<p class="alert ' . $lvl . '">' . $msg . "</p>\n" : '';
+        }
+
+        return $logs;
+    }
+
+    public function nav1(): string
+    {
+        $o = '?o=' . $this->g->in['o'];
+
+        return '
+      <nav>' . implode('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
+    }
+
+    public function head(): string
+    {
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->cfg['self'] . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . $this->g->out['nav2'] . '
+    </header>';
+    }
+
+    public function main(): string
+    {
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
+    }
+
+    public function foot(): string
+    {
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
+    }
+
+    public function end(): string
+    {
+        return '
+    <pre>' . $this->g->out['end'] . '
+    </pre>';
+    }
+
+    public function html(): string
+    {
+        extract($this->g->out, EXTR_SKIP);
+
+        return '<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <script src="lib/js/color-modes.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>' . $doc . '</title>' . $css . '
+  </head>
+  <body>' . $head . $main . $foot . $end . $js . '
+  </body>
+</html>
+';
+    }
+
+    public static function dropdown(
+        array $ary,
+        string $name,
+        string $sel = '',
+        string $label = '',
+        string $class = '',
+        string $extra = ''
+    ): string {
+        $opt = $label ? '
+                <option value="">' . ucfirst($label) . '</option>' : '';
+        $buf = '';
+        $c = $class ? ' class="' . $class . '"' : '';
+        foreach ($ary as $k => $v) {
+            $t = str_replace('?t=', '', (string) $v[1]);
+            $s = $sel === $t ? ' selected' : '';
+            $buf .= '
+                        <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+        }
+
+        return '
+                      <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
+                      </select>';
+    }
+}
+
+// lib/php/themes/bootstrap/theme.php 20150101 - 20230625
+
+class Themes_Bootstrap_Theme extends Theme
+{
+    public function css(): string
+    {
+        return '
+    <meta name="theme-color" content="#712cf9">
+<link href="lib/css/bootstrap.min.css" rel="stylesheet">
+<!--
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 75rem;
+            /* padding-top: 5rem; */
+        }
+
+        .bi {
+            margin-left: .25rem;
+            margin-right: .25rem;
+        }
+
+        .navbar-brand {
+            padding-top: 0;
+        }
+
+        .navbar-toggler {
+            font-size: 1rem;
+        }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            width: 100%;
+            height: 3rem;
+            background-color: rgba(0, 0, 0, .1);
+            border: solid rgba(0, 0, 0, .15);
+            border-width: 1px 0;
+            box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            /* vertical-align: 0.01em; */
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
+        }
+
+        .bd-mode-toggle {
+            z-index: 1500;
+        }
+
+        .navbar-scrolled {
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.25rem !important;
+            /* transition: padding 0.25s; */
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+		integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+		crossorigin="anonymous">
+    </script>
+    ';
+    }
+
+    public function head(): string
+    {
+        return '
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="check2" viewBox="0 0 16 16">
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+      </symbol>
+      <symbol id="circle-half" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+        <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+      </symbol>
+    </svg>
+
+    <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+      <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
+              id="bd-theme"
+              type="button"
+              aria-expanded="false"
+              data-bs-toggle="dropdown"
+              aria-label="Toggle theme (auto)">
+        <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
+        <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+            <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="#sun-fill"></use></svg>
+            Light
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+            <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="#moon-stars-fill"></use></svg>
+            Dark
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+            <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="#circle-half"></use></svg>
+            Auto
+            <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <nav id="navbar" class="navbar mb-4 nav-underline navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="' . $this->g->cfg['self'] . '">
+                <b><i class="bi bi-box"></i> ' . $this->g->out['head'] . '</b>
+                (' . $_SESSION['r'] . ')
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ms-auto">' . $this->g->out['nav1'] . '
+                </ul>
+                <ul class="navbar-nav ms-auto">' . $this->g->out['nav3'] . '
+                </ul>
+            </div>
+        </div>
+    </nav>';
+    }
+
+    public function nav1(array $a = []): string
+    {
+        $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
+        $o = '?o=' . $this->g->in['o'];
+        $t = '?t=' . util::ses('t');
+
+        return implode('', array_map(function ($n) use ($o, $t) {
+            if (is_array($n[1])) {
+                return $this->nav_dropdown($n);
+            }
+            $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
+            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
+
+            return '
+            <li class="nav-item"><a class="nav-link' . $c . '" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
+        }, $a));
+    }
+
+    public function nav2(): string
+    {
+        return $this->nav_dropdown(['Sites', $this->g->nav2, 'bi bi-globe'], 'r');
+    }
+
+    public function nav3(): string
+    {
+        if (util::is_usr()) {
+            $usr[] = ['Change Profile', '?o=accounts&m=read&i=' . $_SESSION['usr']['id'], 'bi bi-person'];
+            $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'bi bi-key'];
+            $usr[] = ['Sign out', '?o=auth&m=delete', 'bi bi-box-arrow-right'];
+
+            if (util::is_adm() && !util::is_acl(0)) {
+                $usr[] =
+                    ['Switch to sysadm', '?o=accounts&m=switch_user&i=' . $_SESSION['adm'], 'bi bi-person-fill'];
+            }
+
+            return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'bi bi-person-fill']);
+        }
+
+        return '';
+    }
+
+    public function nav_dropdown(array $a = []): string
+    {
+        $o = "?o=" . $this->g->in['o'];
+        $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
+
+        return '
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">' . $i . $a[0] . '</a>
+              <div class="dropdown-menu">' . implode('', array_map(function ($n) use ($o) {
+            //elog('n=' . var_export($n, true));
+            $tmp = isset($n[3]) ? '?r=' . $this->g->in[$n[3]] : $o;
+            $c = ($tmp === $n[1]) ? ' active' : '';
+            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
+
+            return '
+                <a class="dropdown-item' . $c . '" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
+        }, $a[1])) . '
+              </div>
+            </li>';
+    }
+
+    public function main(): string
+    {
+        return '
+        <main class="container">' . $this->g->out['log'] . $this->g->out['main'] . '
+        </main>';
+    }
+
+    public function js(): string
+    {
+        return '
+    <script src="lib/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var nav = document.getElementById("navbar");
+        window.addEventListener("scroll", function () {
+            let theme = document.documentElement.getAttribute("data-bs-theme");
+            //console.log(theme);
+            if (window.pageYOffset > 24) {
+                if (theme == "dark") {
+                    nav.classList.add("bg-dark", "shadow", "navbar-scrolled");
+                    nav.style.transition = "padding 0.25s";
+                } else {
+                    nav.classList.add("bg-light", "shadow", "navbar-scrolled");
+                    nav.style.transition = "padding 0.25s";
+                }
+            } else {
+                if (theme == "dark") {
+                    nav.classList.remove("bg-dark", "shadow", "navbar-scrolled");
+                    nav.style.transition = "padding 0.25s";
+                } else {
+                    nav.classList.remove("bg-light", "shadow", "navbar-scrolled");
+                    nav.style.transition = "padding 0.25s";
+                }
+            }
+        });
+    </script>
+
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    ';
+    }
+
+    /**
+     * Return html for log messages stored in session
+     *
+     * @return string
+     */
+    public function log(): string
+    {
+        // Initialize variable to hold the log messages
+        $logs = '';
+
+        // Loop through the log messages stored in session
+        foreach (util::log() as $lvl => $msg) {
+            // If the $msg is an array and not empty, then loop through it and create a log message
+            if (is_array($msg) && !empty($msg)) {
+                // Loop through the array
+                foreach ($msg as $text) {
+                    // Add the log message to the $logs variable
+                    $logs .= '
+                    <div class="row">
+                      <div class="col">
+                        <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          ' . htmlspecialchars($text) . '
+                        </div>
+                      </div>
+                    </div>';
+                }
+            }
+        }
+
+        // Return the log messages
+        return $logs;
+    }
+
+    protected function modal(array $ary): string
+    {
+        return '
+        <div class="modal fade" id="' . $ary['id'] . '" tabindex="-1" role="dialog" aria-labelledby="' . $ary['id'] . '" aria-hidden="true">
+          <div class="modal-dialog">' . $this->modal_content($ary) . '
+          </div>
+        </div>';
+    }
+
+    protected function modal_content(array $ary): string
+    {
+        extract($ary);
+
+        $action = empty($action) ? '' : $action;
+        $hidden = empty($hidden) ? '' : $hidden;
+        $lhs_cmd = empty($lhs_cmd) ? '' : '
+                <a class="btn btn-danger bslink" href="?o=' . $this->g->in['o'] . '&m=delete&i=' . $this->g->in['i'] . '">' . $lhs_cmd . '</a>';
+        $mid_cmd = empty($mid_cmd) ? '' : '
+                <a class="btn btn-info bslink" href="?o=' . $this->g->in['o'] . '&m=help&name=' . $this->g->in['m'] . '">' . $mid_cmd . '</a>';
+        $footer = empty($rhs_cmd) ? '' : '
+              <div class="modal-footer d-flex justify-content-between">' . $lhs_cmd . '
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' . $mid_cmd . '
+                <button type="submit" class="btn btn-primary">' . $rhs_cmd . '</button>
+              </div>';
+        $body = '
+                <div class="modal-body">' . $body . '
+                </div>';
+        $body_buf = empty($footer) ? $body : '
+              <form method="post" action="' . $this->g->cfg['self'] . '">
+                <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+                <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+                <input type="hidden" name="m" value="' . $action . '">
+                <input type="hidden" name="i" value="' . $this->g->in['i'] . '">'
+            . $hidden . $body . $footer . '
+              </form>';
+
+        return '
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">' . $title . '</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+              </div>' . $body_buf . '
+            </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/accounts.php 20170225 - 20230623
+
+class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
+{
+    public function create(array $in): string
+    {
+        return $this->modal_content([
+            'title'     => 'Create new user',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => $this->modal_body($in)
+        ]);
+    }
+
+    public function read(array $in): string
+    {
+        return $this->modal_content([
+            'title'     => 'Update user',
+            'action'    => 'update',
+            'lhs_cmd'   => 'Delete',
+            'rhs_cmd'   => 'Update',
+            'body'      => $this->modal_body($in)
+        ]);
+    }
+
+    public function delete(): ?string
+    {
+        $usr = db::read('login', 'id', $this->g->in['i'], '', 'one');
+
+        return $this->modal_content([
+            'title'     => 'Remove User',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
+            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+            'body'      => '
+            <p class="text-center">Are you sure you want to remove this user?<br><b>' . $usr['login'] . '</b></p>',
+        ]);
+    }
+
+    public function list(array $in): string
+    {
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-people-fill"></i> Accounts
+            <a href="?o=accounts&m=create" class="bslink" title="Add new account">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="table-responsive">
+          <table id="accounts" class="table table-borderless table-striped w-100">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Alt Email</th>
+                <th>ACL</th>
+                <th>Grp</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" id="createdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="readmodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
+          <div class="modal-dialog" id="readdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+          <div class="modal-dialog" id="deletedialog">
+          </div>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#accounts").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=accounts&m=list",
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0, "className":"text-truncate"},
+      {"targets":3, "className":"text-truncate"},
+    ]
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+});
+        </script>';
+    }
+
+    private function modal_body(array $in): string
+    {
+        $aclgrp_buf = '';
+        $acl_ary = $grp_ary = [];
+
+        $acl = $_SESSION['usr']['acl'];
+        $grp = $_SESSION['usr']['grp'];
+
+        foreach ($this->g->acl as $k => $v) {
+            $acl_ary[] = [$v, $k];
+        }
+
+        $acl_buf = $this->dropdown($acl_ary, 'acl', "{$acl}", '', 'form-select');
+
+        $res = db::qry('
+ SELECT login,id
+   FROM `accounts`
+  WHERE acl = :0 OR acl = :1', ['0' => 0, '1' => 1]);
+
+        foreach ($res as $k => $v) {
+            $grp_ary[] = [$v['login'], $v['id']];
+        }
+
+        $grp_buf = $this->dropdown($grp_ary, 'grp', "{$grp}", '', 'form-select');
+
+        $aclgrp_buf = '
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label for="acl" class="form-label">ACL</label>' . $acl_buf . '
+          </div>
+          <div class="col-6 mb-3">
+            <label for="grp" class="form-label">Group</label>' . $grp_buf . '
+          </div>
+        </div>';
+
+        return '
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label for="login" class="form-label">Email ID</label>
+            <input type="email" class="form-control" id="login" name="login" value="' . $in['login'] . '" required>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="altemail" class="form-label">Alt Email</label>
+            <input type="text" class="form-control" id="altemail" name="altemail" value=" ' . $in['altemail'] . '">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label for="fname" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="fname" name="fname" value="' . $in['fname'] . '" required>
+          </div>
+          <div class="col-6 mb-3">
+            <label for="lname" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lname" name="lname" value=" ' . $in['lname'] . '" required>
+          </div>
+        </div>' . $aclgrp_buf;
+    }
+}
+
+// lib/php/themes/bootstrap/auth.php 20150101 - 20230625
+
+class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
+{
+    // forgotpw (create new pw)
+    public function create(array $in): string
+    {
+        return '
+        <div class="row">
+          <h3><i class="bi bi-key"></i> Forgot password</h3>
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text"><i class="bi bi-envelope"></i></div>
+            </div>
+              <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="' . $login . '" autofocus required>
+            </div>
+            <small class="form-text text-muted text-center">
+              You will receive an email with further instructions and please note that this only resets the password for this website interface.
+            </small>
+            <div class="form-group text-right">
+              <div class="btn-group">
+                <a class="btn btn-outline-primary" href="?o=auth">&laquo; Back</a>
+                <button class="btn btn-primary" type="submit" name="m" value="create">Send</button>
+              </div>
+            </div>
+          </form>
+        </div>';
+    }
+
+    // signin (read current pw)
+    public function list(array $in): string
+    {
+        elog(__METHOD__);
+        elog(var_export($in, true));
+
+        return '
+        <div class="col-md-4 mx-auto">
+          <h3><i class="bi bi-key"></i> Sign in</h3>
+
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="o" value="auth">
+
+            <div class="mb-3">
+                <label for="login" class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" name="login" id="login" placeholder="Your Email Address" value="' . $in['login'] . '" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="sr-only" for="webpw">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    <input type="password" name="webpw" id="webpw" class="form-control" placeholder="Your Password" required>
+                </div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="" name="remember" id="remember">
+                <label class="form-check-label" for="remember">
+                    Remember me on this computer
+                </label>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <div class="btn-group">
+                <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
+                <button class="btn btn-primary" type="submit" id="m" name="m" value="list">Sign in</button>
+              </div>
+            </div>
+
+          </form>
+        </div>';
+    }
+
+    // resetpw (update pw)
+    public function update(array $in): string
+    {
+        elog(__METHOD__);
+        elog(var_export($in, true));
+
+        extract($in);
+
+        return '
+        <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mr-auto ml-auto">
+          <h3><i class="fas fa-key fa-fw"></i> Update Password</h3>
+          <form action="' . $this->g->cfg['self'] . '" method="post">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="o" value="auth">
+            <input type="hidden" name="id" value="' . $id . '">
+            <input type="hidden" name="login" value="' . $login . '">
+            <p class="text-center"><b>For ' . $login . '</b></p>
+            <label class="sr-only" for="passwd1">New Password</label>
+            <div class="input-group mb-2 mr-sm-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
+              </div>
+                <input class="form-control" type="password" name="passwd1" id="passwd1" placeholder="New Password" value="" required>
+            </div>
+            <label class="sr-only" for="passwd2">Confirm Password</label>
+            <div class="input-group mb-2 mr-sm-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text"><i class="fas fa-key fa-fw"></i></div>
+              </div>
+                <input class="form-control" type="password" name="passwd2" id="passwd2" placeholder="Confirm Password" value="" required>
+            </div>
+            <div class="form-group text-right">
+              <div class="btn-group">
+                <button class="btn btn-primary" type="submit" name="m" value="update">Update my password</button>
+              </div>
+            </div>
+          </form>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20230625
+
+class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
+{
+    public function create(): string
+    {
+        $keybuf = $this->dropdown([
+            ['1024', '1024'],
+            ['2048', '2048'],
+            ['4096', '4096'],
+        ], 'keylen', '2048', '', 'form-select');
+
+        return $this->modal([
+            'id'        => 'createmodal',
+            'title'     => 'Create SSH Host',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => '
+                  <div class="mb-3">
+                    <label for="domain" class="form-label">Domain</label>
+                    <input type="text" class="form-control" id="domain" name="domain">
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="select" class="form-label">Selector</label>
+                      <input type="text" class="form-control" id="select" name="select" value="mail">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="keylen" class="form-label">Key Length</label>' . $keybuf . '
+                    </div>
+                  </div>',
+        ]);
+    }
+
+    public function read(array $in): string
+    {
+        return '
+        <div class="row">
+          <h3>
+            <a href="?o=dkim&m=list"><i class="bi bi-chevron-double-left"></i></a> DKIM
+            <a href="" title="Remove this DKIM record" data-bs-toggle="modal" data-bs-target="#removemodal">
+              <small><i class="bi bi-trash cursor-pointer text-bs-danger"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="row">' . $in['buf'] . '
+        </div>' . $this->delete($in);
+    }
+
+    public function delete(array $in): string
+    {
+        return $this->modal([
+            'id'        => 'removemodal',
+            'title'     => 'Remove DKIM Record',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
+                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
+            'body'      => '
+                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
+        ]);
+    }
+
+    public function list(array $in): string
+    {
+        elog(var_export($in, true));
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-card-heading"></i> DKIM
+            <a href="#" title="Add New DKIM Key" data-bs-toggle="modal" data-bs-target="#createmodal">
+            <small><i class="bi bi-plus-circle"></i></small></a>
+          </h3>
+        </div>
+        <div class="row">' . $in['buf'] . '
+        </div>' . $this->create();
+    }
+}
+
+// lib/php/themes/bootstrap/domains.php 20170225 - 20230625
+
+class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
+{
+    public function create(array $in): string
+    {
+        elog(__METHOD__);
+
+        return $this->modal_content([
+            'title'     => 'Create DNS Zone',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => $this->modal_body($in)
+        ]);
+    }
+
+    public function update(array $in): string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in): string
+    {
+        elog(__METHOD__);
+
+        elog(var_export($in, true));
+
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-globe"></i> Domains
+            <a href="?o=domains&m=create" class="bslink" title="Add new domain">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="table-responsive">
+            <table id="domains" class="table table-borderless table-striped w-100">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Serial</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" id="createdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="shwhomodal" tabindex="-1" role="dialog" aria-labelledby="readmodal" aria-hidden="true">
+          <div class="modal-dialog" id="shwhodialog">
+          </div>
+        </div>
+        <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+          <div class="modal-dialog" id="deletedialog">
+          </div>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#domains").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": { "url": "?x=json&o=domains&m=list", "deferLoading": 10 },
+    "order": [[ 5, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0, "className":"text-truncate", "width":"40%"},
+      {"targets":4, "width":"3rem", "className":"text-right", "sortable": false},
+      {"targets":5, "visible":false},
+    ],
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+  $(document).on("click", ".serial", {}, (function() {
+    var a = $(this);
+    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
+      $(a).text(data);
+    });
+    return false;
+  }));
+
+});
+        </script>';
+    }
+
+    /*
+  $("#domains").show();
+
+  $(document).on("click", ".serial", {}, (function() {
+    var a = $(this);
+    $.post("?x=text&increment=1&" + this.toString().split("?")[1], function(data) {
+      $(a).text(data);
+    });
+    return false;
+  }));
+
+  $(document).on("click", ".delete", {}, function() {
+    $("#removemodalid").val($(this).attr("data-rowid"));
+    $("#removemodalname").text($(this).attr("data-rowname"));
+  });
+
+  $(document).on("click", ".shwho", {}, function() {
+    var $this = $(this);
+    $("#shwho-name").text($this.attr("data-rowname"));
+    $.post("?x=text&o=domains&m=shwho&name=" + $this.attr("data-rowname"), function(data) {
+      $("#shwho-info").text(data);
+    });
+    return false;
+  });
+
+
+        $create = $this->modal([
+            'id' => 'createmodal',
+            'title' => 'Create DNS Zone',
+            'action' => 'create',
+            'footer' => 'Create',
+            'body' => '
+            <div class="form-group row">
+              <label for="domain" class="col-sm-2 col-form-label">Domain</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="domain" name="domain">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="ip" class="col-sm-2 col-form-label">IP</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ip" name="ip">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="ns1" class="col-sm-2 col-form-label">NS1</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ns1" name="ns1">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="ns2" class="col-sm-2 col-form-label">NS2</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="ns2" name="ns2">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="mxhost" class="col-sm-2 col-form-label">MXHost</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="mxhost" name="mxhost">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="spfip" class="col-sm-2 col-form-label">SPF IP</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="spfip" name="spfip">
+              </div>
+            </div>',
+        ]);
+
+        $remove = $this->modal([
+            'id' => 'removemodal',
+            'title' => 'Remove DNS Zone',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'hidden' => '
+                <input type="hidden" id="removemodalid" name="i" value="">',
+            'body' => '
+                <p class="text-center">Are you sure you want to remove this domain?<br><b id="removemodalname"></b></p>',
+        ]);
+
+        $shwho = $this->modal([
+            'id' => 'shwhomodal',
+            'title' => 'Domain Info for <b id="shwho-name"></b>',
+            'action' => 'shwho',
+            'footer' => '',
+            'body' => '
+            <pre id="shwho-info"></pre>',
+        ]);
+
+
+
+*/
+    private function editor(array $in): string
+    {
+        $domain = $in['name'];
+        $soa = isset($in['soa'])
+            ? explode(' ', $in['soa'])
+            : ['', '', '', 7200, 540, 604800, 300];
+
+        if ('create' === $this->g->in['m']) {
+            $serial = $hidden = '';
+            $header = 'Add Domain';
+            $submit = '
+                <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
+                <button type="submit" id="m" name="m" value="create" class="btn btn-primary">Add Domain</button>';
+        } else {
+            $serial = '&nbsp;&nbsp;<small>Serial: ' . $soa[2] . '</small>';
+            $header = $domain;
+            $submit = '
+                <a class="btn btn-secondary" href="?o=domains&m=list">&laquo; Back</a>
+                <button type="submit" id="m" name="m" value="update" class="btn btn-primary">Update</button>';
+            $hidden = '
+            <input type="hidden" name="serial" value="' . $soa[2] . '">';
+        }
+
+        return '
+          <div class="col-12">
+          <h3>
+            <i class="fa fa-globe fa-fw"></i>  ' . $header . $serial . '
+            <a href="" title="Add new domain" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
+          </h3>
+          </div>
+        </div><!-- END UPPER ROW -->
+        <div class="row">
+          <div class="col-12">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">' . $hidden . '
+              <div class="row">
+                <div class="col-3">
+                  <div class="form-group">
+                    <label for="primary">Primary</label>
+                    <input type="text" class="form-control" id="primary" name="primary" value="' . $soa[0] . '" required>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="' . $soa[1] . '" required>
+                  </div>
+                </div>
+                <div class="col-1">
+                  <div class="form-group">
+                    <label for="refresh">Refresh</label>
+                    <input type="text" class="form-control" id="refresh" name="refresh" value="' . $soa[3] . '" required>
+                  </div>
+                </div>
+                <div class="col-1">
+                  <div class="form-group">
+                    <label for="retry">Retry</label>
+                    <input type="text" class="form-control" id="retry" name="retry" value="' . $soa[4] . '" required>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <div class="form-group">
+                    <label for="expire">Expire</label>
+                    <input type="text" class="form-control" id="expire" name="expire" value="' . $soa[5] . '" required>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <div class="form-group">
+                    <label for="ttl">TTL</label>
+                    <input type="text" class="form-control" id="ttl" name="ttl" value="' . $soa[6] . '" required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12 text-right">
+                  <div class="btn-group">' . $submit . '
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>';
+    }
+
+    public function delete(): ?string
+    {
+        $tmp = db::read('name', 'id', $this->g->in['i'], '', 'one');
+
+        return $this->modal_content([
+            'title'     => 'Remove Domain',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
+            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+            'body'      => '
+            <p class="text-center">Are you sure you want to remove this domain?<br><b>' . $tmp['name'] . '</b></p>',
+        ]);
+    }
+
+    public function shwho(string $name, string $body): string
+    {
+        return $this->modal_content([
+            'title'     => 'Whois summary: <b>' . $name . '</b>',
+            'action'    => 'shwho',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => '',
+            'body'      => '
+            <pre>' . $body . '</pre>',
+        ]);
+    }
+
+    private function modal_body(array $in): string
+    {
+        return '
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="domain" class="form-label">Domain</label>
+            <input type="text" class="form-control" id="domain" name="domain" value="' . $in['domain'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="ip" class="form-label">IP</label>
+            <input type="text" class="form-control" id="ip" name="ip" value="' . $in['ip'] . '" required>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="ns1" class="form-label">NS1</label>
+            <input type="text" class="form-control" id="ns1" name="ns1" value="' . $in['ns1'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="ns2" class="form-label">NS2</label>
+            <input type="text" class="form-control" id="ns2" name="ns2" value="' . $in['ns2'] . '" required>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label for="mxhost" class="form-label">MXHost</label>
+            <input type="text" class="form-control" id="mxhost" name="mxhost" value="' . $in['mxhost'] . '" required>
+          </div>
+          <div class="col-6">
+            <label for="spfip" class="form-label">SPF IP</label>
+            <input type="text" class="form-control" id="spfip" name="spfip" value="' . $in['spfip'] . '" required>
+          </div>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/home.php 20150101 - 20230625
+
+class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        return '
+        <div class="p-md-5 p-2 mb-4 bg-body-tertiary rounded-3 text-center">
+          <h1 class="display-5 fw-bold mt-3"><i class="bi bi-boxes"></i> NetServa HCP</h1>
+          <p class="col col-md-8 fs-5 ms-auto me-auto py-md-3">
+            This is a lightweight Web, Mail and DNS server with a PHP based
+            <b>Hosting Control Panel</b> for servicing multiple virtually
+            hosted domains. The operating system is based on the latest
+            Debian or Ubuntu packages and can use either SQLite or MySQL as
+            a backend database. The entire server can run in as little as 256
+            MB of ram when paired with SQLite and still serve a dozen lightly
+            loaded hosts so it is ideal for LXD and Proxmox virtual machines
+            and containers.
+          </p>
+          <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp">
+            <i class="bi bi-github"></i> Project Page
+            <a class="btn btn-primary btn-lg m-2" href="https://github.com/markc/hcp/issues">
+              <i class="bi bi-github"></i> Issue Tracker
+            </a>
+        </div>
+        <div class="row align-items-md-stretch">
+          <div class="col-md-6 mb-4 order-md-0 order-last">
+            <div class="h-100 p-md-5 p-2 border rounded-3">
+              <h2 class="text-md-start text-center">Features</h2>
+              <ul>
+                <li><b>NetServa HCP</b> does not reqire Python or Ruby, just
+                  PHP and Bash</li>
+                <li>Fully functional Mail server with personalised Spam
+                  filtering</li>
+                <li>Secure SSL enabled <a href="http://nginx.org/">nginx</a>
+                  web server with <a href="http://www.php.net/manual/en/install.fpm.php">PHP FPM 8+</a></li>
+                <li>Always based and tested on the latest release on <a href="https://ubuntu.com">Ubuntu</a> and <a
+                    href="https://debian.org">Debian</a></li>
+                <li>Optional DNS server for local LAN or real-world DNS provisioning</li>
+                <li>Built from the ground up using <a href="https://getbootstrap.com">Bootstrap 5</a> and <a
+                    href="https://datatables.net/examples/styling/bootstrap5">DataTables</a></li>
+              </ul>
+              <h2 class="text-md-start text-center">Software</h2>
+              <ul>
+                <li>nginx and PHP8+ FPM for web services</li>
+                <li>Postfix for SMTP email delivery</li>
+                <li>Dovecot and Spamprobe spam filtered IMAP email</li>
+                <li>Acme.sh and LetsEncrypt SSL for SSL certificates</li>
+                <li>PowerDNS for DNS</li>
+                <li>WordPress when paired with Mysql/Mariadb</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="h-100 p-md-5 p-2 border rounded-3">
+              <h2 class="text-md-start text-center">Notes</h2>
+              <p>
+                You can change the content of this page by creating a file
+                called <code>lib/php/home.tpl</code> and add any Bootstrap 5
+                based layout and text you care to. Modifying the navigation
+                menus above can be done by creating a <code>lib/.ht_conf.php</code>
+                file and copying the
+                <a href="https://github.com/markc/hcp/blob/master/index.php#L67">$nav1 array</a>
+                from <code>index.php</code> into that optional config override file.
+              </p>
+            </div>
+          </div>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/infomail.php 20170225 - 20230625
+
+class Themes_Bootstrap_InfoMail extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        extract($in);
+
+        return '
+        <div class="d-flex justify-content-between mb-4">
+          <h3 class="mb-0"><i class="bi bi-envelope"></i> Mailserver Info</h3>
+          <form method="post" class="form-inline">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="m" value="pflog_renew">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+            </div>
+          </form>
+        </div>
+        <div class="container">
+          <div class="col-md-6 ms-auto me-auto">
+            <h3>Mail Queue</h3>
+            <pre style="overflow-x: auto;">' . $mailq . '
+            </pre>
+          </div>
+        </div>
+        <div class="container">
+          <div class="col-md-6 ms-auto me-auto">
+            <pre style="overflow-x: auto;">' . $pflogs . '
+            </pre>
+          </div>
+        </div>';
+    }
+}
+//            <textarea rows="20" style="font-family:monospace;font-size:9pt;width:100%;">' . $pflogs . '</textarea>
+
+// lib/php/themes/bootstrap/infosys.php 20170225 - 20230625
+
+class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        extract($in);
+
+        return '
+        <div class="d-flex justify-content-between mb-4">
+          <h3 class="mb-0"><i class="bi bi-server"></i> System Info</h3>
+          <form method="post" class="form-inline">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="o" value="infosys">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+            </div>
+          </form>
+        </div>
+        <div class="row align-items-md-stretch">
+          <div class="col-md-6 mb-4 order-md-0 order-last">
+            <div class="pt-md-2 px-md-5 py-3 px-2 border rounded-3">
+              <table class="table table-sm table-borderless mb-0">
+                <tbody>
+                  <tr>
+                    <td><b>Hostname</b></td>
+                    <td>' . $hostname . '</td>
+                  </tr>
+                  <tr>
+                    <td><b>Host IP</b></td>
+                    <td>' . $host_ip . '</td>
+                  </tr>
+                  <tr>
+                    <td><b>Distro</b></td>
+                    <td>' . $os_name . '</td>
+                  </tr>
+                  <tr>
+                    <td><b>Uptime</b></td>
+                    <td>' . $uptime . '</td>
+                  </tr>
+                  <tr>
+                    <td><b>CPU Load</b></td>
+                    <td>' . $loadav . ' - ' . $cpu_num . ' cpus</td>
+                  </tr>
+                  <tr>
+                    <td><b>CPU Model</b></td>
+                    <td>' . $cpu_name . '</td>
+                  </tr>
+                  <tr>
+                    <td><b>Kernel&nbsp;Version</b></td>
+                    <td>' . $kernel . '</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="py-md-3 px-md-5 py-3 px-2 border rounded-3">
+              <div><b>RAM</b><br>Used: ' . $mem_used . ' - Total: ' . $mem_total . ' - Free: ' . $mem_free . '</div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-' . $mem_color . '" role="progressbar" aria-valuenow="' . $mem_pcnt . '"
+                  aria-valuemin="0" aria-valuemax="100" style="width:' . $mem_pcnt . '%" title="Used Memory">' . $mem_text . '
+                </div>
+              </div>
+              <div><b>DISK</b><br>Used: ' . $dsk_used . ' - Total: ' . $dsk_total . ' - Free: ' . $dsk_free . '</div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-' . $dsk_color . '" role="progressbar" aria-valuenow="' . $dsk_pcnt . '"
+                  aria-valuemin="0" aria-valuemax="100" style="width:' . $dsk_pcnt . '%" title="Used Disk Space">' . $dsk_text . '
+                </div>
+              </div>
+              <div><b>CPU</b><br>' . $cpu_all . '</div>
+              <div class="progress mb-2">
+                <div class="progress-bar bg-' . $cpu_color . '" role="progressbar" aria-valuenow="' . $cpu_pcnt . '"
+                  aria-valuemin="0" aria-valuemax="100" style="width:' . $cpu_pcnt . '%" title="Used Disk Space">' . $cpu_text . '
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/mailgraph.php 20170225 - 20230625
+
+class Themes_Bootstrap_MailGraph extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        return '
+        <h3><i class="bi bi-bar-chart"></i> MailServer Graph</h3>
+        <div class="row">
+          <div class="text-center">' . $in['mailgraph'] . '
+          </div>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/processes.php 20170225 - 20230625
+
+class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        return '
+        <div class="d-flex justify-content-between mb-4">
+          <h3 class="mb-0"><i class="bi bi-envelope"></i> Processes <small>(' . (count(explode("\n", $in['procs'])) - 1) . ')</small></h3>
+          <form method="post" class="form-inline">
+            <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+            <input type="hidden" name="m" value="list">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+            </div>
+          </form>
+        </div>
+        <div class="row">
+          <div class="col-md-8 ms-auto me-auto">
+            <pre style="overflow-x: auto;">' . $in['procs'] . '
+            </pre>
+          </div>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/records.php 20180714 - 20230625
+
+class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
+{
+    private $types = [
+        ['A',          'A'],
+        ['MX',         'MX'],
+        ['NS',         'NS'],
+        ['TXT',        'TXT'],
+        ['AAAA',       'AAAA'],
+        ['CAA',        'CAA'],
+        ['AFSDB',      'AFSDB'],
+        ['CERT',       'CERT'],
+        ['CNAME',      'CNAME'],
+        ['DHCID',      'DHCID'],
+        ['DLV',        'DLV'],
+        ['DNSKEY',     'DNSKEY'],
+        ['DS',         'DS'],
+        ['EUI48',      'EUI48'],
+        ['EUI64',      'EUI64'],
+        ['HINFO',      'HINFO'],
+        ['IPSECKEY',   'IPSECKEY'],
+        ['KEY',        'KEY'],
+        ['KX',         'KX'],
+        ['LOC',        'LOC'],
+        ['MINFO',      'MINFO'],
+        ['MR',         'MR'],
+        ['NAPTR',      'NAPTR'],
+        ['NSEC',       'NSEC'],
+        ['NSEC3',      'NSEC3'],
+        ['NSEC3PARAM', 'NSEC3PARAM'],
+        ['OPT',        'OPT'],
+        ['PTR',        'PTR'],
+        ['RKEY',       'RKEY'],
+        ['RP',         'RP'],
+        ['RRSIG',      'RRSIG'],
+        ['SPF',        'SPF'],
+        ['SRV',        'SRV'],
+        ['SSHFP',      'SSHFP'],
+        ['TLSA',       'TLSA'],
+        ['TSIG',       'TSIG'],
+        ['WKS',        'WKS'],
+    ];
+
+    public function list(array $in): string
+    {
+        elog('in=' . var_export($in, true));
+
+        return '
+        <div class="col-12">
+          <h3>
+            <a href="?o=domains&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a>' . $in['domain'] . '
+            <a class="create" href="" title="Create new DNS record">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small></a>
+          </h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class=col-12>
+        <form class="form-inline" method="post" action="' . $this->g->cfg['self'] . '">
+          <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+          <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+          <input type="hidden" name="i" id="i" value="0">
+          <input type="hidden" name="did" value="' . $in['did'] . '">
+          <input type="hidden" name="domain" value="' . $in['domain'] . '">
+          <div class="col-xl-3 col-md-6 col-12 my-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="name" name="name" data-regex="^([^.]+\.)*[^.]*$" value="">
+            </div>
+          </div>
+          <div class="col-xl-3 col-md-6 col-12 my-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="content" name="content" data-regex="^.+$" value="">
+            </div>
+          </div>
+          <div class="col-xl-2 col-md-4 col-8 my-2">
+            <div class="input-group">' . ($this->dropdown($this->types, 'type', 'A', '', 'form-select')) . '
+            </div>
+          </div>
+          <div class="col-xl-1 col-md-2 col-4 my-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="prio" name="prio" data-regex="^[0-9]*$" value="0">
+            </div>
+          </div>
+          <div class="col-xl-2 col-md-4 col-8 my-2">
+            <div class="input-group">
+              <input type="text" class="form-control" id="ttl" name="ttl" data-regex="^[0-9]*$" value="300">
+            </div>
+          </div>
+          <div class="col-xl-1 col-md-2 col-4 my-2">
+            <div class="input-group">
+              <input class="btn btn-secondary form-control" type="submit" id="m" name="m" value="?" disabled>
+            </div>
+          </div>
+        </form>
+      </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <table id=records class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Content</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>TTL</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <script>
+$(document).ready(function() {
+
+  $("#records").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=records&m=list&did=' . $in['did'] . '",
+    "order": [[ 9, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0,   "width":"30%"},
+      {"targets":1,   "width":"40%",
+        render: function ( data, type, row ) {
+            return type === "display" && data.length > 40 ? data.substr( 0, 40 ) + "…" : data; }},
+      {"targets":2,   "width":"3rem"},
+      {"targets":3,   "width":"3rem"},
+      {"targets":4,   "width":"3rem"},
+      {"targets":5,   "width":"2rem", "className":"text-right", "sortable": false},
+      {"targets":6,   "visible":false},
+      {"targets":7,   "visible":false},
+      {"targets":8,   "visible":false},
+      {"targets":9,   "visible":false},
+    ],
+  });
+
+  $(document).on("click", ".create", {}, function() {
+    $("#m").val("Create");
+    $("#m").attr("class", "btn btn-success");
+    $("#m").removeAttr("disabled");
+    $("#name").val("");
+    $("#content").val("");
+    return false;
+  });
+
+  $(document).on("click", ".delete", {}, function() {
+    $("#m").val("Delete");
+    $("#m").attr("class", "btn btn-danger");
+    $("#m").removeAttr("disabled");
+    return false;
+  });
+
+  $(document).on("click", ".update", {}, function() {
+    $("#m").val("Update");
+    $("#m").attr("class", "btn btn-primary");
+    $("#m").removeAttr("disabled");
+    return false;
+  });
+
+  $(document).on("click", ".update,.delete", {}, function() {
+    var row = $(this).closest("tr");
+    $("#i").val($(this).attr("data-rowid"));
+    $("#name").val(row.find("td:eq(0)").text());
+    $("#content").val(row.find("td:eq(1)").text());
+    $("#type").val(row.find("td:eq(2)").text());
+    $("#prio").val(row.find("td:eq(3)").text());
+    $("#ttl").val(row.find("td:eq(4)").text());
+    return false;
+  });
+
+//    if (row.data("active"))
+//      $("#active").attr("checked", "on");
+//    else $("#active").removeAttr("checked");
+
+});
+        </script>';
+    }
+}
+
+// lib/php/themes/bootstrap/valias.php 20170101 - 20230625
+
+class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
+{
+    public function create(array $in): string
+    {
+        return $this->modal_content([
+            'title'     => 'Create New Alias',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => $this->modal_body($in)
+        ]);
+    }
+
+    public function update(array $in): string
+    {
+        return $this->modal_content([
+            'title'     => 'Update Alias',
+            'action'    => 'update',
+            'lhs_cmd'   => 'Delete',
+            'rhs_cmd'   => 'Update',
+            'body'      => $this->modal_body($in)
+        ]);
+    }
+
+    public function delete(): ?string
+    {
+        $tmp = db::read('source', 'id', $this->g->in['i'], '', 'one');
+
+        return $this->modal_content([
+            'title'     => 'Remove Alias',
+            'action'    => 'delete',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Remove',
+            'hidden'    => '
+            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">',
+            'body'      => '
+            <p class="text-center">Are you sure you want to remove this alias?<br><b>' . $tmp['source'] . '</b></p>',
+        ]);
+    }
+
+    public function list(array $in): string
+    {
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-envelope"></i> Aliases
+            <a href="?o=valias&m=create" class="bslink" title="Add New Alias">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="table-responsive">
+          <table id="valias" class="table table-borderless table-striped w-100">
+            <thead>
+              <tr>
+                <th>Alias</th>
+                <th>Target Address</th>
+                <th>Domain</th>
+                <th></th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+          <div class="modal-dialog" id="createdialog">
+          </div>
+        </div>
+        <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="updatemodal" aria-hidden="true">
+          <div class="modal-dialog" id="updatedialog">
+          </div>
+        </div>
+        <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+          <div class="modal-dialog" id="deletedialog">
+          </div>
+        </div>
+        <script>
+$(document).ready(function() {
+  $("#valias").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=valias&m=list",
+    "order": [[ 5, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0,   "className":"text-truncate", "width":"30%"},
+      {"targets":3,   "className":"text-right", "width":"1rem", "sortable": false},
+      {"targets":4,   "visible":false},
+      {"targets":5,   "visible":false},
+    ],
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+});
+        </script>';
+    }
+
+    private function modal_body(array $in): string
+    {
+        $active_buf = ($in['active'] ? 1 : 0) ? ' checked' : '';
+        return '
+        <div class="mb-3">
+          <label class="form-label" for="source">Alias Address(es)</label>
+          <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" name="source"
+            id="source">' . $in['source'] . '</textarea>
+          <div>Full email address/es or @example.com, to catch all messages for a domain (comma-separated). <b>Locally hosted
+              domains only</b>.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="target">Target Address(es)</label>
+          <textarea autocorrect="off" autocapitalize="none" class="form-control" rows="4" id="target"
+            name="target">' . $in['target'] . '</textarea>
+          <div>Full email address/es (comma-separated).</div>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="active" id="active"' . $active_buf . '>
+          <label class="form-check-label" for="active">Active</label>
+        </div>';
+    }
+}
+
+// lib/php/themes/bootstrap/vhosts.php 20170101 - 20230625
+
+class Themes_Bootstrap_Vhosts extends Themes_Bootstrap_Theme
+{
+    public function create(array $in): string
+    {
+        return $this->modal_content([
+            'title'     => 'Create New Vhost',
+            'action'    => 'create',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => $this->modal_create_body($in)
+        ]);
+    }
+
+    public function update(array $in): string
+    {
+        $remove = $this->modal([
+            'id' => 'removemodal',
+            'title' => 'Remove Vhost',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            //            'hidden'  => '
+            //                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
+            'body' => '
+                  <p class="text-center">Are you sure you want to remove this Vhost?<br><b>' . $in['domain'] . '</b></p>',
+        ]);
+
+        return '
+        <div class="row">
+          <h3>
+            <a href="?o=vhosts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Vhosts
+            <a href="" title="Remove this VHOST" data-bs-toggle="modal" data-bs-target="#removemodal">
+              <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <form method="post" action="' . $this->g->cfg['self'] . '">
+              <input type="hidden" name="c" value="' . $_SESSION['c'] . '">
+              <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+              <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+              <div class="row">
+                <div class="form-group col-12 col-md-6 col-lg-4">
+                  <label for="domain">Domain</label>
+                  <input type="text" class="form-control" value="' . $in['domain'] . '" disabled>
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="aliases">Max Aliases</label>
+                  <input type="number" class="form-control" name="aliases" id="aliases" value="' . $in['aliases'] . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="mailboxes">Max Mailboxes</label>
+                  <input type="number" class="form-control" name="mailboxes" id="mailboxes" value="' . $in['mailboxes'] . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="mailquota">Mail Quota (MB)</label>
+                  <input type="number" class="form-control" name="mailquota" id="mailquota"
+                    value="' . intval($in['mailquota'] / 1000000) . '">
+                </div>
+                <div class="form-group col-6 col-md-3 col-lg-2">
+                  <label for="diskquota">Disk Quota (MB)</label>
+                  <input type="number" class="form-control" name="diskquota" id="diskquota"
+                    value="' . intval($in['diskquota'] / 1000000) . '">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12 col-sm-6">
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" name="active" id="active"' . ($in[' active']
+            ? ' checked' : '') . '>
+                                  <label class="custom-control-label" for="active">Active</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-12 col-sm-6 text-right">
+                              <div class="btn-group">
+                                <a class="btn btn-secondary" href="?o=vhosts&m=list">&laquo; Back</a>
+                                <button type="submit" name="m" value="update" class="btn btn-primary">Save</button>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+              ' . $remove;
+    }
+
+    public function list(array $in): string
+    {
+        $create = $this->modal([
+            'id'        => 'createmodal',
+            'title'     => 'Create New Vhost',
+            'lhs_cmd'   => '',
+            'rhs_cmd'   => 'Create',
+            'body'      => '
+',
+        ]);
+
+        return '
+        <div class="row">
+          <h3>
+            <i class="bi bi-globe"></i> Vhosts
+            <a href="?o=vhosts&m=create" class="bslink" title="Add New Vhost">
+              <small><i class="bi bi-plus-circle"></i></small>
+            </a>
+          </h3>
+        </div>
+        <div class="table-responsive">
+          <table id="vhosts" class="table table-borderless table-striped w-100">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th>Alias&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Mbox&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Mail&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th>Disk&nbsp;</th>
+                <th></th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tfoot>
+            </tfoot>
+          </table>
+        </div>
+                <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="createmodal" aria-hidden="true">
+                  <div class="modal-dialog" id="createdialog">
+                  </div>
+                </div>
+                <div class="modal fade" id="updatemodal" tabindex="-1" role="dialog" aria-labelledby="updatemodal" aria-hidden="true">
+                  <div class="modal-dialog" id="updatedialog">
+                  </div>
+                </div>
+                <div class="modal fade" id="deletemodal" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
+                  <div class="modal-dialog" id="deletedialog">
+                  </div>
+                </div>
+        <script>
+$(document).ready(function() {
+  $("#vhosts").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=vhosts&m=list",
+    "order": [[ 15, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0,   "className":"text-truncate", "width":"25%"},
+      {"targets":1,   "className":"text-right", "width":"3rem"},
+      {"targets":2,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":3,   "width":"3rem"},
+      {"targets":4,   "className":"text-right", "width":"3rem"},
+      {"targets":5,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":6,   "width":"3rem"},
+      {"targets":7,   "className":"text-right", "width":"4rem"},
+      {"targets":8,   "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":9,   "width":"4rem"},
+      {"targets":10,  "className":"text-right", "width":"4rem"},
+      {"targets":11,  "className":"text-center", "width":"0.5rem", "sortable": false},
+      {"targets":12,  "width":"4rem"},
+      {"targets":13,  "className":"text-right", "width":"1rem", "sortable": false},
+      {"targets":14,  "visible":false, "sortable": true},
+      {"targets":15,  "visible":false, "sortable": true},
+    ]
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+});
+        </script>';
+    }
+
+    public function modal_create_body(array $in): string
+    {
+        return '
+                  <div class="mb-3">
+                    <label for="domain" class="form-label">Vhost</label>
+                    <input type="text" class="form-control" id="domain" name="domain">
+                  </div>
+                  <div class="row mb-3">
+
+                    <div class="col-12 col-sm-6">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="cms" id="cms" checked>
+                        <label class="form-check-label" for="cms">WordPress</label>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6">
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="ssl" id="ssl">
+                          <label class="form-check-label" for="ssl">Self Signed SSL</label>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row mb-3">
+
+                    <div class="col-12 col-sm-6">
+                      <label for="ip" class="form-label">IP (optional)</label>
+                      <input type="text" class="form-control" id="ip" name="ip">
+                    </div>
+
+                    <div class="col-12 col-sm-6">
+                      <label for="uuser" class="form-label">Custom User</label>
+                      <input type="text" class="form-control" id="uuser" name="uuser">
+                    </div>
+
+                  </div>
+        ';
+    }
+}
+
+// lib/php/themes/bootstrap/vmails.php 20170101 - 20230625
+
+class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
+{
+    public function list(array $in): string
+    {
+        $create = $this->modal([
+            'id' => 'createmodal',
+            'title' => 'Create New Mailbox',
+            'action' => 'create',
+            'footer' => 'Create',
+            'body' => '
+                  <div class="form-group">
+                    <label for="user" class="form-control-label">Email Address</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                  </div>',
+        ]);
+
+        $remove = $this->modal([
+            'id' => 'removemodal',
+            'title' => 'Remove Mailbox',
+            'action' => 'delete',
+            'footer' => 'Remove',
+            'body' => '
+                <input type="hidden" id="removeuser" name="user" value="">
+                <p class="text-center">Are you sure you want to remove this mailbox?<br><b id=targetuser></b></p>',
+        ]);
+
+        $update = $this->modal([
+            'id' => 'updatemodal',
+            'title' => 'Change Password',
+            'action' => 'update',
+            'footer' => 'Update',
+            'body' => '
+                <input type="hidden" id="updateuser" name="user" value="">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <a href="#" class="btn btn-outline-primary" id=shpw>Show</a>
+                  </div>
+                  <input type="text" class="form-control" id=password name=password placeholder="Email Password">
+                  <div class="input-group-append">
+                    <a href="#" class="btn btn-outline-primary" id=newpw>NewPW</a>
+                  </div>
+                </div>',
+        ]);
+
+        return '
+        <div class="col-12">
+          <h3>
+            <i class="fas fa-envelope fa-fw"></i> Mailboxes
+            <a href="#" title="Add New Mailbox" data-toggle="modal" data-target="#createmodal">
+              <small><i class="fas fa-plus-circle fa-fw"></i></small>
+            </a>
+          </h3>
+        </div>
+      </div><!-- END UPPER ROW -->
+      <div class="row">
+        <div class=col-12>
+          <table id=vmails class="table table-sm" style="min-width:1100px;table-layout:fixed">
+            <thead class="nowrap">
+              <tr>
+                <th>Email</th>
+                <th>Usage&nbsp;</th>
+                <th>Messages&nbsp;</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>' . $create . $remove . $update . '
+        <script>
+$(document).ready(function() {
+  $("#vmails").DataTable({
+    "processing": true,
+    "serverSide": true,
+    "ajax": "?x=json&o=vmails&m=list",
+    "order": [[ 4, "desc" ]],
+    "scrollX": true,
+    "columnDefs": [
+      {"targets":0, "width":"30%"},
+      {"targets":1, "className":"text-right"},
+      {"targets":2, "className":"text-right"},
+      {"targets":3, "className":"text-right", "width":"2rem", "sortable": false},
+      {"targets":4, "visible":false, "sortable": true}
+    ]
+  });
+
+  $(document).on("click", ".bslink", function(){
+    event.preventDefault();
+    var url = $(this).attr("href") + "&x=html";
+    var m = new URLSearchParams(url).get("m");
+    $("#" + m + "dialog").load(url, function() {
+      $("#" + m + "modal", document).modal("show");
+    });
+  });
+
+  $("#removemodal").on("show.bs.modal", function (event) {
+    var link = $(event.relatedTarget)
+    var user = link.data("removeuser")
+    var modal = $(this)
+    modal.find("#removeuser").val(user)
+    modal.find("#targetuser").text(user)
+   });
+
+  $("#updatemodal").on("show.bs.modal", function (event) {
+    var link = $(event.relatedTarget)
+    var user = link.data("user")
+    var id = link.data("id")
+    var modal = $(this)
+    modal.find("#i").val(id)
+    modal.find("#updateuser").val(user)
+
+    $("#updatemodal").on("click", "#shpw", {}, (function() {
+        $.post("?x=text&o=vmails&m=update&shpw=1&user=" + user, function(data) {
+          modal.find("#password").val(data)
+        });
+        return false;
+    }));
+
+    $("#updatemodal").on("click", "#newpw", {}, (function() {
+        $.post("?x=text&o=vmails&m=update&newpw=1", function(data) {
+          modal.find("#password").val(data)
+        });
+        return false;
+    }));
+  });
+});
+        </script>';
+    }
+}
+
+
+// lib/php/util.php 20150225 - 20230712
+
+class Util
+{
+
+    /**
+     * Log a message to the session log array.
+     *
+     * If $message is given, it is appended to the log array with the given $level.
+     * If $message is not given, the log array is returned and cleared.
+     *
+     * The log array is stored in the $_SESSION['log'] variable. It is an associative array
+     * where each key is a log level (e.g. 'danger', 'success', etc.) and the value is an
+     * array of messages for that log level.
+     *
+     * @param string $message The message to log. If empty, the log array is returned.
+     * @param string $level The log level. Default is 'danger'.
+     * @return array<string, array<string>> The log array if $message is empty.
+     */
+    public static function log(string $message = '', string $level = 'danger'): array
+    {
+        // If we're given a message, add it to the log array
+        if (!empty($message)) {
+            // If the log array doesn't exist, create it
+            if (!isset($_SESSION['log'])) {
+                $_SESSION['log'] = [];
+            }
+            // If the log array doesn't have an entry for the given log level, create it
+            if (!isset($_SESSION['log'][$level])) {
+                $_SESSION['log'][$level] = [];
+            }
+            // Add the message to the log array for the given log level
+            $_SESSION['log'][$level][] = $message;
+        } else {
+            // If we weren't given a message, return the log array and clear it
+            $log = $_SESSION['log'] ?? [];
+            $_SESSION['log'] = [];
+            return $log;
+        }
+        // If we were given a message, return an empty array
+        return [];
+    }
+
+
+    /**
+     * Encodes a string for safe output in HTML.
+     *
+     * This takes a string, trims it, and then runs it through htmlentities()
+     * with the ENT_QUOTES and UTF-8 flags. This is good for preventing XSS
+     * attacks when outputting user-supplied data in HTML.
+     *
+     * @param string $v The string to encode.
+     * @return string The encoded string.
+     */
+    public static function enc(string $v): string
+    {
+        return \htmlentities(\trim($v), \ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
+     * Escapes values in an array using enc() if they are also in $_REQUEST.
+     *
+     * This takes an array of values, and for each key, checks if the same key
+     * exists in $_REQUEST and is not an array. If so, it runs the value through
+     * the enc() method, which trims it and encodes it for safe output in HTML.
+     * If not, it leaves the value alone.
+     *
+     * This is useful for safely outputting user-supplied data in HTML.
+     *
+     * @param array<string, mixed> $in The array of values to escape.
+     * @return array<string, mixed> The array of escaped values.
+     */
+    public static function esc(array $in): array
+    {
+        $request = &$_REQUEST;
+        foreach ($in as $k => $v) {
+            if (isset($request[$k]) && !is_array($request[$k])) {
+                $in[$k] = self::enc((string)$request[$k]);
+            }
+        }
+        return $in;
+    }
+
+    // TODO please document what $k, $v and $x are for?
+    public static function ses(string $k, string $v = '', string $x = null): string
+    {
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                || (isset($_REQUEST[$k], $_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? self::enc($_REQUEST[$k])
+                : ($_SESSION[$k] ?? $v));
+    }
+
+    public static function cfg($g): void
+    {
+        if (file_exists($g->cfg['file'])) {
+            foreach (include $g->cfg['file'] as $k => $v) {
+                $g->{$k} = array_merge($g->{$k}, $v);
+            }
+        }
+    }
+
+    // util::run should be used instead of this one and move the
+    // usage of 'sudo' to the calling method
+    public static function exe(string $cmd): bool
+    {
+        elog(__METHOD__ . "({$cmd})");
+
+        exec('sudo ' . escapeshellcmd($cmd) . ' 2>&1', $retArr, $retVal);
+        // class="mb-0" appearance tweak for Bootstrap5 should not be here
+        util::log('<pre class="mb-0">' . trim(implode("\n", $retArr)) . '</pre>', $retVal ? 'danger' : 'success');
+        return (boolval($retVal) ? true : false);
+    }
+
+    /**
+     * # Introducing shell exit strategies to trigger Bootstrap5 alerts
+     * #
+     * # exit 0        - success, no alert and continue
+     * # exit 1-250    - error, with 'danger' alert and continue
+     * # exit 251      - success, with 'success' alert and continue
+     * # exit 252      - info, with 'info' alert and continue
+     * # exit 253      - warning, with 'warning' alert and continue
+     * # exit 254      - warning, with 'warning' alert and empty content
+     * # exit 255      - error, with 'danger' alert and empty content
+     * #
+     * # 251/252/253 strip the first line to be used in alert message
+     */
+    public static function run(string $cmd): array
+    {
+        $rem = $_SESSION['r'];
+        $cmd = ($rem && $rem !== 'local') ? "LANG=posix sx $rem $cmd" : $cmd;
+
+        exec(escapeshellcmd("sudo $cmd") . " 2>&1", $retArr, $retVal);
+
+        if (empty($retArr)) {
+            util::log("Info: empty result from '" . $cmd . "'", 'info');
+        } elseif ($retVal === 255) {
+            util::log(implode('\n', $retArr), 'danger');
+        } elseif ($retVal === 254) {
+            util::log(implode('\n', $retArr), 'warning');
+        } elseif ($retVal === 253) {
+            util::log(array_shift($retArr), 'warning');
+        } elseif ($retVal === 252) {
+            util::log(array_shift($retArr), 'info');
+        } elseif ($retVal === 251) {
+            util::log(array_shift($retArr), 'success');
+        } elseif ($retVal > 0) {
+            util::log(implode('\n', $retArr), 'danger');
+        }
+        elog(__METHOD__ . ' cmd=' . $cmd . ' retArr = ' . var_export($retArr, true) . ' retVal = ' . $retVal);
+
+        return ['ary' => array_filter($retArr), 'err' => $retVal];
+    }
+
+    public static function now(string $date1, string $date2 = null): string
+    {
+        if (!is_numeric($date1)) {
+            $date1 = strtotime($date1);
+        }
+        if ($date2 and !is_numeric($date2)) {
+            $date2 = strtotime($date2);
+        }
+        $date2 ??= time();
+        $diff = abs($date1 - $date2);
+        if ($diff < 10) {
+            return ' just now';
+        }
+
+        $blocks = [
+            ['k' => 'year', 'v' => 31536000],
+            ['k' => 'month', 'v' => 2678400],
+            ['k' => 'week', 'v' => 604800],
+            ['k' => 'day',  'v' => 86400],
+            ['k' => 'hour', 'v' => 3600],
+            ['k' => 'min',  'v' => 60],
+            ['k' => 'sec',  'v' => 1],
+        ];
+        $levels = 2;
+        $current_level = 1;
+        $result = [];
+
+        foreach ($blocks as $block) {
+            if ($current_level > $levels) {
+                break;
+            }
+            if ($diff / $block['v'] >= 1) {
+                $amount = floor($diff / $block['v']);
+                $plural = ($amount > 1) ? 's' : '';
+                $result[] = $amount . ' ' . $block['k'] . $plural;
+                $diff -= $amount * $block['v'];
+                ++$current_level;
+            }
+        }
+        return implode(' ', $result) . ' ago';
+    }
+
+    public static function is_adm(): bool
+    {
+        return isset($_SESSION['adm']);
+    }
+
+    public static function is_usr(int|string $id = null): bool
+    {
+        return (is_null($id))
+            ? isset($_SESSION['usr'])
+            : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
+    }
+
+    public static function is_acl(int $acl): bool
+    {
+        return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
+    }
+
+    public static function genpw(int $length = 10): string
+    {
+        return str_replace(
+            '.',
+            '_',
+            substr(
+                password_hash((string) time(), PASSWORD_DEFAULT),
+                random_int(10, 50),
+                $length
+            )
+        );
+    }
+
+    public static function get_nav(array $nav = []): array
+    {
+        return isset($_SESSION['usr'])
+            ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
+            : $nav['non'];
+    }
+
+    public static function get_cookie(string $name, string $default = ''): string
+    {
+        return $_COOKIE[$name] ?? $default;
+    }
+
+    public static function put_cookie(string $name, string $value, int $expiry = 604800): string
+    {
+        return setcookie($name, $value, time() + $expiry) ? $value : '';
+    }
+
+    public static function del_cookie(string $name): string
+    {
+        return self::put_cookie($name, '', -1);
+    }
+
+    public static function chkpw(string $pw, string $pw2 = ''): bool
+    {
+        if (strlen($pw) > 11) {
+            if (preg_match('/[0-9]+/', $pw)) {
+                if (preg_match('/[A-Z]+/', $pw)) {
+                    if (preg_match('/[a-z]+/', $pw)) {
+                        if ($pw2) {
+                            if ($pw === $pw2) {
+                                return true;
+                            }
+                            util::log('Passwords do not match, please try again');
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        util::log('Password must contains at least one lower case letter');
+                    }
+                } else {
+                    util::log('Password must contains at least one captital letter');
+                }
+            } else {
+                util::log('Password must contains at least one number');
+            }
+        } else {
+            util::log('Passwords must be at least 12 characters');
+        }
+        return false;
+    }
+
+    public static function chkapi(object $g): void
+    {
+        [$apiusr, $apikey] = explode(':', $g->in['a'], 2);
+
+        if (!self::is_usr($apiusr)) { // if this user has already logged in then avoid extra DB lookup
+            if (is_null(db::$dbh)) {
+                db::$dbh = new db($g->db);
+            }
+            db::$tbl = 'accounts';
+
+            if ($usr = db::read('id,grp,acl,login,fname,lname,webpw', 'id', $apiusr, '', 'one')) {
+                if (9 !== $usr['acl']) {
+                    if (password_verify(html_entity_decode($apikey, ENT_QUOTES, 'UTF-8'), $usr['webpw'])) {
+                        elog("API login for id={$apiusr}");
+                        $_SESSION['usr'] = $usr;
+                        if (0 == $usr['acl']) {
+                            $_SESSION['adm'] = $apiusr;
+                        }
+                    } else {
+                        exit('Invalid Email Or Password');
+                    }
+                } else {
+                    exit('Account is disabled, contact your System Administrator');
+                }
+            } else {
+                exit('Invalid Email Or Password');
+            }
+        } else {
+            elog("API id={$apiusr} is already logged in");
+        }
+    }
+
+    public static function remember($g): void
+    {
+        if (!self::is_usr()) {
+            if ($c = self::get_cookie('remember')) {
+                if (is_null(db::$dbh)) {
+                    db::$dbh = new db($g->db);
+                }
+                db::$tbl = 'accounts';
+                if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
+                    extract($usr);
+                    $_SESSION['usr'] = $usr;
+                    if (0 == $acl) {
+                        $_SESSION['adm'] = $id;
+                    }
+                    self::log($login . ' is remembered and logged back in', 'success');
+                    self::ses('o', '', $g->in['o']);
+                    self::ses('m', '', $g->in['m']);
+                }
+            }
+        }
+    }
+
+    public static function redirect(string $url, string $method = 'location', int $ttl = 5, string $msg = ''): void
+    {
+        elog(__METHOD__ . "({$url})");
+
+        if ('refresh' == $method) {
+            header('refresh:' . $ttl . '; url=' . $url);
+            echo '<!DOCTYPE html>
+<title>Redirect...</title>
+<h2 style="text-align:center">Redirecting in ' . $ttl . ' seconds...</h2>
+<pre style="width:50em;margin:0 auto;">' . $msg . '</pre>';
+        } else {
+            header('Location:' . $url);
+        }
+        exit;
+    }
+
+    public static function relist(string $m = ''): void
+    {
+        $m = empty($m) ? 'list' : $m;
+        self::redirect('?o=' . $_SESSION['o'] . '&m=' . $m);
+    }
+
+    public static function numfmt(float $size, int $precision = null): string
+    {
+        if (0 == $size) {
+            return '0';
+        }
+        if ($size >= 1000000000000) {
+            return round(($size / 1000000000000), $precision ?? 3) . ' TB';
+        }
+        if ($size >= 1000000000) {
+            return round(($size / 1000000000), $precision ?? 2) . ' GB';
+        }
+        if ($size >= 1000000) {
+            return round(($size / 1000000), $precision ?? 1) . ' MB';
+        }
+        if ($size >= 1000) {
+            return round(($size / 1000), $precision ?? 0) . ' KB';
+        }
+        return $size . ' Bytes';
+    }
+
+    // numfmt() was wrong, we want MiB, not MB
+    public static function numfmtsi(float $size, int $precision = 2): string
+    {
+        if (0 == $size) {
+            return '0';
+        }
+        $base = log($size, 1024);
+        $suffixes = [' Bytes', ' KiB', ' MiB', ' GiB', ' TiB'];
+        return round(1024 ** ($base - floor($base)), $precision) . $suffixes[floor($base)];
+    }
+
+    public static function is_valid_domain_name(string $domainname): bool
+    {
+        $domainname = idn_to_ascii($domainname);
+        return preg_match('/^([a-z\\d](-*[a-z\\d])*)(\\.([a-z\\d](-*[a-z\\d])*))*$/i', $domainname)
+            && preg_match('/^.{1,253}$/', $domainname)
+            && preg_match('/^[^\\.]{1,63}(\\.[^\\.]{1,63})*$/', $domainname);
+    }
+
+    public static function mail_password(string $pw, string $hash = 'SHA512-CRYPT'): string
+    {
+        $salt_str = bin2hex(openssl_random_pseudo_bytes(8));
+        return 'SHA512-CRYPT' === $hash
+            ? '{SHA512-CRYPT}' . crypt($pw, '$6$' . $salt_str . '$')
+            : '{SSHA256}' . base64_encode(hash('sha256', $pw . $salt_str, true) . $salt_str);
+    }
+
+    public static function sec2time(int $seconds): string
+    {
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@{$seconds}");
+        return $dtF->diff($dtT)->format('%a days, %h hours, %i mins and %s secs');
+    }
+
+    public static function is_post(): bool
+    {
+        if ('POST' === $_SERVER['REQUEST_METHOD']) {
+            if (!isset($_POST['c']) || $_SESSION['c'] !== $_POST['c']) {
+                self::log('Possible CSRF attack');
+                self::redirect('?o=' . $_SESSION['o'] . '&m=list');
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static function inc_soa(string $soa): string
+    {
+        $ary = explode(' ', $soa);
+        $ymd = date('Ymd');
+        $day = substr($ary[2], 0, 8);
+        $rev = substr($ary[2], -2);
+        $ary[2] = ($day == $ymd)
+            ? "{$ymd}" . sprintf('%02d', $rev + 1)
+            : "{$ymd}" . '00';
+        return implode(' ', $ary);
+    }
+
+    public static function random_token(int $length = 32): string
+    {
+        $random_base64 = base64_encode(random_bytes($length));
+        $random_base64 = str_replace(['+', '/', '='], '', $random_base64);
+
+        if (strlen($random_base64) < $length) {
+            return self::random_token($length);
+        }
+        return substr($random_base64, 0, $length);
+    }
+}
+
+
+// index.php 20150101 - 20240904
+
+const DS = DIRECTORY_SEPARATOR;
+const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
+const DBG = true;
+
+spl_autoload_register(static function (string $className): void {
+    $filePath = INC . str_replace(['\\', '_'], [DS, DS], strtolower($className)) . '.php';
+    if (is_file($filePath)) {
+        require $filePath;
+    } else {
+        throw new \LogicException("Class $className not found");
+    }
+});
+
+enum AclLevel: int {
+    case SuperAdmin = 0;
+    case Administrator = 1;
+    case User = 2;
+    case Suspended = 3;
+    case Anonymous = 9;
+}
+
+echo new Init(new class() {
+    public object $t;
+
+    public function __construct(
+        public array $cfg = [
+            'email' => '',
+            'admpw' => '',
+            'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php',
+            'hash'  => 'SHA512-CRYPT',
+            'host'  => '',
+            'perp'  => 25,
+            'self'  => '/',
+        ],
+        public array $in = [
+            'a' => '',
+            'd' => '',
+            'g' => null,
+            'i' => null,
+            'l' => '',
+            'm' => 'list',
+            'o' => 'home',
+            'r' => 'local',
+            't' => 'bootstrap',
+            'x' => '',
+        ],
+        public array $out = [
+            'doc'   => 'NetServa',
+            'css'   => '',
+            'log'   => '',
+            'nav1'  => '',
+            'nav2'  => '',
+            'nav3'  => '',
+            'head'  => 'NetServa HCP',
+            'main'  => 'Error: missing page!',
+            'foot'  => 'Copyright (C) 2015-2024 Netserva HCP (AGPL-3.0)',
+            'js'    => '',
+            'end'   => '',
+        ],
+        public array $db = [
+            'host'  => '127.0.0.1',
+            'name'  => 'sysadm',
+            'pass'  => 'lib' . DS . '.ht_pw',
+            'path'  => 'sqlite/sysadm/sysadm.db',
+            'port'  => '3306',
+            'sock'  => '',
+            'type'  => 'sqlite',
+            'user'  => 'sysadm',
+        ],
+        public array $nav1 = [
+            'non' => [
+                ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
+                ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+            ],
+            'usr' => [
+                ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
+                ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+            ],
+            'adm' => [
+                ['Manage', [
+                    ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
+                    ['SSH Manager', '?o=sshm',      'bi bi-key'],
+                    ['Vhosts',      '?o=vhosts',    'bi bi-globe2'],
+                    ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
+                    ['Aliases',     '?o=valias',    'bi bi-envelope-paper-fill'],
+                    ['DKIM',        '?o=dkim',      'bi bi-person-vcard-fill'],
+                    ['Domains',     '?o=domains',   'bi bi-globe-americas'],
+                ], 'bi bi-stack'],
+                ['Stats', [
+                    ['Sys Info',    '?o=infosys',   'bi bi-speedometer2'],
+                    ['Processes',   '?o=processes', 'bi bi-bezier2'],
+                    ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
+                    ['Mail Graph',  '?o=mailgraph', 'bi bi-bar-chart'],
+                ], 'bi bi-graph-up-arrow'],
+                ['Links', [
+                    ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
+                    ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+                ], 'bi bi-list'],
+                ['Sites', [
+                    ['local',       '?r=local',     'bi bi-globe', 'r'],
+                    ['mgo',         '?r=mgo',       'bi bi-globe', 'r'],
+                    ['vmd1',        '?r=vmd1',      'bi bi-globe', 'r'],
+                ], 'bi bi-globe'],
+            ],
+        ],
+        public array $nav2 = [
+            ['local',   '?r=local', 'bi bi-globe'],
+            ['mgo',     '?r=mgo',   'bi bi-globe'],
+            ['vmd1',    '?r=vmd1',  'bi bi-globe'],
+        ],
+        public array $dns = [
+            'a'     => '127.0.0.1',
+            'mx'    => '',
+            'ns1'   => 'ns1.',
+            'ns2'   => 'ns2.',
+            'prio'  => 0,
+            'ttl'   => 300,
+            'soa'   => [
+                'primary'   => 'ns1.',
+                'email'     => 'admin.',
+                'refresh'   => 7200,
+                'retry'     => 540,
+                'expire'    => 604800,
+                'ttl'       => 3600,
+            ],
+            'db'    => [
+                'host'      => '127.0.0.1',
+                'name'      => 'pdns',
+                'pass'      => 'lib' . DS . '.ht_dns_pw',
+                'path'      => 'sqlite/sysadm/pdns.db',
+                'port'      => '3306',
+                'sock'      => '',
+                'type'      => 'sqlite',
+                'user'      => 'sysadm',
+            ],
+        ],
+        public array $acl = [
+            AclLevel::SuperAdmin->value    => AclLevel::SuperAdmin->name,
+            AclLevel::Administrator->value => AclLevel::Administrator->name,
+            AclLevel::User->value          => AclLevel::User->name,
+            AclLevel::Suspended->value     => AclLevel::Suspended->name,
+            AclLevel::Anonymous->value     => AclLevel::Anonymous->name,
+        ]
+    ) {}
+});
