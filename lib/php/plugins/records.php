@@ -1,8 +1,9 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/plugins/records.php 20150101 - 20190605
-// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
+
+// lib/php/plugins/records.php 20150101 - 20240904
+// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Records extends Plugin
 {
@@ -32,10 +33,10 @@ class Plugins_Records extends Plugin
                 $in['created'] = $in['updated'];
                 $lid = db::create($in);
                 $this->update_domains($in['domain_id'], $in['updated']);
-                util::log('Created DNS record ID: ' . $lid . ' for ' . $in['name'], 'success');
+                util::log("Created DNS record ID: $lid for {$in['name']}", 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list&i=$i");
         }
 
         return 'Error creating DNS record';
@@ -50,10 +51,10 @@ class Plugins_Records extends Plugin
                 $in['created'] = $in['updated'];
                 db::update($in, [['id', '=', $this->g->in['i']]]);
                 $this->update_domains($in['domain_id'], $in['updated']);
-                util::log('Updated DNS record ID: ' . $this->g->in['i'] . ' for ' . $dom, 'success');
+                util::log("Updated DNS record ID: {$this->g->in['i']} for $dom", 'success');
             }
             $i = intval(util::enc($_POST['did']));
-            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list&i=$i");
         }
 
         return 'Error updating DNS record';
@@ -68,41 +69,37 @@ class Plugins_Records extends Plugin
 
             db::delete([['id', '=', $this->g->in['i']]]);
             $this->update_domains($did, $now);
-            util::log('Deleted DNS record ID: ' . $this->g->in['i'] . ' from ' . $dom, 'success');
-            $i = $did;
-            util::redirect($this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list&i=' . $i);
+            util::log("Deleted DNS record ID: {$this->g->in['i']} from $dom", 'success');
+            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list&i=$did");
         }
         util::log('Error deleting DNS record');
+        return null;
     }
 
     protected function list(): string
     {
-        if ('json' === $this->g->in['x']) {
+        if ($this->g->in['x'] === 'json') {
             $columns = [
                 ['dt' => 0,  'db' => 'name'],
                 ['dt' => 1,  'db' => 'content'],
                 ['dt' => 2,  'db' => 'type'],
                 ['dt' => 3,  'db' => 'prio'],
                 ['dt' => 4,  'db' => 'ttl'],
-                ['dt' => 5,  'db' => 'id', 'formatter' => function ($d) {
-                    return '
-                    <a class="update" href="" title="Update DNS record ID: ' . $d . '" data-rowid="' . $d . '">
-                      <i class="fas fa-edit fa-fw cursor-pointer"></i></a>
-                    <a class="delete" href="" title="Delete DNS record ID: ' . $d . '" data-rowid="' . $d . '">
-                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
-                }],
+                ['dt' => 5,  'db' => 'id', 'formatter' => fn($d) => "
+                    <a class=\"update\" href=\"\" title=\"Update DNS record ID: $d\" data-rowid=\"$d\">
+                      <i class=\"fas fa-edit fa-fw cursor-pointer\"></i></a>
+                    <a class=\"delete\" href=\"\" title=\"Delete DNS record ID: $d\" data-rowid=\"$d\">
+                      <i class=\"fas fa-trash fa-fw cursor-pointer text-danger\"></i></a>"],
                 ['dt' => 6,  'db' => 'active'],
                 ['dt' => 7,  'db' => 'did'],
                 ['dt' => 8,  'db' => 'domain'],
                 ['dt' => 9,  'db' => 'updated'],
             ];
 
-            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, 'did=' . $_GET['did']), JSON_PRETTY_PRINT);
+            return json_encode(db::simple($_GET, 'records_view', 'id', $columns, "did={$_GET['did']}"), JSON_PRETTY_PRINT);
         }
 
-        $domain = db::qry('
- SELECT name FROM domains
-  WHERE id = :did', ['did' => $this->g->in['i']], 'col'); // i = domain id at this point
+        $domain = db::qry('SELECT name FROM domains WHERE id = :did', ['did' => $this->g->in['i']], 'col');
 
         return $this->g->t->list(['domain' => $domain, 'did' => $this->g->in['i']]);
     }
@@ -110,25 +107,13 @@ class Plugins_Records extends Plugin
     private function update_domains(int $did, string $now): bool
     {
         if ($did && $now) {
-            $sql = "
- SELECT content
-   FROM records
-  WHERE type='SOA'
-    AND domain_id=:did";
-
+            $sql = "SELECT content FROM records WHERE type='SOA' AND domain_id=:did";
             $soa = util::inc_soa(db::qry($sql, ['did' => $did], 'col'));
-            $sql = "
- UPDATE records
-    SET content=:content
-  WHERE type='SOA'
-    AND domain_id=:did";
-
+            $sql = "UPDATE records SET content=:content WHERE type='SOA' AND domain_id=:did";
             db::qry($sql, ['did' => $did, 'content' => $soa]);
             db::$tbl = 'domains';
-
             return db::update(['updated' => $now], [['id', '=', $did]]);
         }
-
         return false;
     }
 
@@ -136,36 +121,32 @@ class Plugins_Records extends Plugin
     {
         if (empty($in['content'])) {
             util::log('Content must not be empty');
-
             return [];
         }
-        if (('A' === $in['type']) && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
+        if ($in['type'] === 'A' && !filter_var($in['content'], FILTER_VALIDATE_IP)) {
             util::log('An "A" record must contain a legitimate IP');
-
             return [];
         }
-        if ('CAA' === $in['type'] && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
+        if ($in['type'] === 'CAA' && !preg_match('/^[a-zA-Z0-9"]+/', $in['content'])) {
             util::log('CAA record content must only contain letters and numbers');
-
             return [];
         }
-        if ($in['name'] && '*' !== $in['name'] && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
+        if ($in['name'] && $in['name'] !== '*' && !preg_match('/^[a-zA-Z0-9_-]+/', $in['name'])) {
             util::log('Record name must contain letters, numbers, _ - or only *');
-
             return [];
         }
 
-        if ('TXT' === $in['type']) {
+        if ($in['type'] === 'TXT') {
             $in['content'] = '"' . trim(htmlspecialchars_decode($in['content'], ENT_COMPAT), '"') . '"';
         }
 
-        if ('CAA' === $in['type']) {
+        if ($in['type'] === 'CAA') {
             $in['content'] = htmlspecialchars_decode($in['content'], ENT_COMPAT);
         }
 
         $domain = strtolower(util::enc($_POST['domain']));
         $in['name'] = strtolower(rtrim(str_replace($domain, '', $in['name']), '.'));
-        $in['name'] = $in['name'] ? $in['name'] . '.' . $domain : $domain;
+        $in['name'] = $in['name'] ? "{$in['name']}.$domain" : $domain;
 
         $in['ttl'] = intval($in['ttl']);
         $in['prio'] = intval($in['prio']);
