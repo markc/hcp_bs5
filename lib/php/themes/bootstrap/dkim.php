@@ -1,8 +1,9 @@
 <?php
 
 declare(strict_types=1);
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20230625
-// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
+
+// lib/php/themes/bootstrap/dkim.php 20180511 - 20240904
+// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 {
@@ -20,36 +21,39 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
             'action'    => 'create',
             'lhs_cmd'   => '',
             'rhs_cmd'   => 'Create',
-            'body'      => '
-                  <div class="mb-3">
+            'body'      => <<<HTML
+                <div class="mb-3">
                     <label for="domain" class="form-label">Domain</label>
                     <input type="text" class="form-control" id="domain" name="domain">
-                  </div>
-                  <div class="row mb-3">
+                </div>
+                <div class="row mb-3">
                     <div class="col-md-6">
-                      <label for="select" class="form-label">Selector</label>
-                      <input type="text" class="form-control" id="select" name="select" value="mail">
+                        <label for="select" class="form-label">Selector</label>
+                        <input type="text" class="form-control" id="select" name="select" value="mail">
                     </div>
                     <div class="col-md-6">
-                      <label for="keylen" class="form-label">Key Length</label>' . $keybuf . '
+                        <label for="keylen" class="form-label">Key Length</label>
+                        $keybuf
                     </div>
-                  </div>',
+                </div>
+            HTML,
         ]);
     }
 
     public function read(array $in): string
     {
-        return '
-        <div class="row">
-          <h3>
-            <a href="?o=dkim&m=list"><i class="bi bi-chevron-double-left"></i></a> DKIM
-            <a href="" title="Remove this DKIM record" data-bs-toggle="modal" data-bs-target="#removemodal">
-              <small><i class="bi bi-trash cursor-pointer text-bs-danger"></i></small>
-            </a>
-          </h3>
-        </div>
-        <div class="row">' . $in['buf'] . '
-        </div>' . $this->delete($in);
+        return <<<HTML
+            <div class="row">
+                <h3>
+                    <a href="?o=dkim&m=list"><i class="bi bi-chevron-double-left"></i></a> DKIM
+                    <a href="" title="Remove this DKIM record" data-bs-toggle="modal" data-bs-target="#removemodal">
+                        <small><i class="bi bi-trash cursor-pointer text-bs-danger"></i></small>
+                    </a>
+                </h3>
+            </div>
+            <div class="row">{$in['buf']}</div>
+            {$this->delete($in)}
+        HTML;
     }
 
     public function delete(array $in): string
@@ -60,25 +64,24 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
             'action'    => 'delete',
             'lhs_cmd'   => '',
             'rhs_cmd'   => 'Remove',
-            'hidden'    => '
-                <input type="hidden" name="domain" value="' . $in['domain'] . '">',
-            'body'      => '
-                  <p class="text-center">Are you sure you want to remove DKIM record for<br><b>' . $in['domain'] . '</b></p>',
+            'hidden'    => sprintf('<input type="hidden" name="domain" value="%s">', $in['domain']),
+            'body'      => sprintf('<p class="text-center">Are you sure you want to remove DKIM record for<br><b>%s</b></p>', $in['domain']),
         ]);
     }
 
     public function list(array $in): string
     {
-        elog(var_export($in, true));
-        return '
-        <div class="row">
-          <h3>
-            <i class="bi bi-card-heading"></i> DKIM
-            <a href="#" title="Add New DKIM Key" data-bs-toggle="modal" data-bs-target="#createmodal">
-            <small><i class="bi bi-plus-circle"></i></small></a>
-          </h3>
-        </div>
-        <div class="row">' . $in['buf'] . '
-        </div>' . $this->create();
+        return <<<HTML
+            <div class="row">
+                <h3>
+                    <i class="bi bi-card-heading"></i> DKIM
+                    <a href="#" title="Add New DKIM Key" data-bs-toggle="modal" data-bs-target="#createmodal">
+                        <small><i class="bi bi-plus-circle"></i></small>
+                    </a>
+                </h3>
+            </div>
+            <div class="row">{$in['buf']}</div>
+            {$this->create()}
+        HTML;
     }
 }
