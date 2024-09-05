@@ -1,16 +1,25 @@
-# NetServa HCP (RC2)
+# NetServa HCP (WIP, being rewritten for PHP 8.3)
 
-This is a lightweight Web, Mail and DNS server with a PHP based **Hosting
-Control Panel** for servicing multiple virtually hosted domains. The operating
-system is based on the latest Debian or Ubuntu packages and can use either
-SQLite or MySQL as a backend database. The entire server can run in as little as
-256 MB of ram when paired with SQLite and still serve a dozen lightly loaded
-hosts so it is ideal for LXD and Proxmox virtual machines and containers. It
-depends on the [NetServa SH] shell scripts being installed first.
+NetServa HCP is a lightweight Web, Mail, and DNS server with a PHP-based Hosting Control Panel for managing multiple virtually hosted domains. It's designed to run on the latest Debian or Ubuntu systems and supports both SQLite and MySQL as backend databases.
+
+## Key Features
+
+- Minimal resource requirements: runs in as little as 256 MB RAM
+- Ideal for LXD containers, Proxmox virtual machines, and small VPS instances
+- Built on [NetServa SH] shell scripts
+
+## Components
+
+- Web Server: nginx with PHP FPM 8+
+- Mail Server: Fully functional IMAP/SMTP with personalized spam filtering
+- SSL: LetsEncrypt integration
+- DNS: Optional PowerDNS for local or public DNS services
+- Database: Choice of SQLite or MySQL
+- Interface: Built with Bootstrap 5 and DataTables
 
 ## Hosting Control Panel
 
-This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
+This project is ideal for [LXD containers] or small 256MB to 512MB VM/VPS plans.
 
 - [NetServa HCP] does not reqire Python or Ruby, just PHP and Bash
 - Fully functional IMAP/SMTP mailserver with personalised Spam filtering
@@ -21,22 +30,17 @@ This project is ideal for [LXD containers] or cheap 256MB to 512MB VPS plans.
 - A fresh SQLite based install uses about 70MB ram (without Wordpress)
 - The "compiled" single file PHP script is less than 200KB in size
 - Built from the ground up using [Bootstrap 5] and [DataTables]
-- Developed and tested using LXD containers on the latest [Plasma Desktop]
+- Developed and tested using Proxmox VM/CTs on the latest [Plasma Desktop]
 
 ## Usage
 
 The PHP web interface relies on the [NetServa SH] scripts being installed on the
 primary and target hosts so the first thing to do, as root...
 
-    # TODO: Needs testing, again (just use the manaul method below for now)
-    # wget https://raw.githubusercontent.com/markc/sh/main/bin/setup-sh ; . setup-sh
-    # Manual method
     cd # as root
     git clone https://github.com/markc/sh .sh
     .sh/bin/shm install
     . .shrc
-
-_Please first review the very simple script with "cat setup-sh"._
 
 This installs the `SH` (Shell Helper) aliases and scripts into a `/root/.sh`
 directory and activates the environment variables and special aliases. See the
@@ -44,7 +48,7 @@ directory and activates the environment variables and special aliases. See the
 scripts directly. This `HCP` project is just a web based frontend for the `SH`
 system which does all the real provisioning and management work.
 
-The first step, after installing the `SH` scripts, is to make sure the current
+The next step, after installing the `SH` scripts, is to make sure the current
 host has a hostname and a domainname. The domainname needs to be valid if using
 a publically accessible server and that needs the assistence of a real DNS
 service. Otherwise, if using a local LAN with private IPs (like 192.168.\*,
@@ -66,33 +70,23 @@ editing `/etc/hostname` and making sure `/etc/resolv.conf` has a reference like
 on with the next step.
 
 Now we "normalize" the host by using `setup-host` which updates the primary
-hosting **Desktop** or **Server** system to Bionic 18.04 (unless `os release` is
+hosting **Desktop** or **Server** system to Noble 24.04 (unless `os release` is
 defined.) using the current `hostname -f` unless a **hostname.domainname** is
 passed in as the first `[domain]` argument...
 
     Usage: setup-host [fqdn] [(mysql)|sqlite]
-
-Assuming a LXD container is to be used for the actual server side (recommended
-for initial testing anyway) then use `setup-lxd` to install and setup the basic
-LXD container system...
-
-    # Currently untested
-    Usage: setup-lxd [pool size (25) GB] [passwd] [IP] (WIP)
 
 We can now setup the actual NetServa SH/HCP system for testing so, for example,
 if we use something like `c1.netserva.lan`, where `c1` will be the container
 label and `netserva.lan` can either be a real domainname (if the server has a
 public IP) or whatever internal LAN-wide domainname you care to use...
 
-    # Currently untested
-    Usage: newlxd FQDN [(small)|medium|large] [distro(bionic)] [(mysql)|sqlite] (WIP)
-
 If the installation procedure can detect an externally available public IP then
 it will attempt to install a LetsEncrypt SSL certificate so that the web server
 can be accessed via `https` and the mail server will be SSL enabled and ready
 for real-world deployment. Otherwise a self-signed certificate will be installed
-(which can be a problem for Firefox.) The mail, web, sftp and HCP login
-credentials will be available in `cat ~/.vhosts/$(hostname -f).conf`.
+The mail, web, sftp and HCP login credentials will be available in
+`cat ~/.vhosts/$(hostname -f).conf`.
 
 The essential configuration settings for the default server will be inside the
 container (example only for a local LAN domain called `netserva.lan`)...
@@ -102,8 +96,7 @@ container (example only for a local LAN domain called `netserva.lan`)...
 
 Or, if you already have a containter or remote server ready to use after a fresh
 Ubuntu or Debian install then you could install the entire NetServa SH and HCP
-system by ssh'ing into the system (or for example, "lxc exec c1 bash" for a
-local LXD container) and...
+system by ssh'ing into the target system and...
 
     wget https://raw.githubusercontent.com/markc/sh/main/bin/setup-sh
     # cat setup-sh
@@ -221,10 +214,12 @@ would chroot or lock access to the `/home/u/netserva.org` area with no
 possibility of using SUDO so folks only interested in working on a web site have
 reasonably safe access to only that web area.
 
-`setup-ssh` can be used on the host to manage local SSH keys making logging in
+`sshm` can be used on the host to manage local SSH keys making logging in
 to a container or remote server much easier...
 
-    Usage: setup-ssh domain [targethost] [user] [port] [sshkeyname]
+    ~ sshm h c
+    Create a new SSH Host file in ~/.ssh/config.d/
+    Usage: sshm create <Name> <Host> [Port] [User] [Skey]
 
 _All scripts and documentation are Copyright (C) 1995-2023 Mark Constable and
 Licensed [AGPL-3.0]_
