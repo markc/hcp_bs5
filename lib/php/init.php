@@ -9,27 +9,47 @@ class Init
 {
     public function __construct(public object $g)
     {
-        session_start();
+        $this->initializeSession();
+        $this->logRequestData();
+        $this->configureEnvironment();
+        $this->handleAuthentication();
+        $this->initializeThemeAndPlugin();
+        $this->generateOutput();
+    }
 
+    private function initializeSession(): void
+    {
+        session_start();
+        $_SESSION['c'] ??= Util::random_token(32);
+    }
+
+    private function logRequestData(): void
+    {
         elog('GET=' . var_export($_GET, true));
         elog('POST=' . var_export($_POST, true));
         elog('SESSION=' . var_export($_SESSION, true));
         elog('REQUEST=' . var_export($_REQUEST, true));
+    }
 
+    private function configureEnvironment(): void
+    {
         $this->g->cfg['host'] ??= getenv('HOSTNAME');
         $this->g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-
         util::cfg($this->g);
         $this->g->in = util::esc($this->g->in);
+    }
+
+    private function handleAuthentication(): void
+    {
         $this->g->in['a'] ? util::chkapi($this->g) : util::remember($this->g);
-
-        $_SESSION['c'] ??= Util::random_token(32);
-
         util::ses('o');
         util::ses('m');
         util::ses('l');
         util::ses('r', '', 'local');
+    }
 
+    private function initializeThemeAndPlugin(): void
+    {
         $thm = util::ses('t', '', $this->g->in['t']);
         $t1 = 'themes_' . $thm . '_' . $this->g->in['o'];
         $t2 = 'themes_' . $thm . '_theme';
@@ -42,12 +62,15 @@ class Init
         $this->g->out['main'] = class_exists($p)
             ? (string) new $p($this->g)
             : "Error: plugin '$p' does not exist!";
+    }
 
+    private function generateOutput(): void
+    {
         if (empty($this->g->in['x'])) {
             foreach ($this->g->out as $k => $v) {
                 $this->g->out[$k] = method_exists($this->g->t, $k)
-                ? $this->g->t->{$k}()
-                : $v;
+                    ? $this->g->t->{$k}()
+                    : $v;
             }
         }
     }
