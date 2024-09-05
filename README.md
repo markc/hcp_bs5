@@ -19,7 +19,7 @@ NetServa HCP is a lightweight Web, Mail, and DNS server with a PHP-based Hosting
 
 ## Hosting Control Panel
 
-This project is ideal for [LXD containers] or small 256MB to 512MB VM/VPS plans.
+This project is ideal for small VMs, CTs (containers) or VPS plans.
 
 - [NetServa HCP] does not reqire Python or Ruby, just PHP and Bash
 - Fully functional IMAP/SMTP mailserver with personalised Spam filtering
@@ -29,7 +29,6 @@ This project is ideal for [LXD containers] or small 256MB to 512MB VM/VPS plans.
 - It can use either [SQLite] or [MySQL] as database backends
 - A fresh SQLite based install uses about 70MB ram (without Wordpress)
 - An optional "compiled" single file PHP script is less than 200KB in size
-- Developed and tested using [Proxmox] VM/CTs on the latest [Plasma Desktop]
 
 ## Usage
 
