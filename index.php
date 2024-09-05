@@ -21,9 +21,9 @@ spl_autoload_register(static function (string $className): void {
 enum AclLevel: int {
     case SuperAdmin = 0;
     case Administrator = 1;
-    case User = 2;
-    case Suspended = 3;
-    case Anonymous = 9;
+    case User       = 2;
+    case Suspended  = 3;
+    case Anonymous  = 9;
 }
 
 echo new Init(new class() {
@@ -40,16 +40,16 @@ echo new Init(new class() {
             'self'  => '/',
         ],
         public array $in = [
-            'a' => '',
-            'd' => '',
-            'g' => null,
-            'i' => null,
-            'l' => '',
-            'm' => 'list',
-            'o' => 'home',
-            'r' => 'local',
-            't' => 'bootstrap',
-            'x' => '',
+            'a'     => '',
+            'd'     => '',
+            'g'     => null,
+            'i'     => null,
+            'l'     => '',
+            'm'     => 'list',
+            'o'     => 'home',
+            'r'     => 'local',
+            't'     => 'bootstrap',
+            'x'     => '',
         ],
         public array $out = [
             'doc'   => 'NetServa',
