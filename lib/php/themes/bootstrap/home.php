@@ -66,7 +66,7 @@ class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
                         based layout and text you care to. Modifying the navigation
                         menus above can be done by creating a <code>lib/.ht_conf.php</code>
                         file and copying the
-                        <a href="https://github.com/markc/hcp/blob/master/index.php#L67">\$nav1 array</a>
+                        <a href="https://github.com/markc/hcp/blob/master/index.php#L77">\$nav1 array</a>
                         from <code>index.php</code> into that optional config override file.
                     </p>
                 </div>
