@@ -28,9 +28,8 @@ This project is ideal for [LXD containers] or small 256MB to 512MB VM/VPS plans.
 - Always based and tested on the latest release of [Ubuntu Server]
 - It can use either [SQLite] or [MySQL] as database backends
 - A fresh SQLite based install uses about 70MB ram (without Wordpress)
-- The "compiled" single file PHP script is less than 200KB in size
-- Built from the ground up using [Bootstrap 5] and [DataTables]
-- Developed and tested using Proxmox VM/CTs on the latest [Plasma Desktop]
+- An optional "compiled" single file PHP script is less than 200KB in size
+- Developed and tested using [Proxmox] VM/CTs on the latest [Plasma Desktop]
 
 ## Usage
 
@@ -227,13 +226,13 @@ Licensed [AGPL-3.0]_
 [NetServa SH]: https://github.com/markc/sh/
 [NetServa HCP]: https://github.com/markc/hcp/
 [AGPL-3.0]: http://www.gnu.org/licenses/agpl-3.0.html
-[Bootstrap 4]: https://getbootstrap.com/
+[Bootstrap 5]: https://getbootstrap.com/
 [DataTables]: https://datatables.net/examples/styling/bootstrap4/
 [index.php]: https://github.com/netserva/www/blob/master/index.php
 [nginx]: http://nginx.org/
 [PHP FPM 8+]: http://www.php.net/manual/en/install.fpm.php
 [Plasma Desktop]: https://kde.org/plasma-desktop/
-[LXD containers]: https://linuxcontainers.org/lxd/introduction/
+[Proxmox]: https://proxmox.com/
 [LetsEncrypt]: https://letsencrypt.org/
 [PowerDNS]: https://powerdns.com/
 [SQLite]: https://sqlite.org/features.html
