@@ -131,16 +131,16 @@ class Themes_Bootstrap_Theme extends Theme
         return <<<HTML
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
       <div class=container>
-        <a class="navbar-brand" href="' . $this->g->cfg['self'] . '">
-          <b><i class="fa fa-server fa-fw"></i> ' . $this->g->out['head'] . '</b>
+        <a class="navbar-brand" href="{$this->g->cfg['self']}">
+          <b><i class="fa fa-server fa-fw"></i> {$this->g->out['head']} </b>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarsDefault">
-          <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+          <ul class="navbar-nav mr-auto">{$this->g->out['nav1']}
           </ul>
-          <ul class="navbar-nav ml-auto">' . $this->g->out['nav3'] . '
+          <ul class="navbar-nav ml-auto">{$this->g->out['nav3']}
           </ul>
         </div>
       </div>
