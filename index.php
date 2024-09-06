@@ -97,7 +97,6 @@ echo new Init(new class() {
                     ['Sys Info',    '?o=infosys',   'bi bi-speedometer2'],
                     ['Processes',   '?o=processes', 'bi bi-bezier2'],
                     ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
-                    ['Mail Graph',  '?o=mailgraph', 'bi bi-bar-chart'],
                 ], 'bi bi-graph-up-arrow'],
                 ['Links', [
                     ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
