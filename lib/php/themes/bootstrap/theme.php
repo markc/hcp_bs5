@@ -123,11 +123,41 @@ class Themes_Bootstrap_Theme extends Theme
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+        
+        <style>
+            /* Add this style to create space below the fixed navbar */
+            body {
+                padding-top: 60px; /* Adjust this value based on your navbar height */
+            }
+        </style>
         HTML;
     }
 
     private function getHeadContent(): string
     {
+        return <<<HTML
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{$this->g->cfg['self']}">
+                <b><i class="bi bi-server"></i> {$this->g->out['head']}</b>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    {$this->g->out['nav1']}
+                </ul>
+                <ul class="navbar-nav">
+                    {$this->g->out['nav3']}
+                </ul>
+                </div>
+            </div>
+        </nav>
+        HTML;
+  
+
+/*
         return <<<HTML
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
       <div class=container>
@@ -146,6 +176,7 @@ class Themes_Bootstrap_Theme extends Theme
       </div>
     </nav>
     HTML;
+    */
     }
 
     private function getJsContent(): string
