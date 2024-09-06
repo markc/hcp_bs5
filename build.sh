@@ -40,19 +40,19 @@ declare(strict_types=1);
     cat lib/php/plugins/vhosts.php
     cat lib/php/plugins/vmails.php
     cat lib/php/theme.php
-    cat lib/php/themes/bootstrap/theme.php
-    cat lib/php/themes/bootstrap/accounts.php
-    cat lib/php/themes/bootstrap/auth.php
-    cat lib/php/themes/bootstrap/dkim.php
-    cat lib/php/themes/bootstrap/domains.php
-    cat lib/php/themes/bootstrap/home.php
-    cat lib/php/themes/bootstrap/infomail.php
-    cat lib/php/themes/bootstrap/infosys.php
-    cat lib/php/themes/bootstrap/processes.php
-    cat lib/php/themes/bootstrap/records.php
-    cat lib/php/themes/bootstrap/valias.php
-    cat lib/php/themes/bootstrap/vhosts.php
-    cat lib/php/themes/bootstrap/vmails.php
+    cat lib/php/themes/bootstrap5/theme.php
+    cat lib/php/themes/bootstrap5/accounts.php
+    cat lib/php/themes/bootstrap5/auth.php
+    cat lib/php/themes/bootstrap5/dkim.php
+    cat lib/php/themes/bootstrap5/domains.php
+    cat lib/php/themes/bootstrap5/home.php
+    cat lib/php/themes/bootstrap5/infomail.php
+    cat lib/php/themes/bootstrap5/infosys.php
+    cat lib/php/themes/bootstrap5/processes.php
+    cat lib/php/themes/bootstrap5/records.php
+    cat lib/php/themes/bootstrap5/valias.php
+    cat lib/php/themes/bootstrap5/vhosts.php
+    cat lib/php/themes/bootstrap5/vmails.php
     cat lib/php/util.php
     cat index.php
 ) | sed \
