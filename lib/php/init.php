@@ -1,133 +1,89 @@
 <?php
-
-declare(strict_types=1);
-
-// lib/php/init.php 20150101 - 20240904
-// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/init.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
-    public function __construct(public object $g)
-    {
-        $this->initializeSession();
-        $this->logRequestData();
-        $this->configureEnvironment();
-        $this->handleAuthentication();
-        $this->initializeThemeAndPlugin();
-        $this->generateOutput();
-    }
+    private $t = null;
 
-    private function initializeSession(): void
+    public function __construct(object $g)
     {
+elog(__METHOD__);
+
         session_start();
-        $_SESSION['c'] ??= Util::random_token(32);
+
+elog('GET=' . var_export($_GET, true));
+elog('POST=' . var_export($_POST, true));
+elog('SESSION=' . var_export($_SESSION, true));
+
+        //$_SESSION = []; // to reset session for testing
+
+        $g->cfg['host'] = $g->cfg['host'] ?? getenv('HOSTNAME');
+
+        util::cfg($g);
+        $g->in = util::esc($g->in);
+        $g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+
+        if (!isset($_SESSION['c'])) $_SESSION['c'] = Util::random_token(32);
+        util::ses('o'); util::ses('m'); util::ses('l');
+        $t = util::ses('t', '', $g->in['t']);
+
+        $t1 = 'themes_' . $t . '_' . $g->in['o'];
+        $t2 = 'themes_' . $t . '_theme';
+
+        $this->t = $thm = class_exists($t1) ? new $t1($g)
+            : (class_exists($t2) ? new $t2($g) : new Theme($g));
+
+        $p  = 'plugins_' . $g->in['o'];
+        if (class_exists($p)) {
+            $g->in['a'] ? util::chkapi($g) : util::remember($g);
+            $g->out['main'] = (string) new $p($thm);
+        } else $g->out['main'] = "Error: no plugin object!";
+
+        if (empty($g->in['x']))
+            foreach ($g->out as $k => $v)
+                $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
     }
 
-    private function logRequestData(): void
+    public function __toString() : string
     {
-        elog('GET=' . var_export($_GET, true));
-        elog('POST=' . var_export($_POST, true));
-        elog('SESSION=' . var_export($_SESSION, true));
-        elog('REQUEST=' . var_export($_REQUEST, true));
-    }
+elog(__METHOD__);
 
-    private function configureEnvironment(): void
-    {
-        $this->g->cfg['host'] ??= getenv('HOSTNAME');
-        $this->g->cfg['self'] = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-        util::cfg($this->g);
-        $this->g->in = util::esc($this->g->in);
-    }
-
-    private function handleAuthentication(): void
-    {
-        $this->g->in['a'] ? util::chkapi($this->g) : util::remember($this->g);
-        util::ses('o');
-        util::ses('m');
-        util::ses('l');
-        util::ses('r', '', 'local');
-    }
-
-    private function initializeThemeAndPlugin(): void
-    {
-        $thm = util::ses('t', '', $this->g->in['t']);
-        $t1 = 'themes_' . $thm . '_' . $this->g->in['o'];
-        $t2 = 'themes_' . $thm . '_theme';
-        $p = 'plugins_' . $this->g->in['o'];
-
-        $this->g->t = class_exists($t1)
-            ? new $t1($this->g)
-            : (class_exists($t2) ? new $t2($this->g) : new Theme($this->g));
-
-        $this->g->out['main'] = class_exists($p)
-            ? (string) new $p($this->g)
-            : "Error: plugin '$p' does not exist!";
-    }
-
-    private function generateOutput(): void
-    {
-        if (empty($this->g->in['x'])) {
-            foreach ($this->g->out as $k => $v) {
-                $this->g->out[$k] = method_exists($this->g->t, $k)
-                    ? $this->g->t->{$k}()
-                    : $v;
-            }
-        }
-    }
-
-    public function __destruct() {
-        static $start;
-
-        if (!isset($start)) {
-            $start = microtime(true);
-        } else {
-            elog(
-                __FILE__
-                . ' '
-                . $_SERVER['REMOTE_ADDR']
-                . ' '
-                . round(microtime(true) - $start, 4)
-                . "\n"
-            );
-        }
-    }
-
-    public function __toString(): string
-    {
-        $x = $this->g->in['x'];
-        $out = $this->g->out;
-
-        if ($x === 'html') {
-            return $out['main'];
-        }
-
+        $g = $this->t->g;
+        $x = $g->in['x'];
         if ($x === 'text') {
-            return trim(
-                preg_replace(
-                    '/^\h*\v+/m',
-                    '',
-                    strip_tags($out['main'])
-                )
-            );
-        }
-
-        if ($x === 'json' || array_key_exists($x, $out)) {
+            return preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main']));
+        } elseif ($x === 'json') {
             header('Content-Type: application/json');
-
-            if ($x === 'json') {
-                return json_encode($out['main'], JSON_PRETTY_PRINT);
+            return $g->out['main'];
+        } elseif ($x) {
+            $out = $g->out[$x] ?? '';
+            if ($out) {
+                header('Content-Type: application/json');
+                return json_encode($out, JSON_PRETTY_PRINT);
             }
-
-            return json_encode($out[$x], JSON_PRETTY_PRINT);
         }
+        return $this->t->html();
+    }
 
-        return $this->g->t->html();
+    public function __destruct()
+    {
+//error_log('SESSION=' . var_export($_SESSION, true));
+        elog(__FILE__.' '.$_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4)."\n");
     }
 }
 
-function elog(string $content): void
+function dbg($var = null)
 {
-    if (DBG) {
-        error_log($content);
-    }
+    if (is_object($var))
+        error_log(ReflectionObject::export($var, true));
+    ob_start();
+    print_r($var);
+    $ob = ob_get_contents();
+    ob_end_clean();
+    error_log($ob);
+}
+
+function elog(string $content) {
+    if (DBG) error_log($content);
 }

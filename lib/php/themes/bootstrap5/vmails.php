@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/vmails.php 20170101 - 20240904
+// lib/php/themes/bootstrap5/vmails.php 20170101 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Vmails extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         $create = $this->generateModal('createmodal', 'Create New Mailbox', 'create', 'Create', $this->createModalBody());
         $remove = $this->generateModal('removemodal', 'Remove Mailbox', 'delete', 'Remove', $this->removeModalBody());
         $update = $this->generateModal('updatemodal', 'Change Password', 'update', 'Update', $this->updateModalBody());
@@ -18,6 +20,8 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 
     private function generateModal(string $id, string $title, string $action, string $footer, string $body): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="modal fade" id="$id" tabindex="-1" aria-labelledby="{$id}Label" aria-hidden="true">
             <div class="modal-dialog">
@@ -43,6 +47,8 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 
     private function createModalBody(): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="mb-3">
             <label for="user" class="form-label">Email Address</label>
@@ -53,6 +59,8 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 
     private function removeModalBody(): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <input type="hidden" id="removeuser" name="user" value="">
         <p class="text-center">Are you sure you want to remove this mailbox?<br><b id="targetuser"></b></p>
@@ -61,6 +69,8 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 
     private function updateModalBody(): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <input type="hidden" id="updateuser" name="user" value="">
         <div class="input-group mb-3">
@@ -73,6 +83,8 @@ class Themes_Bootstrap_Vmails extends Themes_Bootstrap_Theme
 
     private function generateListHTML(string $create, string $remove, string $update): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="col-12">
             <h3>

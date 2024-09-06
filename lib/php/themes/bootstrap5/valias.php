@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/valias.php 20170101 - 20240904
+// lib/php/themes/bootstrap5/valias.php 20170101 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Valias extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modalContent(
             'Create New Alias',
             'create',
@@ -20,6 +22,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     public function update(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modalContent(
             'Update Alias',
             'update',
@@ -31,6 +35,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     public function delete(): string
     {
+elog(__METHOD__);
+
         $source = db::read('source', 'id', $this->g->in['i'], '', 'one');
 
         return $this->modalContent(
@@ -44,11 +50,15 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         return $this->generateListHTML();
     }
 
     private function modalContent(string $title, string $action, string $lhsCmd, string $rhsCmd, string $body): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="modal-content">
             <div class="modal-header">
@@ -69,6 +79,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     private function modalBody(array $in): string
     {
+elog(__METHOD__);
+
         $activeChecked = ($in['active'] ?? false) ? ' checked' : '';
         return <<<HTML
         <div class="mb-3">
@@ -90,6 +102,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     private function deleteModalBody(string $source): string
     {
+elog(__METHOD__);
+
         $id = htmlspecialchars($this->g->in['i'], ENT_QUOTES, 'UTF-8');
         return <<<HTML
         <p class="text-center">Are you sure you want to remove this alias?<br><b>$source</b></p>
@@ -99,6 +113,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     private function modalFooter(string $lhsCmd, string $rhsCmd): string
     {
+elog(__METHOD__);
+
         $lhsButton = $lhsCmd ? "<button type=\"submit\" class=\"btn btn-danger\" name=\"sb\" value=\"$lhsCmd\">$lhsCmd</button>" : '';
         return <<<HTML
         $lhsButton
@@ -109,6 +125,8 @@ class Themes_Bootstrap_Valias extends Themes_Bootstrap_Theme
 
     private function generateListHTML(): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="row">
             <h3>

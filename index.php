@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// index.php 20150101 - 20240904
+// index.php 20150101 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS = DIRECTORY_SEPARATOR;
@@ -11,6 +11,7 @@ const DBG = true;
 
 spl_autoload_register(static function (string $className): void {
     $filePath = INC . str_replace(['\\', '_'], [DS, DS], strtolower($className)) . '.php';
+error_log("filePath=$filePath");
     if (is_file($filePath)) {
         require $filePath;
     } else {
@@ -26,6 +27,120 @@ enum AclLevel: int {
     case Anonymous  = 9;
 }
 
+echo new Init(new class
+{
+    public array
+    $cfg = [
+        'email' => '',
+        'admpw' => '',
+        'file'  => __DIR__ . DS . 'lib' . DS . '.ht_conf.php', // settings override
+        'hash'  => 'SHA512-CRYPT',
+        'host'  => '',
+        'perp'  => 25,
+        'self'  => '/hcp/',
+    ],
+    $in = [
+        'a'     => '',          // API (apiusr:apikey)
+        'd'     => '',          // Domain (current)
+        'g'     => null,        // Group/Category
+        'i'     => null,        // Item or ID
+        'l'     => '',          // Log (message)
+        'm'     => 'list',      // Method (action)
+        'o'     => 'home',      // Object (content)
+        't'     => 'bootstrap5', // Theme
+        'x'     => '',          // XHR (request)
+    ],
+    $out = [
+        'doc'   => 'NetServa',
+        'css'   => '',
+        'log'   => '',
+        'nav1'  => '',
+        'nav2'  => '',
+        'nav3'  => '',
+        'head'  => 'NetServa',
+        'main'  => 'Error: missing page!',
+        'foot'  => 'Copyright (C) 2015-2019 Mark Constable (AGPL-3.0)',
+        'js'   => '',
+        'end'   => '',
+    ],
+    $db = [
+        'host'  => '127.0.0.1', // DB site
+        'name'  => 'sysadm',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
+        'path'  => '/var/lib/sqlite/sysadm/sysadm.db', // SQLite DB
+        'port'  => '3306',      // DB port
+        'sock'  => '',          // '/run/mysqld/mysqld.sock',
+        'type'  => 'mysql',     // mysql | sqlite
+        'user'  => 'sysadm',    // DB user
+    ],
+    $nav1 = [
+        'non' => [
+            ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
+            ['Phpmyadmin',  'phpmyadmin/',      'bi bi-globe'],
+        ],
+        'usr' => [
+            ['Webmail',     'webmail/',         'bi bi-envelope-fill'],
+            ['Phpmyadmin',  'phpmyadmin/',      'bi bi-globe'],
+        ],
+        'adm' => [
+            ['Menu',        [
+                ['Webmail',     'webmail/',     'bi bi-envelope-fill'],
+                ['Phpmyadmin',  'phpmyadmin/',  'bi bi-globe'],
+            ], ''],
+            ['Admin',       [
+                ['Accounts',    '?o=accounts',  'bi bi-people-fill'],
+                ['Vhosts',      '?o=vhosts',    'bi bi-globe'],
+                ['Mailboxes',   '?o=vmails',    'bi bi-envelope-fill'],
+                ['Aliases',     '?o=valias',    'bi bi-envelope'],
+                ['Domains',     '?o=domains',   'bi bi-server'],
+                ['DKIM',        '?o=dkim',      'bi bi-bar-chart'],
+                ['SSHM',        '?o=sshm',      'bi bi-person-badge'],
+            ], ''],
+            ['Stats',       [
+                ['Sys Info',    '?o=infosys',   'bi bi-speedometer'],
+                ['Processes',   '?o=processes', 'bi bi-diagram-3'],
+                ['Mail Info',   '?o=infomail',  'bi bi-envelope-open'],
+            ], ''],
+        ],
+    ],
+    $nav2 = [
+    ],
+    $dns = [
+        'a'     => '127.0.0.1',
+        'mx'    => '',
+        'ns1'   => 'ns1.',
+        'ns2'   => 'ns2.',
+        'prio'  => 0,
+        'ttl'   => 300,
+        'soa'   => [
+            'primary' => 'ns1.',
+            'email'   => 'admin.',
+            'refresh' => 7200,
+            'retry'   => 540,
+            'expire'  => 604800,
+            'ttl'     => 3600,
+        ],
+        'db' => [
+            'host'  => '127.0.0.1', // Alt DNS DB site
+            'name'  => 'pdns',      // Alt DNS DB name
+            'pass'  => 'lib' . DS . '.ht_dns_pw', // MySQL DNS password override
+            'path'  => '/var/lib/sqlite/sysadm/pdns.db', // DNS SQLite DB
+            'port'  => '3306',      // Alt DNS DB port
+            'sock'  => '',          // '/run/mysqld/mysqld.sock',
+            'type'  => '',          // mysql | sqlite | '' to disable
+            'user'  => 'pdns',      // Alt DNS DB user
+        ],
+    ],
+    $acl = [
+        AclLevel::SuperAdmin->value    => AclLevel::SuperAdmin->name,
+        AclLevel::Administrator->value => AclLevel::Administrator->name,
+        AclLevel::User->value          => AclLevel::User->name,
+        AclLevel::Suspended->value     => AclLevel::Suspended->name,
+        AclLevel::Anonymous->value     => AclLevel::Anonymous->name,
+    ];
+});
+
+/*
 echo new Init(new class() {
     public object $t;
 
@@ -149,3 +264,4 @@ echo new Init(new class() {
         ]
     ) {}
 });
+*/

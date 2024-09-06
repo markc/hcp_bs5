@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/records.php 20180714 - 20240904
+// lib/php/themes/bootstrap5/records.php 20180714 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Records extends Themes_Bootstrap5_Theme
 {
     private const TYPES = [
         'A', 'MX', 'NS', 'TXT', 'AAAA', 'CAA', 'AFSDB', 'CERT', 'CNAME', 'DHCID',
@@ -16,11 +16,15 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         return $this->generateHtml($in) . $this->generateJavaScript($in);
     }
 
     private function generateHtml(array $in): string
     {
+elog(__METHOD__);
+
         $csrfToken      = $_SESSION['c'] ?? '';
         $currentObject  = $this->g->in['o'] ?? '';
         $domainId       = $in['did'] ?? '';
@@ -98,6 +102,8 @@ class Themes_Bootstrap_Records extends Themes_Bootstrap_Theme
 
     private function generateJavaScript(array $in): string
     {
+elog(__METHOD__);
+
         $domainId = $in['did'] ?? '';
         return <<<JavaScript
         <script>

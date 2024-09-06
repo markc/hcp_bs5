@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/auth.php 20150101 - 20240904
+// lib/php/themes/bootstrap5/auth.php 20150101 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Auth extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
-        $login = $in['login'] ?? '';
+elog(__METHOD__);
+
+      $login = $in['login'] ?? '';
         return <<<HTML
         <div class="row">
           <h3><i class="bi bi-key"></i> Forgot password</h3>
@@ -38,10 +40,12 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         $login = $in['login'] ?? '';
         return <<<HTML
         <div class="col-md-4 mx-auto">
-          <h3><i class="bi bi-key"></i> Sign in</h3>
+          <h1><i class="bi bi-key"></i> Sign in</h1>
           <form action="{$this->g->cfg['self']}" method="post">
             <input type="hidden" name="c" value="{$_SESSION['c']}">
             <input type="hidden" name="o" value="auth">
@@ -78,6 +82,8 @@ class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
 
     public function update(array $in): string
     {
+elog(__METHOD__);
+
         $id = $in['id'] ?? '';
         $login = $in['login'] ?? '';
         return <<<HTML

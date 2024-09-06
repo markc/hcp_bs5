@@ -2,18 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/home.php 20150101 - 20240905
+// lib/php/themes/bootstrap5/home.php 20150101 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Home extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        return $this->getHomeContent();
-    }
+elog(__METHOD__);
 
-    private function getHomeContent(): string
-    {
         return <<<HTML
         <div class="p-md-5 p-2 mb-4 bg-body-tertiary rounded-3 text-center">
             <h1 class="display-5 fw-bold mt-3"><i class="bi bi-boxes"></i> NetServa HCP</h1>

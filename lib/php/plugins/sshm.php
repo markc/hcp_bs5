@@ -20,6 +20,8 @@ class Plugins_Sshm extends Plugin
 
     public function create(): ?string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             util::run('sshm create ' . implode(' ', $this->inp));
             util::relist();
@@ -33,6 +35,8 @@ class Plugins_Sshm extends Plugin
 
     public function update(): ?string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             util::run('sshm create ' . implode(' ', $this->inp));
             util::relist();
@@ -51,6 +55,8 @@ class Plugins_Sshm extends Plugin
 
     public function delete(): ?string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             util::run('sshm delete ' . $this->inp['name']);
             util::relist();
@@ -61,11 +67,15 @@ class Plugins_Sshm extends Plugin
 
     public function list(): string
     {
+elog(__METHOD__);
+
         return $this->g->t->list(util::run('sshm list'));
     }
 
     public function help(): string
     {
+elog(__METHOD__);
+
         return $this->g->t->help(
             $this->inp['name'],
             util::run('sshm help ' . escapeshellarg($this->inp['name']))
@@ -74,6 +84,8 @@ class Plugins_Sshm extends Plugin
 
     public function key_create(): ?string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             util::run(
                 'sshm key_create ' .
@@ -89,6 +101,8 @@ class Plugins_Sshm extends Plugin
 
     protected function key_read(): string
     {
+elog(__METHOD__);
+
         return $this->g->t->key_read(
             $this->inp['skey'],
             shell_exec('sshm key_read ' . $this->inp['skey'])
@@ -97,6 +111,8 @@ class Plugins_Sshm extends Plugin
 
     public function key_delete(): ?string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             util::run('sshm key_delete ' . $this->inp['key_name']);
             util::relist('key_list');
@@ -107,6 +123,8 @@ class Plugins_Sshm extends Plugin
 
     public function key_list(): string
     {
+elog(__METHOD__);
+
         return $this->g->t->key_list(util::run('sshm key_list all', $this->g->in['r']));
     }
 }

@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/accounts.php 20170225 - 20240904
+// lib/php/themes/bootstrap5/accounts.php 20170225 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Accounts extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modal_content([
             'title'     => 'Create new user',
             'action'    => 'create',
@@ -20,6 +22,8 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 
     public function read(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modal_content([
             'title'     => 'Update user',
             'action'    => 'update',
@@ -31,6 +35,8 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 
     public function delete(): ?string
     {
+elog(__METHOD__);
+
         $usr = db::read('login', 'id', $this->g->in['i'], '', 'one');
 
         return $this->modal_content([
@@ -45,14 +51,16 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="row">
-          <h3>
+          <h1>
             <i class="bi bi-people-fill"></i> Accounts
             <a href="?o=accounts&m=create" class="bslink" title="Add new account">
               <small><i class="bi bi-plus-circle"></i></small>
             </a>
-          </h3>
+          </h1>
         </div>
         <div class="table-responsive">
           <table id="accounts" class="table table-borderless table-striped w-100">
@@ -110,6 +118,8 @@ class Themes_Bootstrap_Accounts extends Themes_Bootstrap_Theme
 
     private function modal_body(array $in): string
     {
+elog(__METHOD__);
+
         $acl = $_SESSION['usr']['acl'];
         $grp = $_SESSION['usr']['grp'];
 

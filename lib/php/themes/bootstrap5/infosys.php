@@ -2,19 +2,23 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/infosys.php 20170225 - 20240904
+// lib/php/themes/bootstrap5/infosys.php 20170225 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_InfoSys extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         $data = $this->prepareData($in);
         return $this->generateInfoSysContent($data);
     }
 
     private function prepareData(array $in): array
     {
+elog(__METHOD__);
+
         return [
             'csrfToken' => $_SESSION['c'] ?? '',
             'hostname'  => $in['hostname'] ?? '',
@@ -46,6 +50,8 @@ class Themes_Bootstrap_InfoSys extends Themes_Bootstrap_Theme
 
     private function generateInfoSysContent(array $data): string
     {
+elog(__METHOD__);
+
         $progressBar = fn($label, $used, $total, $free, $pcnt, $color, $text) => <<<HTML
         <div><b>{$label}</b><br>Used: {$used} - Total: {$total} - Free: {$free}</div>
         <div class="progress mb-2">

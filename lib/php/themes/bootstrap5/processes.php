@@ -2,18 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/processes.php 20170225 - 20240904
+// lib/php/themes/bootstrap5/processes.php 20170225 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Processes extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Processes extends Themes_Bootstrap5_Theme
 {
     public function list(array $in): string
     {
-        return $this->generateProcessesContent($in);
-    }
+elog(__METHOD__);
 
-    private function generateProcessesContent(array $in): string
-    {
         $csrfToken = $_SESSION['c'] ?? '';
         $procs = htmlspecialchars($in['procs'] ?? '');
         $processCount = count(explode("\n", $in['procs'] ?? '')) - 1;

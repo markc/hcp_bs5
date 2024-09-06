@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/domains.php 20170225 - 20240904
+// lib/php/themes/bootstrap5/domains.php 20170225 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Domains extends Themes_Bootstrap5_Theme
 {
     public function create(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modal_content([
             'title'     => 'Create DNS Zone',
             'action'    => 'create',
@@ -20,11 +22,15 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     public function update(array $in): string
     {
+elog(__METHOD__);
+
         return $this->editor($in);
     }
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="row">
           <h3>
@@ -99,6 +105,8 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     private function editor(array $in): string
     {
+elog(__METHOD__);
+
         $domain = $in['name'];
         $soa = $in['soa'] ?? ['', '', '', 7200, 540, 604800, 300];
         $soa = is_array($soa) ? $soa : explode(' ', $soa);
@@ -182,6 +190,8 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     public function delete(): ?string
     {
+elog(__METHOD__);
+
         $tmp = db::read('name', 'id', $this->g->in['i'], '', 'one');
 
         return $this->modal_content([
@@ -196,6 +206,8 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     public function shwho(string $name, string $body): string
     {
+elog(__METHOD__);
+
         return $this->modal_content([
             'title'     => "Whois summary: <b>{$name}</b>",
             'action'    => 'shwho',
@@ -207,6 +219,8 @@ class Themes_Bootstrap_Domains extends Themes_Bootstrap_Theme
 
     private function modal_body(array $in): string
     {
+elog(__METHOD__);
+
         return <<<HTML
         <div class="row mb-3">
           <div class="col-6">

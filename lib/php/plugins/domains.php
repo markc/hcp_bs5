@@ -1,197 +1,324 @@
 <?php
-
-declare(strict_types=1);
-
-// lib/php/plugins/domains.php 20150101 - 20240904
-// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugins/domains.php 20150101 - 20190320
+// Copyright (C) 2015-2019 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_Domains extends Plugin
 {
-    protected string $tbl = 'domains';
-
-    public array $inp = [
-        'name' => '',
-        'master' => '',
-        'last_check' => '',
-        'type' => '',
+    protected
+    $dbh = null,
+    $tbl = 'domains',
+    $in = [
+        'name'          => '',
+        'master'        => '',
+        'last_check'    => '',
+        'disabled'      => 0,
+        'type'          => '',
         'notified_serial' => '',
-        'account' => '',
-        'ip' => '',
-        'ns1' => '',
-        'ns2' => '',
+        'account'       => '',
+        'increment'     => 0,
+        'ip'            => '',
+        'ns1'           => '',
+        'ns2'           => '',
     ];
 
-    public function __construct($g)
+    public function __construct(Theme $t)
     {
-        if ($g->dns['db']['type']) {
-            $this->dbh = new db($g->dns['db']);
-        }
-        parent::__construct($g);
+elog(__METHOD__);
+
+        if ($t->g->dns['db']['type'])
+            $this->dbh = new db($t->g->dns['db']);
+        parent::__construct($t);
     }
 
-    public function create(): string
+    protected function create() : string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             extract($_POST);
-            $command = "addpdns $domain $ip $ns1 $ns2 $mxhost \"$spfip\"";
-            util::log($command);
-            elog($command);
-            return $command;
+
+//            $err = var_export($_POST, true);
+//util::log('<pre>'.$err.'</pre>');
+//            $cms = ($cms === 'on') ? 'wp' : 'none';
+//            $ssl = ($ssl === 'on') ? 'self' : 'le';
+//            $vhost = $uuser ? $uuser . '@' . $domain : $domain;
+// wtf, we are not creating a new vhost!!!
+//            shell_exec("nohup sh -c 'sudo addvhost $vhost $cms $ssl $ip' > /tmp/addvhost.log 2>&1 &");
+//            util::log('Added ' . $domain . ', please wait another few minutes for the setup to complete', 'success');
+//            util::redirect($this->g->cfg['self'] . '?o=vhosts');
+
+// Usage: addpdns domain ip ns1 ns2 [mx] [spfip] [sshkey]
+
+            util::exe("addpdns $domain $ip $ns1 $ns2 $mxhost $spfip");
+            return $this->t->create($this->in);
         }
-        return $this->g->t->create($this->inp);
     }
 
-    protected function create2(): string
+    protected function create2() : string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             extract($_POST);
             extract($this->g->dns);
             $created = date('Y-m-d H:i:s');
-            $soa_buf = "{$soa['primary']}$domain {$soa['email']}$domain. " . date('Ymd') . "00 {$soa['refresh']} {$soa['retry']} {$soa['expire']} {$soa['ttl']}";
+            $disable = 0;
+            $soa_buf =
+              $soa['primary'] . $domain . ' ' .
+              $soa['email'] . $domain . '. ' .
+              date('Ymd') . '00' . ' ' .
+              $soa['refresh'] . ' ' .
+              $soa['retry'] . ' ' .
+              $soa['expire'] . ' ' .
+              $soa['ttl'];
             $did = db::create([
-                'name' => $domain,
-                'master' => $type === 'SLAVE' ? $master : '',
-                'type' => $type ?: 'MASTER',
+                'name'    => $domain,
+                'master'  => $type === 'SLAVE' ? $master : '',
+                'type'    => $type ? $type : 'MASTER',
                 'updated' => $created,
                 'created' => $created,
             ]);
 
             if ($type === 'SLAVE') {
-                util::log("Created DNS Zone: $domain", 'success');
-                util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list");
+                util::log('Created DNS Zone: ' . $domain, 'success');
+                util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
             }
 
-            $sql = 'INSERT INTO `records` (content, created, disabled, domain_id, name, prio, ttl, type, updated) VALUES (:content, :created, :disabled, :did, :domain, :prio, :ttl, :type, :updated)';
-            $common = [
+            $sql = "
+ INSERT INTO `records` (
+        content, created, disabled, domain_id, name, prio, ttl, type, updated
+) VALUES (
+        :content, :created, :disabled, :did, :domain, :prio, :ttl, :type, :updated
+)";
+            db::qry($sql, [
+                'content' => $soa_buf,
                 'created' => $created,
-                'did' => $did,
-                'disabled' => 0,
-                'domain' => $domain,
-                'prio' => $prio,
-                'ttl' => $ttl,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'SOA',
                 'updated' => $created,
-            ];
-
-            db::qry($sql, [...$common, 'content' => $soa_buf, 'type' => 'SOA']);
-            db::qry($sql, [...$common, 'content' => $ns1 . $domain, 'type' => 'NS']);
-            db::qry($sql, [...$common, 'content' => $ns2 . $domain, 'type' => 'NS']);
-            db::qry($sql, [...$common, 'content' => $a, 'type' => 'A']);
-            db::qry($sql, [...$common, 'content' => $a, 'domain' => "cdn.$domain", 'type' => 'A']);
-            db::qry($sql, [...$common, 'content' => $a, 'domain' => "www.$domain", 'type' => 'A']);
-            db::qry($sql, [...$common, 'content' => $mx . $domain, 'type' => 'MX']);
-
-            util::log("Created DNS Zone: $domain", 'success');
-            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list");
+            ]);
+            db::qry($sql, [
+                'content' => $ns1 . $domain,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'NS',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $ns2 . $domain,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'NS',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => 'cdn.' . $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $a,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => 'www.' . $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'A',
+                'updated' => $created,
+            ]);
+            db::qry($sql, [
+                'content' => $mx . $domain,
+                'created' => $created,
+                'did'     => $did,
+                'disabled'=> $disable,
+                'domain'  => $domain,
+                'prio'    => $prio,
+                'ttl'     => $ttl,
+                'type'    => 'MX',
+                'updated' => $created,
+            ]);
+            util::log('Created DNS Zone: ' . $domain, 'success');
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
-
-        return $this->g->t->create($this->inp);
+        return $this->t->create($this->in);
     }
 
-    protected function update(): string
+    protected function update() : string
     {
-        if ($this->inp['increment']) {
-            $sql = "SELECT content as soa FROM records WHERE type='SOA' AND domain_id=:did";
-            $oldsoa = explode(' ', db::qry($sql, ['did' => $this->g->in['i']], 'col'));
-            [$primary, $email, $serial, $refresh, $retry, $expire, $ttl] = $oldsoa;
+elog(__METHOD__);
+
+        if ($this->in['increment']) {
+//            if ($this->in['increment']) {
+                $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
+
+                $oldsoa   = explode(' ', db::qry($sql, ['did' => $this->g->in['i']], 'col'));
+                $primary  = $oldsoa[0];
+                $email    = $oldsoa[1];
+                $serial   = $oldsoa[2];
+                $refresh  = $oldsoa[3];
+                $retry    = $oldsoa[4];
+                $expire   = $oldsoa[5];
+                $ttl      = $oldsoa[6];
+//            } else {
+//                extract($_POST);
+//            }
 
             $today = date('Ymd');
             $serial_day = substr($serial, 0, 8);
             $serial_rev = substr($serial, -2);
 
-            $serial = $serial_day == $today
-                ? $today . sprintf('%02d', (int)$serial_rev + 1)
-                : $today . '00';
+            $serial = ($serial_day == $today)
+                ? "$today" . sprintf("%02d", $serial_rev + 1)
+                : "$today" . "00";
 
-            $soa = "$primary $email $serial $refresh $retry $expire $ttl";
+            $soa =
+              $primary . ' ' .
+              $email . ' ' .
+              $serial . ' ' .
+              $refresh . ' ' .
+              $retry . ' ' .
+              $expire . ' ' .
+              $ttl;
 
-            $sql = "UPDATE records SET ttl = :ttl, content = :soa, updated = :updated WHERE type = 'SOA' AND domain_id = :did";
-            db::qry($sql, [
+            $sql = "
+ UPDATE records SET
+        ttl     = :ttl,
+        content = :soa,
+        updated = :updated
+  WHERE type = 'SOA'
+    AND domain_id = :did";
+
+            $res = db::qry($sql, [
                 'did' => $this->g->in['i'],
                 'soa' => $soa,
                 'ttl' => $ttl,
                 'updated' => date('Y-m-d H:i:s'),
             ]);
 
-            if ($this->inp['increment']) {
-                return $serial;
-            }
+            if ($this->in['increment']) return $serial;
 
+            // TODO check $res ???
             util::log('Updated DNS domain ID ' . $this->g->in['i'], 'success');
-            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list");
+            util::redirect( $this->g->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
+
         } elseif (util::is_post() && $this->g->in['i']) {
+
             extract($_POST);
+
             $dom = db::read('name,type,master', 'id', $this->g->in['i'], '', 'one');
             if ($dom['type'] === 'SLAVE') {
-                return $this->g->t->update($dom);
-            }
-            $sql = "SELECT content as soa FROM records WHERE type='SOA' AND domain_id=:did";
-            $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
-            return $this->g->t->update([...$dom, ...$soa]);
-        }
+                return $this->t->update($dom);
+            } else {
+                $sql = "
+ SELECT content as soa
+   FROM records
+  WHERE type='SOA'
+    AND domain_id=:did";
 
+                $soa = db::qry($sql, ['did' => $this->g->in['i']], 'one');
+                return $this->t->update(array_merge($dom, $soa));
+            }
+        }
         return 'Error updating item';
     }
 
-    protected function delete(): ?string
+    protected function delete() : string
     {
-        if (util::is_post()) {
-            $sql = 'DELETE FROM `records` WHERE domain_id = :id';
-            db::qry($sql, ['id' => $this->g->in['i']]);
-            db::delete([['id', '=', $this->g->in['i']]]);
+elog(__METHOD__);
+
+        if ($this->g->in['i']) {
+            $sql = "
+ DELETE FROM `records`
+  WHERE  domain_id = :id";
+
+            $res1 = db::qry($sql, ['id' => $this->g->in['i']]);
+            $res2 = db::delete([['id', '=', $this->g->in['i']]]);
+            // TODO check $res1 and $res2 ???
             util::log('Deleted DNS zone ID: ' . $this->g->in['i'], 'success');
-            util::redirect("{$this->g->cfg['self']}?o={$this->g->in['o']}&m=list");
+            util::redirect( $this->cfg['self'] . '?o=' . $this->g->in['o'] . '&m=list');
         }
-        return $this->g->t->delete($this->g->in);
+        return 'Error deleting item';
     }
 
-    protected function list(): string
+    protected function list() : string
     {
+elog(__METHOD__);
+
         if ($this->g->in['x'] === 'json') {
             $columns = [
-                [
-                    'dt' => 0,
-                    'db' => 'name',
-                    'formatter' => fn($d, $row) => $row['type'] !== 'SLAVE'
-                        ? "<a href=\"?o=records&m=list&i={$row['id']}\" title=\"Update Domain SOA\"><b>$d</b></a>"
-                        : "<b>$d</b>"
-                ],
-                ['dt' => 1, 'db' => 'type'],
-                ['dt' => 2, 'db' => 'records'],
-                [
-                    'dt' => 3,
-                    'db' => 'soa',
-                    'formatter' => fn($d, $row) => $row['type'] !== 'SLAVE'
-                        ? "<a class=\"serial\" href=\"?o=domains&m=update&i={$row['id']}\" title=\"Update Serial\">" . explode(' ', $row['soa'])[2] . "</a>"
-                        : explode(' ', $row['soa'])[2]
-                ],
-                [
-                    'dt' => 4,
-                    'db' => 'id',
-                    'formatter' => fn($d, $row) => "
-                        <a href=\"?o=domains&m=shwho&name={$row['name']}\" class=\"bslink\" title=\"Whois Summary\">
-                          <i class=\"bi bi-info-circle cursor-pointer\"></i></a>
-                        <a href=\"?o=domains&m=delete&i=$d\" class=\"bslink\" title=\"Remove Domain ID: $d\" data-rowid=\"$d\" data-rowname=\"{$row['name']}\">
-                          <i class=\"bi bi-trash cursor-pointer text-danger\"></i></a>"
-                ],
-                ['dt' => 5, 'db' => 'updated'],
+                ['dt' => 0,   'db' => 'name',       'formatter' => function($d, $row) {
+                    return ($row['type'] !== 'SLAVE') ? '
+                    <a href="?o=records&m=list&i=' . $row['id'] . '" title="Update Domain SOA">
+                      <b>' . $d . '</b></a>' : '<b>' . $d . '</b>';
+                }],
+                ['dt' => 1,   'db' => 'type'],
+                ['dt' => 2,   'db' => 'records'],
+                ['dt' => 3,   'db' => 'soa',        'formatter' => function($d, $row) {
+                    $soa = explode(' ', $row['soa']);
+                    return ($row['type'] !== 'SLAVE') ? '
+        <a class="serial" href="?o=domains&m=update&i=' . $row['id'] . '" title="Update Serial">' . $soa[2] . '</a>' : $soa[2];
+                }],
+                ['dt' => 4,  'db' => 'id', 'formatter' => function($d, $row) {
+                    return '
+                    <a href="" class="shwho" data-toggle="modal" data-target="#shwhomodal" title="Show Domain Info" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="fas fa-info-circle fa-fw cursor-pointer"></i></a>
+                    <a href="" class="delete" data-toggle="modal" data-target="#removemodal" title="Remove Domain ID: ' . $d . '" data-rowid="' . $d . '" data-rowname="' . $row['name'] . '">
+                      <i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></a>';
+                }],
+                ['dt' => 5,   'db' => 'updated'],
             ];
-
             return json_encode(db::simple($_GET, 'domains_view2', 'id', $columns), JSON_PRETTY_PRINT);
         }
-
-        return $this->g->t->list([]);
+        return $this->t->list([]);
     }
 
-    protected function shwho(): string
+    protected function shwho() : string
     {
-        return $this->g->t->shwho(
-            $this->inp['name'],
-            shell_exec('sudo shwho ' . $this->inp['name'])
-        );
+elog(__METHOD__);
+
+        return shell_exec('sudo shwho ' . $this->in['name']);
     }
 
-    protected function incsoa(): string
+    protected function incsoa() : string
     {
-        return shell_exec('sudo incsoa ' . $this->inp['name']);
+elog(__METHOD__);
+
+        return shell_exec('sudo incsoa ' . $this->in['name']);
     }
 }
+
+?>

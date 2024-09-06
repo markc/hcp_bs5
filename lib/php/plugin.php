@@ -1,96 +1,109 @@
 <?php
-
-declare(strict_types=1);
-
-// lib/php/plugin.php 20150101 - 20240904
-// Copyright (C) 2015-2023 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/plugin.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
 {
-    public array $inp = [];
-    protected mixed $dbh = null;
-    protected string $buf = '';
-    protected string $tbl = '';
-
-    public function __construct(public object $g)
+    protected
+    $buf = '',
+    $dbh = null,
+    $tbl = '',
+    $in  = [],
+    $t   = null,
+    $g   = null;
+    
+    public function __construct(Theme $t)
     {
-        $this->inp = util::esc($this->inp);
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
+elog(__METHOD__);
 
-        if (!util::is_usr() && ('auth' !== $o || !in_array($m, ['list', 'create', 'resetpw']))) {
-            util::redirect("{$this->g->cfg['self']}?o=auth");
+        $o = $t->g->in['o'];
+        $m = $t->g->in['m'];
+        if(!util::is_usr() && ($o !== 'auth' || ($m !== 'list' && $m !== 'create' && $m !== 'resetpw'))){
+            util::redirect($t->g->cfg['self'] . '?o=auth');
         }
 
+        $this->t  = $t;
+        $this->g  = $t->g;
+        $this->in = util::esc($this->in);
         if ($this->tbl) {
-            db::$dbh ??= $this->dbh ?? new db($this->g->db);
+            if (!is_null($this->dbh))
+                db::$dbh = $this->dbh;
+            elseif (is_null(db::$dbh))
+                db::$dbh = new db($t->g->db);
             db::$tbl = $this->tbl;
         }
 
-        $this->buf .= $this->{$this->g->in['m']}();
+        $this->buf .= $this->{$t->g->in['m']}();
     }
 
-    public function __toString(): string
+    public function __toString() : string
     {
+elog(__METHOD__);
+
         return $this->buf;
     }
 
-    public function __call(string $name, array $args): string
+    protected function create() : string
     {
-        elog(__METHOD__ . "() name = $name, args = " . var_export($args, true));
-        return "Plugin::$name() not implemented";
-    }
+elog(__METHOD__);
 
-    protected function create(): ?string
-    {
         if (util::is_post()) {
-            $this->inp['updated'] = $this->inp['created'] = date('Y-m-d H:i:s');
-            $lid = db::create($this->inp);
-            util::log("Item number $lid created", 'success');
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            $this->in['created'] = date('Y-m-d H:i:s');
+            $lid = db::create($this->in);
+            util::log('Item number ' . $lid . ' created', 'success');
             util::relist();
-            return null;
-        }
-        
-        return $this->g->t->create($this->inp);
+        } else return $this->t->create($this->in);
     }
 
-    protected function read(): ?string
+    protected function read() : string
     {
-        return $this->g->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+elog(__METHOD__);
+
+        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
-    protected function update(): ?string
+    protected function update() : string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
-            $this->inp['updated'] = date('Y-m-d H:i:s');
-            if (db::update($this->inp, [['id', '=', $this->g->in['i']]])) {
-                util::log("Item number {$this->g->in['i']} updated", 'success');
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            if(db::update($this->in, [['id', '=', $this->g->in['i']]])){
+                util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
                 util::relist();
-                return null;
+            }else{
+                util::log('Error updating item.');
             }
-            util::log('Error updating item.');
         }
         return $this->read();
     }
 
-    protected function delete(): ?string
+    protected function delete() : string
     {
+elog(__METHOD__);
+
         if (util::is_post()) {
             if ($this->g->in['i']) {
-                db::delete([['id', '=', $this->g->in['i']]]);
-                util::log("Item number {$this->g->in['i']} removed", 'success');
+                $res = db::delete([['id', '=', $this->g->in['i']]]);
+                util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
                 util::relist();
-                return null;
             }
-        } else {
-            return $this->g->t->delete($this->g->in);
         }
-        util::log('Error deleting item');
-        return null;
+        return 'Error deleting item';
     }
 
-    protected function list(): string
+    protected function list() : string
     {
-        return $this->g->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
+elog(__METHOD__);
+
+        return $this->t->list(db::read('*', '', '', 'ORDER BY `updated` DESC'));
+    }
+
+    public function __call(string $name, array $args) : string
+    {
+elog(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
+
+        return 'Plugin::' . $name . '() not implemented';
     }
 }

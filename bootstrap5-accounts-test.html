@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>mail.rmpsystems.com</title>
+    <link rel="icon" type="image/x-icon" href="/hcp/favicon.ico">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+      body { padding-top: 4.5rem; }
+      .table { width: 100%; table-layout: fixed; }
+      table.dataTable { border-collapse: collapse !important; }
+      
+      @media (min-width: 768px) {
+        .columns { column-count: 2; }
+      }
+      @media (min-width: 1200px) {
+        .columns { column-count: 3; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/hcp/">
+          <b><i class="bi bi-server"></i> mgo.goldcoast.org</b>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-list"></i> Menu</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="webmail/"><i class="bi bi-envelope"></i> Webmail</a></li>
+                  <li><a class="dropdown-item" href="phpmyadmin/"><i class="bi bi-globe"></i> Phpmyadmin</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i> Admin</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="?o=accounts"><i class="bi bi-people"></i> Accounts</a></li>
+                  <li><a class="dropdown-item" href="?o=vhosts"><i class="bi bi-globe"></i> Vhosts</a></li>
+                  <li><a class="dropdown-item" href="?o=vmails"><i class="bi bi-envelope"></i> Mailboxes</a></li>
+                  <li><a class="dropdown-item" href="?o=valias"><i class="bi bi-envelope-fill"></i> Aliases</a></li>
+                  <li><a class="dropdown-item" href="?o=dkim"><i class="bi bi-person-badge"></i> DKIM</a></li>
+                  <li><a class="dropdown-item" href="?o=domains"><i class="bi bi-server"></i> Domains</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-graph-up"></i> Stats</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="?o=infosys"><i class="bi bi-speedometer"></i> Sys Info</a></li>
+                  <li><a class="dropdown-item" href="?o=processes"><i class="bi bi-diagram-3"></i> Processes</a></li>
+                  <li><a class="dropdown-item" href="?o=infomail"><i class="bi bi-envelope-open"></i> Mail Info</a></li>
+                  <li><a class="dropdown-item" href="?o=mailgraph"><i class="bi bi-bar-chart"></i> Mail Graph</a></li>
+                </ul>
+              </li>
+            </ul>
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person"></i> admin@rmpsystems.com</a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="?o=accounts&m=read&i=1"><i class="bi bi-person"></i> Change Profile</a></li>
+                  <li><a class="dropdown-item" href="?o=auth&m=update&i=1"><i class="bi bi-key"></i> Change Password</a></li>
+                  <li><a class="dropdown-item" href="?o=auth&m=delete"><i class="bi bi-box-arrow-right"></i> Sign out</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>    
+      <main class="container">
+        <div class="row">
+          <div class="col-12">
+            <h1>
+              <i class="bi bi-people"></i> Accounts
+              <a href="#" data-bs-toggle="modal" data-bs-target="#createModal" title="Add new account">
+                <small><i class="bi bi-plus-circle"></i></small>
+              </a>
+            </h1>
+          </div>
+        </div>
+      <div class="table-responsive">
+        <table id="accounts" class="table table-striped" style="width:100%">
+          <thead>
+            <tr>
+              <th class="w-25">User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th class="w-25">Alt Email</th>
+              <th>ACL</th>
+              <th>Grp</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createModalLabel">Create New Account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="post" action="/hcp/">
+            <input type="hidden" name="c" value="3794CupqjjReacg1lSbq3G3UomnZNKtD">
+            <input type="hidden" name="o" value="accounts">
+            <input type="hidden" name="m" value="create">
+            <input type="hidden" name="i" value="">
+            <div class="modal-body">
+              <!-- Form fields (same as in the original HTML) -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-4">
+      <p><em><small>Copyright (C) 2024 mail.rmpsystems.com</small></em></p>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $("#accounts").DataTable({
+      "processing": true,
+      "serverSide": true,
+      "ajax": {
+        "url": "/hcp/?x=json&o=accounts&m=list",
+        "dataSrc": function(json) {
+          // Check if the response is valid JSON
+          if (typeof json === 'object') {
+            return json.data || [];
+          } else {
+            console.error("Invalid JSON response:", json);
+            return [];
+          }
+        },
+        "error": function(xhr, error, thrown) {
+          console.error("DataTables AJAX error:", error, thrown);
+          alert("An error occurred while fetching data. Please try again.");
+        }
+      },
+      "scrollX": true,
+      "columnDefs": [
+        {"targets": 0, "className": "text-truncate"},
+        {"targets": 3, "className": "text-truncate"},
+      ],
+      "drawCallback": function(settings) {
+        console.log("DataTables draw callback:", settings);
+      },
+      "initComplete": function(settings, json) {
+        console.log("DataTables initialization complete:", json);
+      }
+    });
+  });
+/*
+     $(document).ready(function() {
+        $("#accounts").DataTable({
+          "processing": true,
+          "serverSide": true,
+          "ajax": "?x=json&o=accounts&m=list",
+          "scrollX": true,
+          "columnDefs": [
+            {"targets":0, "className":"text-truncate"},
+            {"targets":3, "className":"text-truncate"},
+          ]
+        });
+      });
+*/
+    </script>
+
+  </body>
+</html>

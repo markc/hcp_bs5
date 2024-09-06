@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-// lib/php/themes/bootstrap/dkim.php 20180511 - 20240904
+// lib/php/themes/bootstrap5/dkim.php 20180511 - 20240906
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
+class Themes_Bootstrap5_Dkim extends Themes_Bootstrap5_Theme
 {
     public function create(): string
     {
+elog(__METHOD__);
+
         $keybuf = $this->dropdown([
             ['1024', '1024'],
             ['2048', '2048'],
@@ -42,14 +44,16 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 
     public function read(array $in): string
     {
+elog(__METHOD__);
+
         return <<<HTML
             <div class="row">
-                <h3>
+                <h1>
                     <a href="?o=dkim&m=list"><i class="bi bi-chevron-double-left"></i></a> DKIM
                     <a href="" title="Remove this DKIM record" data-bs-toggle="modal" data-bs-target="#removemodal">
                         <small><i class="bi bi-trash cursor-pointer text-bs-danger"></i></small>
                     </a>
-                </h3>
+                </h1>
             </div>
             <div class="row">{$in['buf']}</div>
             {$this->delete($in)}
@@ -58,6 +62,8 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 
     public function delete(array $in): string
     {
+elog(__METHOD__);
+
         return $this->modal([
             'id'        => 'removemodal',
             'title'     => 'Remove DKIM Record',
@@ -71,14 +77,16 @@ class Themes_Bootstrap_Dkim extends Themes_Bootstrap_Theme
 
     public function list(array $in): string
     {
+elog(__METHOD__);
+
         return <<<HTML
             <div class="row">
-                <h3>
+                <h1>
                     <i class="bi bi-card-heading"></i> DKIM
                     <a href="#" title="Add New DKIM Key" data-bs-toggle="modal" data-bs-target="#createmodal">
                         <small><i class="bi bi-plus-circle"></i></small>
                     </a>
-                </h3>
+                </h1>
             </div>
             <div class="row">{$in['buf']}</div>
             {$this->create()}

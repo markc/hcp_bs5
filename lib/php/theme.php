@@ -1,99 +1,111 @@
 <?php
-
-declare(strict_types=1);
-
-// lib/php/theme.php 20150101 - 20240904
-// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
+// lib/php/theme.php 20150101 - 20200414
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Theme
 {
-    private string $buf = '';
+    private
+    $buf = '',
+    $in  = [];
 
-    public function __construct(public object $g)
+    public $g   = null;
+
+    public function __construct(object $g)
     {
+elog(__METHOD__);
+
+        $this->g = $g;
     }
 
-    public function __toString(): string
+    public function __toString() : string
     {
+elog(__METHOD__);
+
         return $this->buf;
     }
 
-    public function __call(string $name, array $args): string
+    public function log() : string
     {
-        elog(__METHOD__ . "() name = $name class = " . __CLASS__);
-        return "Theme::$name() not implemented";
+elog(__METHOD__);
+
+        $alts = '';
+        foreach (util::log() as $lvl => $msg) {
+            $alts .= $msg ?  '<p class="alert ' . $lvl . '">' . $msg . "</p>\n" : '';
+        }
+        return $alts;
     }
 
-    public function log(): string
+    public function nav1() : string
     {
-        return implode('', array_map(
-            fn($lvl, $msg) => $msg ? "<p class=\"alert $lvl\">$msg</p>\n" : '',
-            array_keys(util::log()),
-            util::log()
-        ));
+elog(__METHOD__);
+
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
     }
 
-    public function nav1(): string
+    public function head() : string
     {
-        $o = "?o={$this->g->in['o']}";
-        $navItems = array_map(
-            fn($n) => sprintf(
-                '<a%s href="%s">%s</a>',
-                $o === $n[1] ? ' class="active"' : '',
-                $n[1],
-                $n[0]
-            ),
-            $this->g->nav1
-        );
+elog(__METHOD__);
 
-        return "<nav>" . implode('', $navItems) . "</nav>";
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->cfg['self'] . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
+    </header>';
     }
 
-    public function head(): string
+    public function main() : string
     {
-        return <<<HTML
-        <header>
-            <h1><a href="{$this->g->cfg['self']}">{$this->g->out['head']}</a></h1>
-            {$this->g->out['nav1']}{$this->g->out['nav2']}
-        </header>
-        HTML;
+elog(__METHOD__);
+
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
     }
 
-    public function main(): string
+    public function foot() : string
     {
-        return "<main>{$this->g->out['log']}{$this->g->out['main']}</main>";
+elog(__METHOD__);
+
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
     }
 
-    public function foot(): string
+    public function end() : string
     {
-        return <<<HTML
-        <footer class="text-center">
-            <br>
-            <p><em><small>{$this->g->out['foot']}</small></em></p>
-        </footer>
-        HTML;
+elog(__METHOD__);
+
+        return '
+    <pre>' . $this->g->out['end'] . '
+    </pre>';
     }
 
-    public function end(): string
+    public function html() : string
     {
-        return "<pre>{$this->g->out['end']}</pre>";
-    }
+elog(__METHOD__);
 
-    public function html(): string
-    {
         extract($this->g->out, EXTR_SKIP);
-        return <<<HTML
-        <!DOCTYPE html>
-        <html lang="en" data-bs-theme="auto">
-            <head>
-                <script src="lib/js/color-modes.js"></script>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                <title>$doc</title>$css
-            </head>
-            <body>$head$main$foot$end$js</body>
-        </html>
-        HTML;
+        return '<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>' . $doc . '</title>' . $css . $js . '
+  </head>
+  <body>' . $head . $main . $foot . $end . '
+  </body>
+</html>
+';
     }
 
     public static function dropdown(
@@ -102,22 +114,29 @@ class Theme
         string $sel = '',
         string $label = '',
         string $class = '',
-        string $extra = ''
-    ): string {
-        $opt = $label ? "<option value=\"\">" . ucfirst($label) . "</option>" : '';
-        $c = $class ? " class=\"$class\"" : '';
-        
-        $options = array_map(function($v) use ($sel) {
-            $t = str_replace('?t=', '', (string)$v[1]);
-            $s = $sel === $t ? ' selected' : '';
-            return "<option value=\"$t\"$s>{$v[0]}</option>";
-        }, $ary);
+        string $extra = '') : string
+    {
+elog(__METHOD__);
 
-        return <<<HTML
-        <select$c name="$name" id="$name"$extra>
-            $opt
-            {implode('', $options)}
-        </select>
-        HTML;
+        $opt = $label ? '
+                <option value="">' . ucfirst($label) . '</option>' : '';
+        $buf = '';
+        $c = $class ? ' class="' . $class . '"' : '';
+        foreach($ary as $k => $v) {
+            $t = str_replace('?t=', '', $v[1]);
+            $s = $sel === $t ? ' selected' : '';
+            $buf .= '
+                        <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+        }
+        return '
+                      <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
+                      </select>';
+    }
+
+    public function __call(string $name, array $args) : string
+    {
+elog(__METHOD__ . '() name = ' . $name);
+
+        return 'Theme::' . $name . '() not implemented';
     }
 }

@@ -1,171 +1,102 @@
 <?php
-
-declare(strict_types=1);
-
-// plugins/infosys.php 20170225 - 20240904
-// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
+// plugins/infosys.php 20170225 - 20200807
+// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_InfoSys extends Plugin
 {
-    private array $memInfo = [];
-    private array $cpuInfo = [];
-    private string $osInfo = 'Unknown OS';
-
-    public function list(): string
+    public function list() : string
     {
-        $this->gatherMemoryInfo();
-        $this->gatherCpuInfo();
-        $this->gatherOsInfo();
+elog(__METHOD__);
 
-        $systemInfo = array_merge(
-            $this->getDiskInfo(),
-            $this->getMemoryInfo(),
-            $this->getCpuInfo(),
-            $this->getNetworkInfo(),
-            [
-                'os_name' => $this->osInfo,
-                'uptime' => $this->getUptime(),
-                'loadav' => $this->getLoadAverage(),
-                'kernel' => $this->getKernelVersion(),
-            ]
-        );
+        $mem = $dif = $cpu = [];
+        $cpu_name = $procs = '';
+        $cpu_num = 0;
+        $os  = 'Unknown OS';
 
-        return $this->g->t->list($systemInfo);
-    }
-
-    private function gatherMemoryInfo(): void
-    {
-        $meminfo = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        foreach ($meminfo as $line) {
-            [$key, $value] = explode(':', $line);
-            $this->memInfo[$key] = explode(' ', trim($value))[0];
-        }
-    }
-
-    private function gatherCpuInfo(): void
-    {
-        if (is_readable('/proc/cpuinfo')) {
-            $cpuinfo = trim(file_get_contents('/proc/cpuinfo'));
-            $matches = [];
-            preg_match_all('/model name.+/', $cpuinfo, $matches);
-            $this->cpuInfo['name'] = $matches[0] ? explode(': ', $matches[0][0])[1] : 'Unknown CPU';
-            $this->cpuInfo['num'] = count($matches[0]);
-        }
-
+        $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
+        $lav = join(', ', sys_getloadavg());
         $stat1 = file('/proc/stat');
         sleep(1);
         $stat2 = file('/proc/stat');
 
-        $info1 = explode(' ', preg_replace('!cpu +!', '', $stat1[0]));
-        $info2 = explode(' ', preg_replace('!cpu +!', '', $stat2[0]));
-        
-        $dif = [
-            'user' => $info2[0] - $info1[0],
-            'nice' => $info2[1] - $info1[1],
-            'sys'  => $info2[2] - $info1[2],
-            'idle' => $info2[3] - $info1[3]
-        ];
-
-        $total = array_sum($dif);
-        $this->cpuInfo['usage'] = array_map(fn($y) => round($y / $total * 100, 2), $dif);
-    }
-
-    private function gatherOsInfo(): void
-    {
-        if (is_readable('/etc/os-release')) {
-            $osRelease = explode("\n", trim(file_get_contents('/etc/os-release')));
-            $osInfo = array_reduce($osRelease, function($carry, $item) {
-                [$k, $v] = explode('=', $item);
-                $carry[$k] = trim($v, '" ');
-                return $carry;
-            }, []);
-            $this->osInfo = $osInfo['PRETTY_NAME'] ?? 'Unknown OS';
+        if (is_readable('/proc/cpuinfo')) {
+            $tmp = trim(file_get_contents('/proc/cpuinfo'));
+            $ret = preg_match_all('/model name.+/', $tmp, $matches);
+            $cpu_name = $ret ? explode(': ', $matches[0][0])[1] : 'Unknown CPU';
+            $cpu_num = count($matches[0]);
         }
-    }
-    
-    private function getDiskInfo(): array
-    {
-        $total = (float) disk_total_space('/');
-        $free = (float) disk_free_space('/');
-        $used = $total - $free;
-        $usedPercent = ($used / $total) * 100;
-    
-        return [
-            'dsk_color' => $this->getColorForPercentage($usedPercent),
-            'dsk_free' => util::numfmt($free, 1),
-            'dsk_pcnt' => floor($usedPercent),
-            'dsk_text' => $usedPercent > 5 ? floor($usedPercent) . "%" : '',
-            'dsk_total' => util::numfmt($total, 1),
-            'dsk_used' => util::numfmt($used, 1),
-        ];
-    }
 
-    private function getMemoryInfo(): array
-    {
-        $total = (float) $this->memInfo['MemTotal'] * 1000;
-        $used = (float) ($this->memInfo['MemTotal'] - $this->memInfo['MemFree'] - $this->memInfo['Cached'] - $this->memInfo['SReclaimable'] - $this->memInfo['Buffers']) * 1000;
-        $free = $total - $used;
-        $usedPercent = ($used / $total) * 100;
+        if (is_readable('/etc/os-release')) {
+            $tmp = explode("\n", trim(file_get_contents('/etc/os-release')));
+            $osr = [];
+            foreach ($tmp as $line) {
+                list($k, $v) = explode('=', $line);
+                $osr[$k] = trim($v, '" ');
+            }
+            $os = $osr['PRETTY_NAME'] ?? 'Unknown OS';
+        }
 
-        return [
-            'mem_color' => $this->getColorForPercentage($usedPercent),
-            'mem_free' => util::numfmt($free),
-            'mem_pcnt' => floor($usedPercent),
-            'mem_text' => $usedPercent > 5 ? floor($usedPercent) . "%" : '',
-            'mem_total' => util::numfmt($total, 1),
-            'mem_used' => util::numfmt($used, 1),
-        ];
-    }
+        foreach ($pmi as $line) {
+            list($k, $v) = explode(':', $line);
+            list($mem[$k],) = explode(' ', trim($v));
+        }
 
-    private function getCpuInfo(): array
-    {
-        $usage = $this->cpuInfo['usage'];
-        $usedPercent = intval(round(100 - $usage['idle']));
+        $info1 = explode(" ", preg_replace("!cpu +!", "", $stat1[0]));
+        $info2 = explode(" ", preg_replace("!cpu +!", "", $stat2[0]));
+        $dif['user'] = $info2[0] - $info1[0];
+        $dif['nice'] = $info2[1] - $info1[1];
+        $dif['sys']  = $info2[2] - $info1[2];
+        $dif['idle'] = $info2[3] - $info1[3];
+        $total = array_sum($dif);
+        foreach($dif as $x=>$y) $cpu[$x] = round($y / $total * 100, 2);
+        $cpu_all = sprintf("User: %01.2f, System: %01.2f, Nice: %01.2f, Idle: %01.2f", $cpu['user'], $cpu['sys'], $cpu['nice'], $cpu['idle']);
+        $cpu_pcnt = intval(round(100 - $cpu['idle']));
 
-        return [
-            'cpu_all' => sprintf('User: %01.1f - System: %01.1f - Nice: %01.1f - Idle: %01.1f', 
-                                 $usage['user'], $usage['sys'], $usage['nice'], $usage['idle']),
-            'cpu_name' => $this->cpuInfo['name'],
-            'cpu_num' => $this->cpuInfo['num'],
-            'cpu_color' => $this->getColorForPercentage($usedPercent),
-            'cpu_pcnt' => $usedPercent,
-            'cpu_text' => $usedPercent > 5 ? "$usedPercent%" : '',
-        ];
-    }
+        $dt  = (float) disk_total_space('/');
+        $df  = (float) disk_free_space('/');
+        $du  = (float) $dt - $df;
+        $dp  = floor(($du / $dt) * 100);
 
-    private function getNetworkInfo(): array
-    {
-        $ip = gethostbyname(gethostname());
-        return [
-            'hostname' => gethostbyaddr($ip),
-            'host_ip' => $ip,
-        ];
-    }
+        $mt  = (float) $mem['MemTotal'] * 1000;
+        //$mf  = (float) ($mem['MemFree'] + $mem['Cached'] + $mem['Buffers'] + $mem['SReclaimable']) * 1024;
+        //$mu  = (float) ($mem['MemTotal'] - $mem['MemFree'] - $mem['Cached'] - $mem['SReclaimable'] - $mem['Buffers'] - $mem['Shmem']) * 1024;
+        $mu  = (float) ($mem['MemTotal'] - $mem['MemFree'] - $mem['Cached'] - $mem['SReclaimable'] - $mem['Buffers']) * 1000;
+        $mf  = (float) $mt - $mu;
+        $mp  = floor(($mu / $mt) * 100);
 
-    private function getUptime(): string
-    {
-        return util::sec2time(intval(explode(' ', file_get_contents('/proc/uptime'))[0]));
-    }
-
-    private function getLoadAverage(): string
-    {
-        $loadAvg = sys_getloadavg();
-        return sprintf('1 min: %.2f - 5 min: %.2f - 15 min: %.2f', ...$loadAvg);
-    }
-
-    private function getKernelVersion(): string
-    {
-        return is_readable('/proc/version')
+        $ip  = gethostbyname(gethostname());
+        $hn  = gethostbyaddr($ip);
+        $knl = is_readable('/proc/version')
             ? explode(' ', trim(file_get_contents('/proc/version')))[2]
             : 'Unknown';
-    }
-    private function getColorForPercentage(float $percentage): string
-    {
-        $intPercentage = (int)$percentage;
-        return match(true) {
-            $intPercentage > 90 => 'danger',
-            $intPercentage > 80 => 'warning',
-            default => 'default',
-        };
+
+        return $this->t->list([
+            'dsk_color' => $dp > 90 ? 'danger' : ($dp > 80 ? 'warning' : 'default'),
+            'dsk_free'  => util::numfmtsi($df),
+            'dsk_pcnt'  => $dp,
+            'dsk_text'  => $dp > 5 ? $dp. '%' : '',
+            'dsk_total' => util::numfmtsi($dt),
+            'dsk_used'  => util::numfmtsi($du),
+            'mem_color' => $mp > 90 ? 'danger' : ($mp > 80 ? 'warning' : 'default'),
+            'mem_free'  => util::numfmt($mf),
+            'mem_pcnt'  => $mp,
+            'mem_text'  => $mp > 5 ? $mp . '%' : '',
+            'mem_total' => util::numfmt($mt),
+            'mem_used'  => util::numfmt($mu),
+            'os_name'   => $os,
+            'uptime'    => util::sec2time(intval(explode(' ', (string) file_get_contents('/proc/uptime'))[0])),
+            'loadav'    => $lav,
+            'hostname'  => $hn,
+            'host_ip'   => $ip,
+            'kernel'    => $knl,
+            'cpu_all'   => $cpu_all,
+            'cpu_name'  => $cpu_name,
+            'cpu_num'   => $cpu_num,
+            'cpu_color' => $cpu_pcnt > 90 ? 'danger' : ($cpu_pcnt > 80 ? 'warning' : 'default'),
+            'cpu_pcnt'  => $cpu_pcnt,
+            'cpu_text'  => $cpu_pcnt > 5 ? $cpu_pcnt. '%' : '',
+        ]);
     }
 }
+
+?>
