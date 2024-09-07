@@ -123,12 +123,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="row">
-            <h3>
+            <h1>
                 <a href="?o=vhosts&m=list"><i class="fas fa-angle-double-left fa-fw"></i></a> Vhosts
                 <a href="" title="Remove this VHOST" data-bs-toggle="modal" data-bs-target="#removemodal">
                     <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
                 </a>
-            </h3>
+            </h1>
         </div>
         <div class="row">
             <div class="col-12">
@@ -186,12 +186,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="row">
-            <h3>
+            <h1>
                 <i class="bi bi-globe"></i> Vhosts
                 <a href="?o=vhosts&m=create" class="bslink" title="Add New Vhost">
                     <small><i class="bi bi-plus-circle"></i></small>
                 </a>
-            </h3>
+            </h1>
         </div>
         <div class="table-responsive">
             <table id="vhosts" class="table table-borderless table-striped w-100">

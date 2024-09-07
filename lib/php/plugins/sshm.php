@@ -18,7 +18,7 @@ class Plugins_Sshm extends Plugin
         'key_pass'  => '',
     ];
 
-    public function create(): ?string
+    public function create(): string
     {
 elog(__METHOD__);
 
@@ -33,7 +33,7 @@ elog(__METHOD__);
         return $this->g->t->create($this->inp);
     }
 
-    public function update(): ?string
+    public function update(): string
     {
 elog(__METHOD__);
 
@@ -53,7 +53,7 @@ elog(__METHOD__);
         return $this->g->t->update($inp);
     }
 
-    public function delete(): ?string
+    public function delete(): string
     {
 elog(__METHOD__);
 
@@ -69,7 +69,7 @@ elog(__METHOD__);
     {
 elog(__METHOD__);
 
-        return $this->g->t->list(util::run('sshm list'));
+        return (array) [$this->t->list(util::run('sshm list'))];
     }
 
     public function help(): string

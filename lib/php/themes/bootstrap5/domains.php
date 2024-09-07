@@ -33,12 +33,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="row">
-          <h3>
+          <h1>
             <i class="bi bi-globe"></i> Domains
             <a href="?o=domains&m=create" class="bslink" title="Add new domain">
               <small><i class="bi bi-plus-circle"></i></small>
             </a>
-          </h3>
+          </h1>
         </div>
         <div class="table-responsive">
             <table id="domains" class="table table-borderless table-striped w-100">
@@ -123,12 +123,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="col-12">
-          <h3>
+          <h1>
             <i class="bi bi-globe"></i> {$header}{$serial}
             <a href="" title="Add new domain" data-bs-toggle="modal" data-bs-target="#createmodal">
               <small><i class="bi bi-plus-circle"></i></small>
             </a>
-          </h3>
+          </h1>
         </div>
         <div class="row">
           <div class="col-12">

@@ -87,12 +87,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="col-12">
-            <h3>
+            <h1>
                 <i class="bi bi-envelope"></i> Mailboxes
                 <a href="#" title="Add New Mailbox" data-bs-toggle="modal" data-bs-target="#createmodal">
                     <small><i class="bi bi-plus-circle"></i></small>
                 </a>
-            </h3>
+            </h1>
         </div>
         <div class="row">
             <div class="col-12">

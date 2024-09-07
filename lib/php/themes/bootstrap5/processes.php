@@ -17,9 +17,9 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="d-flex justify-content-between mb-4">
-            <h3 class="mb-0">
+            <h1 class="mb-0">
                 <i class="bi bi-cpu"></i> Processes <small>({$processCount})</small>
-            </h3>
+            </h1>
             <form method="post" class="form-inline">
                 <input type="hidden" name="c" value="{$csrfToken}">
                 <input type="hidden" name="m" value="list">

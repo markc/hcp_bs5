@@ -33,12 +33,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="col-12">
-          <h3>
+          <h1>
             <a href="?o=domains&m=list"><i class="bi bi-chevron-double-left"></i></a>{$domain}
             <a class="create" href="" title="Create new DNS record">
               <small><i class="bi bi-plus-circle"></i></small>
             </a>
-          </h3>
+          </h1>
         </div>
         </div>
         <div class="row">

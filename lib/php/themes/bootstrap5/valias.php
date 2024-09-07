@@ -129,12 +129,12 @@ elog(__METHOD__);
 
         return <<<HTML
         <div class="row">
-            <h3>
+            <h1>
                 <i class="bi bi-envelope"></i> Aliases
                 <a href="?o=valias&m=create" class="bslink" title="Add New Alias">
                     <small><i class="bi bi-plus-circle"></i></small>
                 </a>
-            </h3>
+            </h1>
         </div>
         <div class="table-responsive">
             <table id="valias" class="table table-borderless table-striped w-100">

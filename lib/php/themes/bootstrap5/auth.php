@@ -14,7 +14,7 @@ elog(__METHOD__);
       $login = $in['login'] ?? '';
         return <<<HTML
         <div class="row">
-          <h3><i class="bi bi-key"></i> Forgot password</h3>
+          <h1><i class="bi bi-key"></i> Forgot password</h1>
           <form action="{$this->g->cfg['self']}" method="post">
             <input type="hidden" name="c" value="{$_SESSION['c']}">
             <input type="hidden" name="o" value="{$this->g->in['o']}">
