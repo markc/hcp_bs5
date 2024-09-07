@@ -174,24 +174,38 @@ elog(__METHOD__);
         return self::put_cookie($name, '', -1);
     }
 
-    public static function chkpw(string $pw, string $pw2 = '') : bool
+    public static function chkpw(string $pw1, string $pw2 = ''): bool
     {
 elog(__METHOD__);
-
-        if (strlen($pw) > 11) {
-            if (preg_match('/[0-9]+/', $pw)) {
-                if (preg_match('/[A-Z]+/', $pw)) {
-                    if (preg_match('/[a-z]+/', $pw)) {
-                        if ($pw2) {
-                            if ($pw === $pw2) {
-                                return true;
-                            } else util::log('Passwords do not match, please try again');
-                        } else return true;
-                    } else util::log('Password must contains at least one lower case letter');
-                } else util::log('Password must contains at least one captital letter');
-            } else util::log('Password must contains at least one number');
-        } else util::log('Passwords must be at least 12 characters');
-        return false;
+    
+        if (strlen($pw1) < 12) {
+            util::log('Password must be at least 12 characters');
+            return false;
+        }
+    
+        if (!preg_match('/[0-9]+/', $pw1)) {
+            util::log('Password must contain at least one number');
+            return false;
+        }
+    
+        if (!preg_match('/[A-Z]+/', $pw1)) {
+            util::log('Password must contain at least one capital letter');
+            return false;
+        }
+    
+        if (!preg_match('/[a-z]+/', $pw1)) {
+            util::log('Password must contain at least one lowercase letter');
+            return false;
+        }
+    
+        if ($pw2 !== '') {
+            if ($pw1 !== $pw2) {
+                util::log('Passwords do not match, please try again');
+                return false;
+            }
+        }
+    
+        return true;
     }
 
     public static function chkapi(object $g) : void
