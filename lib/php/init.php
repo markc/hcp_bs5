@@ -1,6 +1,7 @@
 <?php
-// lib/php/init.php 20150101 - 20200414
-// Copyright (C) 2015-2020 Mark Constable <markc@renta.net> (AGPL-3.0)
+
+// lib/php/init.php 20150101 - 20240907
+// Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Init
 {
@@ -45,30 +46,30 @@ elog('SESSION=' . var_export($_SESSION, true));
                 $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
 elog(__METHOD__);
-
-        $g = $this->t->g;
-        $x = $g->in['x'];
-        if ($x === 'text') {
-            return preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main']));
-        } elseif ($x === 'json') {
-            header('Content-Type: application/json');
-            return $g->out['main'];
-        } elseif ($x) {
-            $out = $g->out[$x] ?? '';
-            if ($out) {
-                header('Content-Type: application/json');
-                return json_encode($out, JSON_PRETTY_PRINT);
-            }
+        $x = $this->g->in['x'];
+        $out = $this->g->out;
+    
+        if ($x === 'html') {
+            return $out['main'];
         }
-        return $this->t->html();
+    
+        if ($x === 'text') {
+            return trim(preg_replace('/^\h*\v+/m', '', strip_tags($out['main'])));
+        }
+    
+        if ($x === 'json' || array_key_exists($x, $out)) {
+            header('Content-Type: application/json');
+            return json_encode($x === 'json' ? $out['main'] : $out[$x], JSON_PRETTY_PRINT);
+        }
+    
+        return $this->g->t->html();
     }
 
     public function __destruct()
     {
-//error_log('SESSION=' . var_export($_SESSION, true));
         elog(__FILE__.' '.$_SERVER['REMOTE_ADDR'].' '.round((microtime(true)-$_SERVER['REQUEST_TIME_FLOAT']), 4)."\n");
     }
 }
