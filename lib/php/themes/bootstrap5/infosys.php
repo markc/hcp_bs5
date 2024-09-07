@@ -77,7 +77,7 @@ elog(__METHOD__);
                 <div class="pt-md-2 px-md-5 py-3 px-2 border rounded-3">
                     <table class="table table-sm table-borderless mb-0">
                         <tbody>
-                            <tr><td><b>Hostname</b></td><td>{$data['hostname']}</td></tr>
+                            <tr><td class="w-25"><b>Hostname</b></td><td>{$data['hostname']}</td></tr>
                             <tr><td><b>Host IP</b></td><td>{$data['host_ip']}</td></tr>
                             <tr><td><b>Distro</b></td><td>{$data['os_name']}</td></tr>
                             <tr><td><b>Uptime</b></td><td>{$data['uptime']}</td></tr>

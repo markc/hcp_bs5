@@ -96,14 +96,14 @@ elog(__METHOD__);
 
         extract($this->g->out, EXTR_SKIP);
         return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>' . $doc . '</title>' . $css . $js . '
-  </head>
-  <body>' . $head . $main . $foot . $end . '
-  </body>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>' . $doc . '</title>' . $css . $js . '
+    </head>
+    <body>' . $head . $main . $foot . $end . '
+    </body>
 </html>
 ';
     }
