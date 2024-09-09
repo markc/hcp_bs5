@@ -64,16 +64,12 @@ elog(__METHOD__);
             $columns = [
                 ['dt' => null, 'db' => 'id'],
                 ['dt' => 0, 'db' => 'user', 'formatter' => function($d, $row) {
-                    return '
-                    <a href="" title="Change password for ' . $d . '" data-id="' . $row['id'] .  '" data-user="' . $d .  '" data-toggle="modal" data-target="#updatemodal">
-                      <b>' . $d . ' </b></a>';
+                    return '<a href="" title="Change password for ' . $d . '"data-bs-toggle="modal" data-bs-target="#updatemodal" data-user="' . $d . '" data-id="' . $row['id'] . '"<b>' . $d . '</b></a>';
                 }],
                 ['dt' => 1, 'db' => 'size_mail', 'formatter' => function($d) { return util::numfmt(intval($d)); }],
                 ['dt' => 2, 'db' => 'num_total', 'formatter' => function($d) { return number_format(intval($d)); }],
                 ['dt' => 3, 'db' => null, 'formatter' => function($d, $row) {
-                    return '<a href="" title="Remove this Mailbox" data-removeuser="' . $row['user'] . '" data-toggle="modal" data-target="#removemodal">
-                    <small><i class="fas fa-trash fa-fw cursor-pointer text-danger"></i></small>
-                  </a>';
+                    return '<a href="" title="Remove this Mailbox" data-bs-toggle="modal" data-bs-target="#removemodal" data-removeuser="' . $row['user'] . '"<small><i class="bi bi-trash text-danger"></i></small></a>';
                 }],
                 ['dt' => 4, 'db' => 'updated'],
             ];

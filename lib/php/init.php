@@ -19,18 +19,52 @@ elog(__METHOD__);
         $this->loadPlugin();
         $this->processOutput();
     }
+/*
+    public function __toString() : string
+    {
+elog(__METHOD__);
+
+        $g = $this->theme->g;
+        $x = $g->in['x'];
+
+        if ($x === 'text') {
+elog("x === text");
+            return trim(preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main'])));
+        } elseif ($x === 'json') {
+elog("x === json");
+            header('Content-Type: application/json');
+            if (json_validate($g->out['main'])) {
+                //return $g->out['main'];
+                $tmp = $g->out['main'];
+            } else {
+                util::log(json_last_error_msg());
+            }
+            elog("tmp = $tmp");
+            return $tmp;
+        } elseif ($x) {
+elog("x === $x");
+            $out = $g->out[$x] ?? '';
+            if ($out) {
+                header('Content-Type: application/json');
+                return json_encode($out, JSON_PRETTY_PRINT);
+            }
+        }
+elog("return this->theme->html()");
+        return $this->theme->html();
+    }
+*/
 
     public function __toString(): string
     {
 elog(__METHOD__);
 
-        $x = $this->g->in['x'] ?? '';
-        $out = $this->g->out;
+        $g = $this->theme->g;
+        $x = $g->in['x'];
 
         return match ($x) {
-            'html' => $out['main'],
-            'text' => $this->stripHtmlAndWhitespace($out['main']),
-            'json' => $this->jsonResponse($out['main']),
+            //'html' => $g->out['main'], ??
+            'text' => $this->stripAll($g->out['main']),
+            'json' => $this->jsonValidate($g->out['main']),
             default => $this->theme->html(),
         };
     }
@@ -47,7 +81,8 @@ elog(__METHOD__);
 
         session_start();
         $_SESSION['c'] ??= Util::random_token(32);
-        $this->logSessionData();
+
+        // $this->logSessionData();
     }
 
     private function configureEnvironment(): void
@@ -93,19 +128,23 @@ elog(__METHOD__);
         }
     }
 
-    private function stripHtmlAndWhitespace(string $content): string
+    private function stripAll(string $content): string
     {
 elog(__METHOD__);
 
         return trim(preg_replace('/^\h*\v+/m', '', strip_tags($content)));
     }
 
-    private function jsonResponse($data): string
+    private function jsonValidate($data): string
     {
 elog(__METHOD__);
 
-        header('Content-Type: application/json');
-        return json_encode($data, JSON_PRETTY_PRINT);
+        if (json_validate($data)) {
+            header('Content-Type: application/json');
+            return $data;
+        } else {
+            return json_last_error_msg();
+        }
     }
 
     private function getThemeClass(string $theme): string

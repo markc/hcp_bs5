@@ -66,8 +66,7 @@ elog(__METHOD__);
             $columns = [
                 ['dt' => null, 'db' => 'id'],
                 ['dt' => 0, 'db' => 'login', 'formatter' => function($d, $row) {
-                    return '
-                    <b><a href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
+                    return '<b><a href="?o=accounts&m=read&i=' . $row['id'] . '">' . $d . '</a></b>';
                 }],
                 ['dt' => 1, 'db' => 'fname'],
                 ['dt' => 2, 'db' => 'lname'],
