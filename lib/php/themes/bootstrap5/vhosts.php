@@ -194,7 +194,7 @@ elog(__METHOD__);
             </h1>
         </div>
         <div class="table-responsive">
-            <table id="vhosts" class="table table-borderless table-striped w-100">
+            <table id="vhosts" class="table table-borderless table-striped datatable">
                 <thead>
                     <tr>
                         <th>Domain</th>

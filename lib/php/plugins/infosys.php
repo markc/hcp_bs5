@@ -14,7 +14,14 @@ elog(__METHOD__);
         $os  = 'Unknown OS';
 
         $pmi = explode("\n", trim(file_get_contents('/proc/meminfo')));
-        $lav = join(', ', sys_getloadavg());
+
+        $lavg = sys_getloadavg();
+        $lav =  "1m: " . number_format($lavg[0], 2) .
+                ", 5m: " . number_format($lavg[1], 2) .
+                ", 15m: " . number_format($lavg[2], 2);
+elog("lav=$lav");
+        join(', ', sys_getloadavg());
+
         $stat1 = file('/proc/stat');
         sleep(1);
         $stat2 = file('/proc/stat');

@@ -137,7 +137,7 @@ elog(__METHOD__);
             </h1>
         </div>
         <div class="table-responsive">
-            <table id="valias" class="table table-borderless table-striped w-100">
+            <table id="valias" class="table table-borderless table-striped datatable">
                 <thead>
                     <tr>
                         <th>Alias</th>

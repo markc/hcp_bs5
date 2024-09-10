@@ -60,6 +60,14 @@ elog(__METHOD__);
             </div>
         </div>
         HTML;
+        $progressBar2 = fn($label, $used, $total, $free, $pcnt, $color, $text) => <<<HTML
+        <div><b>{$label}</b><br>{$used}</div>
+        <div class="progress mb-2">
+            <div class="progress-bar bg-{$color}" role="progressbar" aria-valuenow="{$pcnt}"
+                aria-valuemin="0" aria-valuemax="100" style="width:{$pcnt}%" title="Used {$label}">{$text}
+            </div>
+        </div>
+        HTML;
 
         return <<<HTML
         <div class="d-flex justify-content-between mb-4">
@@ -75,15 +83,15 @@ elog(__METHOD__);
         <div class="row align-items-md-stretch">
             <div class="col-md-6 mb-4 order-md-0 order-last">
                 <div class="pt-md-2 px-md-5 py-3 px-2 border rounded-3">
-                    <table class="table table-sm table-borderless mb-0">
+                    <table class="table table-sm table-borderless mb-0 info-table">
                         <tbody>
-                            <tr><td class="w-25"><b>Hostname</b></td><td>{$data['hostname']}</td></tr>
-                            <tr><td><b>Host IP</b></td><td>{$data['host_ip']}</td></tr>
-                            <tr><td><b>Distro</b></td><td>{$data['os_name']}</td></tr>
-                            <tr><td><b>Uptime</b></td><td>{$data['uptime']}</td></tr>
-                            <tr><td><b>CPU Load</b></td><td>{$data['loadav']} - {$data['cpu_num']} cpus</td></tr>
-                            <tr><td><b>CPU Model</b></td><td>{$data['cpu_name']}</td></tr>
-                            <tr><td><b>Kernel&nbsp;Version</b></td><td>{$data['kernel']}</td></tr>
+                            <tr><td>Hostname</td><td>{$data['hostname']}</td></tr>
+                            <tr><td>Host IP</td><td>{$data['host_ip']}</td></tr>
+                            <tr><td>Distro</td><td>{$data['os_name']}</td></tr>
+                            <tr><td>Uptime</td><td>{$data['uptime']}</td></tr>
+                            <tr><td>CPU Load</td><td>{$data['loadav']} - {$data['cpu_num']} cpus</td></tr>
+                            <tr><td>CPU Model</td><td>{$data['cpu_name']}</td></tr>
+                            <tr><td>Kernel&nbsp;Version</td><td>{$data['kernel']}</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -92,7 +100,7 @@ elog(__METHOD__);
                 <div class="py-md-3 px-md-5 py-3 px-2 border rounded-3">
                     {$progressBar('RAM', $data['mem_used'], $data['mem_total'], $data['mem_free'], $data['mem_pcnt'], $data['mem_color'], $data['mem_text'])}
                     {$progressBar('DISK', $data['dsk_used'], $data['dsk_total'], $data['dsk_free'], $data['dsk_pcnt'], $data['dsk_color'], $data['dsk_text'])}
-                    {$progressBar('CPU', $data['cpu_all'], '', '', $data['cpu_pcnt'], $data['cpu_color'], $data['cpu_text'])}
+                    {$progressBar2('CPU', $data['cpu_all'], '', '', $data['cpu_pcnt'], $data['cpu_color'], $data['cpu_text'])}
                 </div>
             </div>
         </div>

@@ -5,23 +5,66 @@ declare(strict_types=1);
 // lib/php/themes/bootstrap5/theme.php 20150101 - 20240908
 // Copyright (C) 2015-2024 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-class Themes_Bootstrap5_Theme extends Theme
-{
-    public function css(): string
+class Themes_Bootstrap5_Theme extends Theme {
+
+
+    public function html() : string
     {
 elog(__METHOD__);
 
+        extract($this->g->out, EXTR_SKIP);
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{$doc}</title>
+        {$css}
+        {$js}
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+                    <div class="sidebar-brand">
+                        <a href="#" class="text-decoration-none text-white">NetServa HCP</a>
+                    </div>
+                    <div class="position-sticky">
+                        <ul class="nav flex-column">
+                            {$nav1}
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Main content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
+                    <button id="sidebarToggle" class="btn btn-dark d-md-none mb-3">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    {$log}
+                    {$main}
+                    {$foot}
+                    {$end}
+                </main>
+            </div>
+        </div>
+    </body>
+</html>
+HTML;
+    }
+
+    public function css(): string {
+        elog(__METHOD__);
         $self = json_encode($this->g->cfg['self']);
-elog("self = $self");
+        elog("self = $self");
         return <<<HTML
     <link href="/hcp/favicon.ico" rel="icon" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-    body {
-        padding-left: 250px;
-    }
     .sidebar {
         position: fixed;
         top: 0;
@@ -31,7 +74,6 @@ elog("self = $self");
         padding: 0;
         box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
         width: 250px;
-        transition: margin .25s ease-out;
     }
     .sidebar-brand {
         padding: 1rem;
@@ -44,6 +86,8 @@ elog("self = $self");
         font-weight: 500;
         color: #adb5bd;
         padding: .5rem 1rem;
+        display: flex;
+        align-items: center;
     }
     .sidebar .nav-link:hover {
         color: #fff;
@@ -56,32 +100,49 @@ elog("self = $self");
         font-size: .75rem;
         text-transform: uppercase;
     }
+    .sidebar .nav-link.dropdown-toggle::after {
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+    .sidebar .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+    .sidebar .nav-link i {
+        margin-right: 0.5rem;
+    }
     .sidebar .collapse .nav-link {
-        padding-left: 2rem;
+        padding-left: 2rem;  /* This indents the submenu items */
     }
     main {
         padding-top: 1rem;
+        margin-left: 250px; /* Adjust to match sidebar width */
+    }
+    .info-table td:first-child {
+        width: 40%;
+        font-weight: bold;
+    }
+    .info-table td:last-child {
+        width: 60%;
     }
     @media (max-width: 767.98px) {
-        body {
-            padding-left: 0;
-        }
         .sidebar {
             margin-left: -250px;
+        }
+        main {
+            margin-left: 0;
         }
         body.sb-sidenav-toggled .sidebar {
             margin-left: 0;
         }
-        body.sb-sidenav-toggled {
-            padding-left: 250px;
+        body.sb-sidenav-toggled main {
+            margin-left: 250px;
         }
     }
-    .table-responsive { 
+    .table-responsive {
         width: 100%;
     }
     .table {
         width: 100% !important;
-        min-width: 1100px;
     }
     ul.pagination {
         padding-top: 1rem;
@@ -97,7 +158,111 @@ elog("self = $self");
     </script>
     HTML;
     }
-
+    public function js(): string
+    {
+        elog(__METHOD__);
+        return <<<HTML
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', event => {
+                event.preventDefault();
+                document.body.classList.toggle('sb-sidenav-toggled');
+            });
+        }
+    
+        // Handle submenu toggling and content loading
+        const submenuToggles = document.querySelectorAll('.sidebar .nav-link');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const submenuId = this.getAttribute('data-bs-target');
+                const submenu = submenuId ? document.querySelector(submenuId) : null;
+    
+                // Toggle submenu if it exists
+                if (submenu) {
+                    const isCurrentlyExpanded = this.getAttribute('aria-expanded') === 'true';
+                    
+                    // Close all submenus
+                    submenuToggles.forEach(otherToggle => {
+                        const otherSubmenuId = otherToggle.getAttribute('data-bs-target');
+                        const otherSubmenu = otherSubmenuId ? document.querySelector(otherSubmenuId) : null;
+                        if (otherSubmenu) {
+                            otherSubmenu.classList.remove('show');
+                            otherToggle.classList.add('collapsed');
+                            otherToggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+    
+                    // If the clicked submenu wasn't expanded, open it
+                    if (!isCurrentlyExpanded) {
+                        submenu.classList.add('show');
+                        this.classList.remove('collapsed');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                }
+    
+                // Load content
+                loadContent(this.getAttribute('href'));
+            });
+        });
+    
+        function loadContent(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const mainContent = doc.querySelector('main').innerHTML;
+                    document.querySelector('main').innerHTML = mainContent;
+                    
+                    // Reinitialize any scripts that need to run on the new content
+                    reinitializeScripts();
+                })
+                .catch(error => console.error('Error loading content:', error));
+        }
+    
+        function reinitializeScripts() {
+            // Destroy existing DataTables
+            if ($.fn.DataTable.isDataTable('.datatable')) {
+                $('.datatable').DataTable().destroy();
+            }
+            
+            // Reinitialize DataTables
+            $('.datatable').DataTable({
+                // Add your DataTables options here
+                "pageLength": 25,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+            });
+            
+            // Add any other script reinitializations here
+        }
+    
+        // Initial script initialization
+        reinitializeScripts();
+    
+        // Prevent Bootstrap's default collapse behavior
+        const collapseElements = document.querySelectorAll('.sidebar .collapse');
+        collapseElements.forEach(collapse => {
+            collapse.addEventListener('show.bs.collapse', (e) => {
+                e.preventDefault();
+            });
+            collapse.addEventListener('hide.bs.collapse', (e) => {
+                e.preventDefault();
+            });
+        });
+    });
+    </script>
+    HTML;
+    }
+      
     public function nav1(array $a = []): string
     {
 elog(__METHOD__);
@@ -120,19 +285,17 @@ elog(__METHOD__);
 
     private function generateNavDropdown(array $n, string $o, string $t): string
     {
-elog(__METHOD__);
-
+        elog(__METHOD__);
         $id = strtolower(str_replace(' ', '', $n[0]));
-        $icon = isset($n[2]) ? "<i class=\"{$n[2]}\"></i> " : '';
+        $icon = isset($n[2]) ? "<i class=\"{$n[2]}\"></i>" : '';
         $items = '';
         foreach ($n[1] as $subItem) {
             $items .= $this->generateNavItem($subItem, $o, $t, 'nav-link');
         }
-
         return <<<HTML
         <li class="nav-item">
             <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#{$id}Submenu" aria-expanded="false">
-                {$icon}{$n[0]}
+                {$icon} {$n[0]}
             </a>
             <div class="collapse" id="{$id}Submenu">
                 <ul class="nav flex-column">
@@ -142,7 +305,7 @@ elog(__METHOD__);
         </li>
         HTML;
     }
-
+ 
     private function generateNavItem(array $n, string $o, string $t, string $class = 'nav-link'): string
     {
 elog(__METHOD__);
@@ -151,42 +314,7 @@ elog(__METHOD__);
         $i = isset($n[2]) ? "<i class=\"{$n[2]}\"></i> " : '';
         return "<li class=\"nav-item\"><a class=\"{$class}{$c}\" href=\"{$n[1]}\">{$i}{$n[0]}</a></li>";
     }
-
-    public function js(): string
-    {
-elog(__METHOD__);
-
-        return <<<HTML
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const sidebarToggle = document.getElementById('sidebarToggle');
-                if (sidebarToggle) {
-                    sidebarToggle.addEventListener('click', event => {
-                        event.preventDefault();
-                        document.body.classList.toggle('sb-sidenav-toggled');
-                    });
-                }
-
-                // Handle submenu toggling
-                const submenuToggles = document.querySelectorAll('.sidebar .dropdown-toggle');
-                submenuToggles.forEach(toggle => {
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const submenuId = this.getAttribute('data-bs-target');
-                        const submenu = document.querySelector(submenuId);
-                        submenu.classList.toggle('show');
-                        this.setAttribute('aria-expanded', submenu.classList.contains('show'));
-                    });
-                });
-            });
-        </script>
-        HTML;
-    }
-
+ 
     public function head(): string
     {
 elog(__METHOD__);
@@ -230,58 +358,8 @@ elog(__METHOD__);
     {
 elog(__METHOD__);
 
-        return "<main class=\"container\">{$this->g->out['log']}{$this->g->out['main']}</main>";
-    }
-
-    public function html() : string
-    {
-elog(__METHOD__);
-
-        extract($this->g->out, EXTR_SKIP);
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>{$doc}</title>
-        {$css}
-        {$js}
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container-fluid">
-                <button id="sidebarToggle" class="navbar-toggler" type="button">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <a class="navbar-brand" href="#">NetServa HCP</a>
-                <!-- Other navbar items if needed -->
-            </div>
-        </nav>
-
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Sidebar -->
-                <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
-                    <div class="position-sticky">
-                        <ul class="nav flex-column">
-                            {$nav1}
-                        </ul>
-                    </div>
-                </nav>
-
-                <!-- Main content -->
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                    {$log}
-                    {$main}
-                    {$foot}
-                    {$end}
-                </main>
-            </div>
-        </div>
-    </body>
-</html>
-HTML;
+        return "{$this->g->out['log']}{$this->g->out['main']}";
+//        return "<main class=\"container\">{$this->g->out['log']}{$this->g->out['main']}</main>";
     }
 
     public function log(): string
@@ -390,7 +468,7 @@ elog(__METHOD__);
         </div>
         HTML;
     }
-    
+
     private function generateModalCommand(string $cmd, string $class, string $action): string
     {
 elog(__METHOD__);
@@ -399,7 +477,7 @@ elog(__METHOD__);
         }
         return "<button type=\"button\" class=\"btn btn-{$class} bslink\" data-bs-action=\"{$action}\">{$cmd}</button>";
     }
-    
+
     private function generateModalFooter(string $rhs_cmd, string $lhs_cmd, string $mid_cmd): string
     {
 elog(__METHOD__);
@@ -415,7 +493,7 @@ elog(__METHOD__);
         </div>
         HTML;
     }
-    
+
     private function generateModalBody(string $body, string $footer, string $action, string $hidden): string
     {
 elog(__METHOD__);
@@ -435,7 +513,7 @@ elog(__METHOD__);
         </form>
         HTML;
     }
-    
+
     private function generateModalContent(string $title, string $body): string
     {
 elog(__METHOD__);
@@ -450,4 +528,5 @@ elog(__METHOD__);
         HTML;
     }
 }
+
 

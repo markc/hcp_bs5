@@ -28,16 +28,28 @@ elog(__METHOD__);
         $x = $g->in['x'];
 
         return match ($x) {
-            //'html' => $g->out['main'], ??
             'text' => $this->stripAll($g->out['main']),
             'json' => $this->jsonValidate($g->out['main']),
-            default => $this->theme->html(),
+            default => 
+                // Check if it's an AJAX request
+                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+                ? $this->g->out['main']
+                : $this->theme->html(),
         };
+            }
+/*
+    public function checkAjax()
+    {
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            return true;
+        } else {
+            return false;
+        }
     }
-
+*/
     public function __destruct()
     {
-        $executionTime = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4);
+            $executionTime = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4);
         elog("{$_SERVER['REMOTE_ADDR']} - Execution time: {$executionTime}s");
     }
 

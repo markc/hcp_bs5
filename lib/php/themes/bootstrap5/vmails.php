@@ -93,7 +93,7 @@ elog(__METHOD__);
             </a>
         </h1>
         <div class="table-responsive">
-            <table id="vmails" class="table table-borderless table-striped">
+            <table id="vmails" class="table table-borderless table-striped datatable">
                 <thead>
                     <tr>
                         <th>Email</th>
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show password button click handler
         this.querySelector('#shpw').addEventListener('click', function() {
-            fetch('?x=text&o=vmails&m=update&shpw=1&user=${user}', {method: 'POST'})
+            fetch('?x=text&o=vmails&m=update&shpw=1&user=\${user}', {method: 'POST'})
                 .then(response => response.text())
                 .then(data => passwordInput.value = data);
         });
