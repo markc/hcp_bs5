@@ -19,40 +19,6 @@ elog(__METHOD__);
         $this->loadPlugin();
         $this->processOutput();
     }
-/*
-    public function __toString() : string
-    {
-elog(__METHOD__);
-
-        $g = $this->theme->g;
-        $x = $g->in['x'];
-
-        if ($x === 'text') {
-elog("x === text");
-            return trim(preg_replace('/^\h*\v+/m', '', strip_tags($g->out['main'])));
-        } elseif ($x === 'json') {
-elog("x === json");
-            header('Content-Type: application/json');
-            if (json_validate($g->out['main'])) {
-                //return $g->out['main'];
-                $tmp = $g->out['main'];
-            } else {
-                util::log(json_last_error_msg());
-            }
-            elog("tmp = $tmp");
-            return $tmp;
-        } elseif ($x) {
-elog("x === $x");
-            $out = $g->out[$x] ?? '';
-            if ($out) {
-                header('Content-Type: application/json');
-                return json_encode($out, JSON_PRETTY_PRINT);
-            }
-        }
-elog("return this->theme->html()");
-        return $this->theme->html();
-    }
-*/
 
     public function __toString(): string
     {
